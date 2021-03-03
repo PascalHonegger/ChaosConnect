@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  doppio:
+    image: "ghcr.io/pascalhonegger/cc-doppio"
+    labels:
+      - "traefik.enable=true"
+    networks:
+      - speedwagon_net
+
+  speedwagon:
+    image: "traefik:v2.4"
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.network=speedwagon_net"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - speedwagon_net
+
+  joestars:
+    image: "ghcr.io/pascalhonegger/cc-joestar"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.joestars.rule=Host(`backend.localhost`)"
+      - "traefik.http.routers.joestars.entrypoints=web"
+    networks:
+      - speedwagon_net
+      - rohan_net
+
+  rohan:
+    image: "ghcr.io/pascalhonegger/cc-rohan"
+    networks:
+      - rohan_net

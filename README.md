@@ -15,6 +15,19 @@ The modern, distributed and scalable implementation of a game inspired by Connec
 - You can exchange your points for perks and skins
 - To ensure fairness, some bots might be added to balance the teams
 
+# Running
+In order to run all services within docker you can run an alternation of one of the following commands:
+
+```sh
+# Run services hosted under backed.localhost and frontend.localhost, built locally, run 2 joestar instances
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build --scale joestars=2
+
+# Run services under https://ourdomain.com, generating certificates throught Let's Encrypt, using images published to GitHub Packages
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --scale joestars=5
+
+# Or write your own override file with your domain
+```
+
 # Technical Implementation
 
 ![Architecture Overview](https://www.plantuml.com/plantuml/png/VP91RzGm48Nl_XN3YkikMdfTHQLmwg6WqYCNuymw9ex7jSVRLgZ_dOcpZKeWlLWQlyylpy-vpAmJby6hTouONrg4WoTB-KDBfiUqYw8r_uYMOhSg_ieKLgIUsBirCL9ccp3V-nKWdz0pRfsP_HKxzWXtQBf00Zt1rnEcayC7fNBlGjH93p1G8DCb6X0u5Nobj7ZKnVCTFl8dxsmOC30OMJ0f5RNfjKNO7DvFPJGR-Aq04XhMmVgglChK_0XVA4P76z0PZed49hHouBvWgV1Kct3V8sBxe2s5oiP4Zqy2pb-y9XmV9bSr6osbsIiHnQz6M8IOQXNVQmgQEpsv1cfn_oQSCNOp-l5Db7MY6RqGz5cjmRVqac1iCcb_JYu7ZcvYnr-agKZxKxO3iMnVkTQDZew2zc1e64fmHeypS9Ues0xixRVFzTpDNZshbuvXsvmxhAkCYz9KxG8EMr4MeUhLLvMB_of_Zo20N4FTx65NTlF3d-Tbad4txPQEbxAKmVy1)

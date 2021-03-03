@@ -1,0 +1,12 @@
+# TODO FROM gradle:jdk15 as build
+
+# TODO COPY build.gradle .
+# TODO COPY src ./src
+# TODO RUN gradle clean build --no-daemon
+
+# TODO FROM openjdk:15-jdk-alpine
+# TODO COPY --from=build /home/gradle/build/libs/gradle.jar /joestar.jar
+# TODO VOLUME /etc/rohan/
+# TODO ENTRYPOINT ["java","-jar","/joestar.jar"]
+
+FROM nginx:mainline-alpine

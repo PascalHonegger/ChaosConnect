@@ -1,0 +1,36 @@
+version: '3.8'
+services:
+  doppio:
+    extends:
+      file: docker-compose.common.yml
+      service: doppio
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    labels:
+      - "traefik.http.routers.doppio.rule=Host(`frontend.localhost`)"
+      - "traefik.http.routers.doppio.entrypoints=web"
+
+  speedwagon:
+    extends:
+      file: docker-compose.common.yml
+      service: speedwagon
+
+  joestars:
+    extends:
+      file: docker-compose.common.yml
+      service: joestars
+    labels:
+      - "traefik.http.routers.joestars.rule=Host(`backend.localhost`)"
+      - "traefik.http.routers.joestars.entrypoints=web"
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.joestar
+
+  rohan:
+    extends:
+      file: docker-compose.common.yml
+      service: rohan
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.rohan
