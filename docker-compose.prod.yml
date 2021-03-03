@@ -1,0 +1,39 @@
+version: '3.8'
+services:
+  doppio:
+    extends:
+      file: docker-compose.common.yml
+      service: doppio
+    labels:
+      - "traefik.http.routers.doppio.rule=Host(`www.ourdomain.com`, `ourdomain.com`)"
+      - "traefik.http.routers.doppio.entrypoints=websecure"
+
+  speedwagon:
+    extends:
+      file: docker-compose.common.yml
+      service: speedwagon
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.network=speedwagon_net"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+      - "--entrypoints.websecure.http.tls.certresolver=letsencrypt"
+      - "--certificatesResolvers.letsencrypt.acme.email=acme@ourdomain.com"
+      - "--certificatesResolvers.letsencrypt.acme.storage=acme.json"
+      - "--certificatesResolvers.letsencrypt.acme.tlschallenge=true"
+
+  joestars:
+    extends:
+      file: docker-compose.common.yml
+      service: joestars
+    labels:
+      - "traefik.http.routers.joestars.rule=Host(`backend.ourdomain.com`)"
+      - "traefik.http.routers.joestars.entrypoints=websecure"
+
+  rohan:
+    extends:
+      file: docker-compose.common.yml
+      service: rohan
