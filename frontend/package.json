@@ -1,7 +1,13 @@
 {
   "name": "chaos-connect-frontend",
+  "description": "Svelte Frontend for ChaosConnect",
+  "license": "GPL-3.0-or-later",
   "version": "1.0.0",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "github:PascalHonegger/ChaosConnect"
+  },
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
