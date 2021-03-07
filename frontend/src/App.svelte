@@ -1,10 +1,18 @@
 <script lang="ts">
 	export let name: string;
+
+	import client from "./Client";
+
+	import EchoTest from "./EchoTest.svelte";
 </script>
 
 <main>
 	<h1>Hello {name}!</h1>
-	<p>Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn how to build Svelte apps.</p>
+	<EchoTest {client} />
+	<p>
+		Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn
+		how to build Svelte apps.
+	</p>
 </main>
 <footer>
 	<a href="https://github.com/twitter/twemoji">Twitter Emoji (Twemoji)</a> images licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC-BY 4.0</a>
