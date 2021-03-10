@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+package joestar;
+
+option java_package = "ch.chaosconnect.joestar";
+option java_multiple_files = true;
+
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message RegisterRequest {
+  string username = 1;
+  string password = 2;
+  string display_name = 3;
+}
+
+message PlayWithoutAccountRequest {
+  string display_name = 1;
+}
+
+message UpdateMetaStateRequest {
+  oneof changed_property {
+    string display_name = 1;
+    string password = 2;
+  }
+}
+
+message TokenResponse {
+  string jwt_token = 1;
+}
+
+service LoginService {
+  rpc Login(LoginRequest) returns (TokenResponse);
+
+  rpc Register(RegisterRequest) returns (TokenResponse);
+
+  rpc PlayWithoutAccount(PlayWithoutAccountRequest) returns (TokenResponse);
+
+  rpc RenewToken(google.protobuf.Empty) returns (TokenResponse);
+
+  rpc UpdateMetaState(UpdateMetaStateRequest) returns (TokenResponse);
+}

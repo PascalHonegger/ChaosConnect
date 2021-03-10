@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+package joestar;
+
+option java_package = "ch.chaosconnect.joestar";
+option java_multiple_files = true;
+
+enum Fraction {
+  RED = 0;
+  YELLOW = 1;
+}
+
+message Piece {
+  string owner = 1;
+  Fraction fraction = 2;
+}
+
+enum RowColumnAction {
+  ADD = 0;
+  DISABLE = 1;
+  DELETE = 2;
+  CLEAR = 3;
+}
+
+message Coordinate {
+  int32 row = 1;
+  int32 column = 2;
+}
+
+message PiecePlaced {
+  Coordinate position = 1;
+  Fraction fraction = 2;
+  string owner = 3;
+}
+
+message ScoreAchieved {
+  string message = 1;
+  Fraction fraction = 2;
+  string scorer = 3;
+  repeated Coordinate affected_fields = 4;
+}
+
+message ColumnChanged {
+  int32 position = 1;
+  RowColumnAction action = 2;
+}
+
+message RowChanged {
+  int32 position = 1;
+  RowColumnAction action = 2;
+}
+
+message GameStateColumn {
+  repeated Piece pieces = 1;
+}
+
+message GameState {
+  repeated GameStateColumn columns = 1;
+}
+
+message GameUpdateResponse {
+  oneof action {
+    GameState game_state = 1;
+    PiecePlaced piece_placed = 2;
+    ScoreAchieved score_achieved = 3;
+    ColumnChanged column_changed = 4;
+    RowChanged row_changed = 5;
+  }
+}
+
+service ChaosConnectService {
+  rpc PlacePiece(Coordinate) returns (google.protobuf.Empty);
+
+  rpc GetGameUpdates(google.protobuf.Empty)
+      returns (stream GameUpdateResponse);
+}
