@@ -1,12 +1,9 @@
-# TODO FROM gradle:jdk15 as build
+FROM gradle:jdk15 as build
 
-# TODO COPY build.gradle .
-# TODO COPY src ./src
-# TODO RUN gradle clean build --no-daemon
+COPY . .
+RUN gradle :rohan:shadowjar --no-daemon
 
-# TODO FROM openjdk:15-jdk-alpine
-# TODO COPY --from=build /home/gradle/build/libs/gradle.jar /joestar.jar
-# TODO VOLUME /etc/rohan/
-# TODO ENTRYPOINT ["java","-jar","/joestar.jar"]
-
-FROM nginx:mainline-alpine
+FROM openjdk:15-jdk-alpine
+COPY --from=build /home/gradle/rohan/build/libs/rohan-*-all.jar /rohan.jar
+VOLUME /etc/rohan/
+ENTRYPOINT ["java","-jar","/rohan.jar"]
