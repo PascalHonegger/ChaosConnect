@@ -1,3 +1,6 @@
 micronaut:
   application:
     name: rohan
+grpc:
+  server:
+    port: '${rohan.port}'

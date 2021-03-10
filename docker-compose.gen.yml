@@ -3,6 +3,6 @@ services:
   gen_grpc_joestar_client:
     image: namely/protoc-all
     volumes:
-      - "./grpc/joestar:/defs"
+      - "./backend/grpc/joestar:/defs"
       - "./frontend/src/gen:/generated"
     command: -o /generated -d /defs -l web --grpc-web-out=import_style=typescript,mode=grpcweb:/generated

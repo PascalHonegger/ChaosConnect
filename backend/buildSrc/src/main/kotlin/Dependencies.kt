@@ -1,5 +1,6 @@
 object Versions {
     const val kotlinVersion = "1.4.31"
+    const val kotlinxVersion = "1.4.3"
     const val micronautVersion = "2.4.0"
     const val micronautGradlePluginVersion = "1.4.2"
     const val protobufGradlePluginVersion = "0.8.15"

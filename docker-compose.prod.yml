@@ -32,6 +32,12 @@ services:
     labels:
       - "traefik.http.routers.joestars.rule=Host(`backend.ourdomain.com`)"
       - "traefik.http.routers.joestars.entrypoints=websecure"
+      - "traefik.http.routers.joestars.middlewares=grpc"
+      - "traefik.http.middlewares.grpc.headers.accessControlAllowCredentials=true"
+      - "traefik.http.middlewares.grpc.headers.accessControlAllowOriginList=https://www.ourdomain.com,https://ourdomain.com"
+      - "traefik.http.middlewares.grpc.headers.accessControlAllowMethods=*"
+      - "traefik.http.middlewares.grpc.headers.accessControlAllowHeaders=*"
+      - "traefik.http.middlewares.grpc.headers.accessControlExposeHeaders=*"
 
   rohan:
     extends:

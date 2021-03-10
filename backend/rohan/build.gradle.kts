@@ -13,7 +13,7 @@ version = About.version
 group = About.group
 
 repositories {
-    jcenter()
+    mavenCentral()
 }
 
 micronaut {
@@ -33,11 +33,12 @@ dependencies {
     implementation("io.micronaut:micronaut-runtime")
     implementation("io.micronaut.grpc:micronaut-grpc-runtime")
     implementation("javax.annotation:javax.annotation-api")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.kotlinxVersion}")
+    implementation("io.grpc:grpc-kotlin-stub:${Versions.protocKotlinVersion}")
     runtimeOnly("ch.qos.logback:logback-classic")
     runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
     testImplementation("io.micronaut:micronaut-http-client")
 }
-
 
 application {
     mainClass.set("ch.chaosconnect.rohan.ApplicationKt")
@@ -58,11 +59,16 @@ tasks {
         }
     }
 }
+
 sourceSets {
     main {
         java {
             srcDirs("build/generated/source/proto/main/grpc")
+            srcDirs("build/generated/source/proto/main/grpckt")
             srcDirs("build/generated/source/proto/main/java")
+        }
+        proto {
+            srcDir("${project.rootDir}/grpc")
         }
     }
 }
@@ -74,14 +80,16 @@ protobuf {
     plugins {
         id("grpc") {
             artifact = "io.grpc:protoc-gen-grpc-java:${Versions.protocJavaVersion}"
-            // artifact = "io.grpc:protoc-gen-grpc-kotlin:${Versions.protocKotlinVersion}"
+        }
+        id("grpckt") {
+            artifact = "io.grpc:protoc-gen-grpc-kotlin:${Versions.protocKotlinVersion}:jdk7@jar"
         }
     }
     generateProtoTasks {
         ofSourceSet("main").forEach {
             it.plugins {
-                // Apply the "grpc" plugin whose spec is defined above, without options.
                 id("grpc")
+                id("grpckt")
             }
         }
     }

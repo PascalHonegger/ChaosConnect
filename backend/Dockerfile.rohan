@@ -4,6 +4,6 @@ COPY . .
 RUN gradle :rohan:shadowjar --no-daemon
 
 FROM openjdk:15-jdk-alpine
-COPY --from=build /home/gradle/rohan/build/libs/rohan-*-all.jar /rohan.jar
 VOLUME /etc/rohan/
+COPY --from=build /home/gradle/rohan/build/libs/rohan-*-all.jar /rohan.jar
 ENTRYPOINT ["java","-jar","/rohan.jar"]

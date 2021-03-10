@@ -1,3 +1,10 @@
 micronaut:
   application:
     name: joestar
+grpc:
+  server:
+    port: '${joestar.port}'
+  channels:
+    rohan:
+      address: '${rohan.server}:${rohan.port}'
+      plaintext: true

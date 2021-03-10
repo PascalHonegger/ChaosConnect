@@ -1,7 +1,7 @@
 import { EchoServiceClient } from "./gen/EchoServiceClientPb";
 import { EchoRequest, ServerStreamingEchoRequest } from "./gen/echo_pb";
 
-export default new EchoServiceClient("http://localhost:8080");
+export default new EchoServiceClient("http://backend.localhost");
 
 export function newTodoRequest(message: string): EchoRequest {
     const req = new EchoRequest();
