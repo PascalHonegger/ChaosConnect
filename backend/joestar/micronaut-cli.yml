@@ -1,5 +1,5 @@
 applicationType: grpc
-defaultPackage: ch.chaosconnect
+defaultPackage: ch.chaosconnect.joestar
 testFramework: junit
 sourceLanguage: kotlin
 buildTool: gradle_kotlin

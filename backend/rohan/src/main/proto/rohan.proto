@@ -1,11 +1,11 @@
 syntax = "proto3";
 
 option java_multiple_files = true;
-option java_package = "ch.chaosconnect";
+option java_package = "ch.chaosconnect.rohan";
 option java_outer_classname = "Rohan";
 option objc_class_prefix = "HLW";
 
-package ch.chaosconnect;
+package ch.chaosconnect.rohan;
 
 service RohanService {
   rpc send (RohanRequest) returns (RohanReply) {}

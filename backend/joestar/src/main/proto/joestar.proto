@@ -1,11 +1,11 @@
 syntax = "proto3";
 
 option java_multiple_files = true;
-option java_package = "ch.chaosconnect";
+option java_package = "ch.chaosconnect.joestar";
 option java_outer_classname = "Joestar";
 option objc_class_prefix = "HLW";
 
-package ch.chaosconnect;
+package ch.chaosconnect.joestar;
 
 service JoestarService {
   rpc send (JoestarRequest) returns (JoestarReply) {}

@@ -1,10 +1,10 @@
-package ch.chaosconnect
+package ch.chaosconnect.rohan
 
 import io.micronaut.runtime.Micronaut.*
 fun main(args: Array<String>) {
 	build()
 	    .args(*args)
-		.packages("ch.chaosconnect")
+		.packages("ch.chaosconnect.rohan")
 		.start()
 }
 
