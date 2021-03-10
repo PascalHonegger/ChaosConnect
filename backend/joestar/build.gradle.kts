@@ -1,22 +1,23 @@
 import com.google.protobuf.gradle.*
+
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.4.10"
-    id("org.jetbrains.kotlin.kapt") version "1.4.10"
-    id("org.jetbrains.kotlin.plugin.allopen") version "1.4.10"
-    id("com.github.johnrengelman.shadow") version "6.1.0"
-    id("io.micronaut.application") version "1.4.2"
-    id("com.google.protobuf") version "0.8.13"
+    id("org.jetbrains.kotlin.jvm") version Versions.kotlinVersion
+    id("org.jetbrains.kotlin.kapt") version Versions.kotlinVersion
+    id("org.jetbrains.kotlin.plugin.allopen") version Versions.kotlinVersion
+    id("com.github.johnrengelman.shadow") version Versions.shadowVersion
+    id("io.micronaut.application") version Versions.micronautGradlePluginVersion
+    id("com.google.protobuf") version Versions.protobufGradlePluginVersion
 }
 
-version = "0.1"
-group = "ch.chaosconnect"
+version = About.version
+group = About.group
 
-val kotlinVersion=project.properties.get("kotlinVersion")
 repositories {
-    mavenCentral()
+    jcenter()
 }
 
 micronaut {
+    version(Versions.micronautVersion)
     testRuntime("junit5")
     processing {
         incremental(true)
@@ -26,8 +27,8 @@ micronaut {
 
 dependencies {
     implementation("io.micronaut:micronaut-validation")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlinVersion}")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlinVersion}")
     implementation("io.micronaut.kotlin:micronaut-kotlin-runtime")
     implementation("io.micronaut:micronaut-runtime")
     implementation("io.micronaut.grpc:micronaut-grpc-runtime")
@@ -42,22 +43,20 @@ application {
     mainClass.set("ch.chaosconnect.joestar.ApplicationKt")
 }
 java {
-    sourceCompatibility = JavaVersion.toVersion("14")
+    sourceCompatibility = JavaVersion.toVersion(Versions.jvmTargetVersion)
 }
 
 tasks {
     compileKotlin {
         kotlinOptions {
-            jvmTarget = "14"
+            jvmTarget = Versions.jvmTargetVersion
         }
     }
     compileTestKotlin {
         kotlinOptions {
-            jvmTarget = "14"
+            jvmTarget = Versions.jvmTargetVersion
         }
     }
-
-
 }
 sourceSets {
     main {
@@ -65,16 +64,21 @@ sourceSets {
             srcDirs("build/generated/source/proto/main/grpc")
             srcDirs("build/generated/source/proto/main/java")
         }
+        proto {
+            srcDir("${project.rootDir}/../grpc/shared")
+            srcDir("${project.rootDir}/../grpc/joestar")
+        }
     }
 }
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:3.14.0"
+        artifact = "com.google.protobuf:protoc:${Versions.protocVersion}"
     }
     plugins {
         id("grpc") {
-            artifact = "io.grpc:protoc-gen-grpc-java:1.33.1"
+            artifact = "io.grpc:protoc-gen-grpc-java:${Versions.protocJavaVersion}"
+            // artifact = "io.grpc:protoc-gen-grpc-kotlin:${Versions.protocKotlinVersion}"
         }
     }
     generateProtoTasks {
