@@ -20,7 +20,7 @@ micronaut {
     testRuntime("junit5")
     processing {
         incremental(true)
-        annotations("ch.chaosconnect.*")
+        annotations("ch.chaosconnect.joestar.*")
     }
 }
 
@@ -39,7 +39,7 @@ dependencies {
 
 
 application {
-    mainClass.set("ch.chaosconnect.ApplicationKt")
+    mainClass.set("ch.chaosconnect.joestar.ApplicationKt")
 }
 java {
     sourceCompatibility = JavaVersion.toVersion("14")
