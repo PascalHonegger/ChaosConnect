@@ -10,6 +10,11 @@
     <option name="shortenCommandLine" />
     <option name="vmParameters" value="" />
     <option name="workingDirectory" value="" />
+    <envs>
+      <env name="JOESTAR_PORT" value="8080" />
+      <env name="ROHAN_SERVER" value="localhost" />
+      <env name="ROHAN_PORT" value="9090" />
+    </envs>
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

@@ -21,8 +21,20 @@ services:
       file: docker-compose.common.yml
       service: joestars
     labels:
+      - "traefik.http.services.joestars.loadbalancer.server.scheme=h2c"
+      - "traefik.http.services.joestars.loadbalancer.server.port=8080"
       - "traefik.http.routers.joestars.rule=Host(`backend.localhost`)"
       - "traefik.http.routers.joestars.entrypoints=web"
+      - "traefik.http.routers.joestars.middlewares=grpc"
+      - "traefik.http.middlewares.grpc.headers.accessControlAllowCredentials=true"
+      - "traefik.http.middlewares.grpc.headers.accessControlAllowOriginList=*"
+      - "traefik.http.middlewares.grpc.headers.accessControlAllowMethods=*"
+      - "traefik.http.middlewares.grpc.headers.accessControlAllowHeaders=*"
+      - "traefik.http.middlewares.grpc.headers.accessControlExposeHeaders=*"
+    environment:
+      JOESTAR_PORT: 8080
+      ROHAN_SERVER: rohan
+      ROHAN_PORT: 9090
     build:
       context: ./backend
       dockerfile: Dockerfile.joestar
@@ -34,3 +46,5 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile.rohan
+    environment:
+      ROHAN_PORT: 9090
