@@ -8,7 +8,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import javax.inject.Singleton
 
-val logger: Logger = LoggerFactory.getLogger(EchoJob::class.java)
+private val logger: Logger = LoggerFactory.getLogger(EchoJob::class.java)
 
 @Singleton
 class EchoJob(private val client: EchoServiceGrpcKt.EchoServiceCoroutineStub) {

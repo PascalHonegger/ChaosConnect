@@ -11,7 +11,7 @@ class EchoEndpoint(private val echoService: EchoService) :
     override suspend fun echo(request: EchoRequest): EchoResponse =
         EchoResponse
             .newBuilder()
-            .setMessage(echoService.echo(request.message))
+            .setMessage(echoService.echoViaRohan(request.message))
             .build()
 
     override fun serverStreamingEcho(request: ServerStreamingEchoRequest): Flow<ServerStreamingEchoResponse> =
