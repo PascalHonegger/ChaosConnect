@@ -19,21 +19,26 @@ The modern, distributed and scalable implementation of a game inspired by Connec
 In order to run all services within docker you can run an alternation of one of the following commands:
 
 ```sh
-# Run services hosted under backed.localhost and frontend.localhost, built locally, run 2 joestar instances
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build --scale joestars=2
+# Run services hosted under http://localhost:5001, built locally, run 2 joestar instances
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build --scale joestar=2
 
-# Run services under https://ourdomain.com, generating certificates throught Let's Encrypt, using images published to GitHub Packages
-docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --scale joestars=5
+# Generate self-signed certs, files ./certs/cc.key and ./certs/cc.cert are required to run HTTPS
+docker-compose -f docker-compose.gen.yml up gen_self_signed_cert
 
-# Or write your own override file with your domain
+# Run services under https://localhost/, using certificates from the certs directory, using images published to GitHub Packages
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --scale joestar=5 -d
 ```
 
-# Developping
-In order to run components in development mode, the folling commands are good to get started:
+# Development
+In order to run components in development mode, the following commands are good to get started:
 
 ```sh
 # Required once at the beginning and afterwards once the protocol buffer contract changes
-docker-compose -f docker-compose.gen.yml up
+docker-compose -f docker-compose.gen.yml up gen_grpc_joestar_client
+
+# Run proxy (proxies http://localhost:5001 => http://localhost:5000 and http://localhost:5001/api => http://localhost:8080/)
+# If running on linux, might require some changes (see file for comment)
+docker-compose -f docker-compose.proxy.yml up -d
 
 # Svelte Frontend
 cd frontend
@@ -51,24 +56,24 @@ The service names are all a reference to the popular anime `JoJo's Bizarre Adven
 | ------- | ---- |
 | Frontend | Doppio |
 | Loadbalancer | Speedwagon |
-| Scaling Backend | Joestars (Jonathan, Joseph, Jotaro, Josuke, Giorno, Jolyne) |
+| Scaling Backend | Joestar |
 | Central Backend | Rohan |
 
 ## Frontend
 The frontend is written in [Svelte](https://svelte.dev/). As it's main purpose is to display the current state of the board, we decided that frameworks such as Angular are overkill.
 
 ## Reverse Proxy
-We use [Traefik](https://doc.traefik.io/traefik/) as a reverse proxy to handle load balancing.
+We use [Envoy](https://www.envoyproxy.io/) as a reverse proxy to handle load balancing. We had to use Envoy as it's the only reverse proxy which currently supports grpc-web.
 
 ## Backend
 The backend is split into two parts:
 * Scaling: Communicates directly with our Frontend, issues and validates JWT, caches game state and sends game updates to all clients
 * Central: Manages the actual game state, synchronizes requests and handels game logic, stores persistent information, such as user credentials and scores, in a json document
 
-Both backends use [Spring Boot](https://spring.io/) with [Kotlin](https://kotlinlang.org/).
+Both backends use [Micronaut](https://micronaut.io/) with [Kotlin](https://kotlinlang.org/).
 
 ## Database
 We decided not to use any database but instead store the (very minimalistic) data in a json document.
 
 ## Communication
-Bidirectional communication is enabled through [gRPC](https://grpc.io/). For example, this allows `Rohan` to send a game update event to all `Joestars`, which then forward them realtime to all `Doppio` clients.
+Bidirectional communication is enabled through [gRPC](https://grpc.io/). For example, this allows `Rohan` to send a game update event to all `Joestar` instances, which then forward them realtime to all `Doppio` clients.
