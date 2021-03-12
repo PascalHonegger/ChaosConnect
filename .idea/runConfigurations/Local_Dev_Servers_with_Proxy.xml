@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Local Dev Servers with Proxy" type="CompoundRunConfigurationType">
+    <toRun name="Joestar Dev" type="MicronautRunConfigurationType" />
+    <toRun name="Speedwagon Dev" type="docker-deploy" />
+    <toRun name="Rohan Dev" type="MicronautRunConfigurationType" />
+    <toRun name="Doppio Dev" type="js.build_tools.npm" />
+    <method v="2" />
+  </configuration>
+</component>
