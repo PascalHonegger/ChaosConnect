@@ -7,34 +7,18 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    labels:
-      - "traefik.http.routers.doppio.rule=Host(`frontend.localhost`)"
-      - "traefik.http.routers.doppio.entrypoints=web"
 
   speedwagon:
     extends:
       file: docker-compose.common.yml
       service: speedwagon
+    volumes:
+      - ./backend/envoy-dev.yaml:/etc/envoy/envoy.yaml
 
-  joestars:
+  joestar:
     extends:
       file: docker-compose.common.yml
-      service: joestars
-    labels:
-      - "traefik.http.services.joestars.loadbalancer.server.scheme=h2c"
-      - "traefik.http.services.joestars.loadbalancer.server.port=8080"
-      - "traefik.http.routers.joestars.rule=Host(`backend.localhost`)"
-      - "traefik.http.routers.joestars.entrypoints=web"
-      - "traefik.http.routers.joestars.middlewares=grpc"
-      - "traefik.http.middlewares.grpc.headers.accessControlAllowCredentials=true"
-      - "traefik.http.middlewares.grpc.headers.accessControlAllowOriginList=*"
-      - "traefik.http.middlewares.grpc.headers.accessControlAllowMethods=*"
-      - "traefik.http.middlewares.grpc.headers.accessControlAllowHeaders=*"
-      - "traefik.http.middlewares.grpc.headers.accessControlExposeHeaders=*"
-    environment:
-      JOESTAR_PORT: 8080
-      ROHAN_SERVER: rohan
-      ROHAN_PORT: 9090
+      service: joestar
     build:
       context: ./backend
       dockerfile: Dockerfile.joestar
@@ -46,5 +30,9 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile.rohan
-    environment:
-      ROHAN_PORT: 9090
+
+networks:
+  speedwagon_net:
+    name: speedwagon_net
+  rohan_net:
+    name: rohan_net

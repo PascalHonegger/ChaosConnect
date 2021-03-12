@@ -2,33 +2,20 @@ version: '3.8'
 services:
   doppio:
     image: "ghcr.io/pascalhonegger/cc-doppio"
-    labels:
-      - "traefik.enable=true"
     networks:
       - speedwagon_net
 
   speedwagon:
-    image: "traefik:v2.4"
-    command:
-      - "--providers.docker=true"
-      - "--providers.docker.network=speedwagon_net"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    image: envoyproxy/envoy-alpine:v1.17-latest
     networks:
       - speedwagon_net
 
-  joestars:
+  joestar:
     image: "ghcr.io/pascalhonegger/cc-joestar"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.joestars.rule=Host(`backend.localhost`)"
-      - "traefik.http.routers.joestars.entrypoints=web"
+    environment:
+      JOESTAR_PORT: 8080
+      ROHAN_SERVER: rohan
+      ROHAN_PORT: 9090
     networks:
       - speedwagon_net
       - rohan_net
@@ -37,3 +24,5 @@ services:
     image: "ghcr.io/pascalhonegger/cc-rohan"
     networks:
       - rohan_net
+    environment:
+      ROHAN_PORT: 9090

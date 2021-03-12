@@ -3,6 +3,11 @@ services:
   gen_grpc_joestar_client:
     image: namely/protoc-all
     volumes:
-      - "./backend/grpc/joestar:/defs"
+      - "./backend/grpc/joestar:/defs:ro"
       - "./frontend/src/gen:/generated"
-    command: -o /generated -d /defs -l web --grpc-web-out=import_style=typescript,mode=grpcweb:/generated
+    command: -o /generated -d /defs -l web --grpc-web-out=import_style=typescript,mode=grpcwebtext:/generated
+  gen_self_signed_cert:
+    image: alpine/openssl
+    volumes:
+      - "./certs:/certs"
+    command: req -new -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 -days 365 -nodes -x509 -subj "/CN=localhost" -keyout /certs/cc.key -out /certs/cc.cert
