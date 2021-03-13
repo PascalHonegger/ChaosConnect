@@ -15,34 +15,49 @@ The modern, distributed and scalable implementation of a game inspired by Connec
 - You can exchange your points for perks and skins
 - To ensure fairness, some bots might be added to balance the teams
 
-# Running
+# Running for Production
 In order to run all services within docker you can run an alternation of one of the following commands:
 
 ```sh
 # Run services hosted under http://localhost:5001, built locally, run 2 joestar instances
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build --scale joestar=2
+docker-compose -f docker-compose.dev.yml up --build --scale joestar=2
 
 # Generate self-signed certs, files ./certs/cc.key and ./certs/cc.cert are required to run HTTPS
 docker-compose -f docker-compose.gen.yml up gen_self_signed_cert
 
 # Run services under https://localhost/, using certificates from the certs directory, using images published to GitHub Packages
-docker-compose -f docker-compose.yml -f docker-compose.prod.yml up --scale joestar=5 -d
+# Valid certificates are expected to be placed under ./certs/cc.key and ./certs/cc.cert
+docker-compose -f docker-compose.prod.yml up --scale joestar=5 -d
 ```
 
 # Development
 In order to run components in development mode, the following commands are good to get started:
 
 ```sh
+# Generate self-signed certs, puts them in the ./certs directory
+# Ensure the permissions are set such that the envoy docker user can read the certificate
+docker-compose -f docker-compose.gen.yml up gen_self_signed_cert
+
 # Required once at the beginning and afterwards once the protocol buffer contract changes
 docker-compose -f docker-compose.gen.yml up gen_grpc_joestar_client
 
 # Run proxy (proxies http://localhost:5001 => http://localhost:5000 and http://localhost:5001/api => http://localhost:8080/)
-# If running on linux, might require some changes (see file for comment)
+
+# (Docker for Windows / Docker for Mac)
 docker-compose -f docker-compose.proxy.yml up -d
+# (Docker on Linux)
+docker-compose -f docker-compose.proxy-linux.yml up -d
 
 # Svelte Frontend
 cd frontend
 npm run dev
+
+# backend
+cd backend
+# run joestar
+./gradlew joestar:run
+# run rohan
+./gradlew rohan:run
 ```
 
 # Technical Implementation

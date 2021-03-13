@@ -13,7 +13,8 @@ services:
       file: docker-compose.common.yml
       service: speedwagon
     volumes:
-      - ./backend/envoy-prod.yaml:/etc/envoy/envoy.yaml
+      - ./backend/envoy-prod.yaml:/etc/envoy/envoy.yaml:ro
+      - ./certs:/etc/envoy/certs:ro
 
   joestar:
     extends:
