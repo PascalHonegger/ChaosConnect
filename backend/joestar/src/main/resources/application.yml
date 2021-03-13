@@ -3,8 +3,8 @@ micronaut:
     name: joestar
 grpc:
   server:
-    port: '${joestar.port}'
+    port: '${joestar.port:`80`}'
   channels:
     rohan:
-      address: '${rohan.server}:${rohan.port}'
+      address: '${rohan.server:`localhost`}:${rohan.port:`80`}'
       plaintext: true

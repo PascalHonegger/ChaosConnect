@@ -3,4 +3,4 @@ micronaut:
     name: rohan
 grpc:
   server:
-    port: '${rohan.port}'
+    port: '${rohan.port:`80`}'
