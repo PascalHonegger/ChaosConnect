@@ -9,12 +9,6 @@ services:
     extends:
       file: docker-compose.common.yml
       service: speedwagon
-    volumes:
-      - ./backend/envoy-prod.yaml:/etc/envoy/envoy.yaml:ro
-      - ./certs:/etc/envoy/certs:ro
-    ports:
-      - 80:80
-      - 443:443
 
   joestar:
     extends:
@@ -25,3 +19,9 @@ services:
     extends:
       file: docker-compose.common.yml
       service: rohan
+
+networks:
+  speedwagon_net:
+    name: speedwagon_net
+  rohan_net:
+    name: rohan_net

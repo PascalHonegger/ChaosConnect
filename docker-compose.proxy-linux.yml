@@ -1,0 +1,7 @@
+version: '3.8'
+services:
+  speedwagon:
+    image: envoyproxy/envoy-alpine:v1.17-latest
+    volumes:
+      - ./backend/envoy-dev-linux.yaml:/etc/envoy/envoy.yaml:ro
+    network_mode: host
