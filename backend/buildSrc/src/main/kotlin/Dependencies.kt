@@ -8,5 +8,6 @@ object Versions {
     const val protocVersion = "3.15.5"
     const val protocJavaVersion = "1.36.0"
     const val protocKotlinVersion = "1.0.0"
+    const val mockkVersion = "1.10.6"
     const val jvmTargetVersion = "15"
 }
