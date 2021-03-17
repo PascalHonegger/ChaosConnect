@@ -4,4 +4,6 @@ services:
     image: envoyproxy/envoy-alpine:v1.17-latest
     volumes:
       - ./backend/envoy-dev-linux.yaml:/etc/envoy/envoy.yaml:ro
-    network_mode: host
+    ports:
+      - 5001:5001
+      - 9901:9901
