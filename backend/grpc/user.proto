@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package api.user;
+
+option java_package = "ch.chaosconnect.api.user";
+option java_multiple_files = true;
+
+message GetUserRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message AddUserRequest {
+  string username = 1;
+  string password = 2;
+  string display_name = 3;
+}
+
+message AddTemporaryUserRequest {
+  string display_name = 1;
+}
+
+message UpdateUserRequest {
+  string user = 1;
+  oneof changed_property {
+    string display_name = 2;
+    string password = 3;
+  }
+}
+
+message UserAuthResponse {
+  oneof response {
+    string identifier = 1;
+    string failure_reason = 2;
+  }
+}
+

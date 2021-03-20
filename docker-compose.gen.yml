@@ -3,7 +3,7 @@ services:
   gen_grpc_joestar_client:
     image: namely/protoc-all
     volumes:
-      - "./backend/grpc/joestar:/defs:ro"
+      - "./backend/grpc:/defs:ro"
       - "./frontend/src/gen:/generated"
     command: -o /generated -d /defs -l web --grpc-web-out=import_style=typescript,mode=grpcwebtext:/generated
   gen_self_signed_cert:
