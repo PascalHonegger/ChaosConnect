@@ -1,5 +1,5 @@
-import { EchoServiceClient } from "./gen/EchoServiceClientPb";
-import { EchoRequest, ServerStreamingEchoRequest } from "./gen/echo_pb";
+import { EchoServiceClient } from "./gen/joestar/EchoServiceClientPb";
+import { EchoRequest, ServerStreamingEchoRequest } from "./gen/joestar/echo_pb";
 
 export default new EchoServiceClient("/api");
 

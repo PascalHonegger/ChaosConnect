@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+import "common.proto";
+import "game.proto";
+import "authentication.proto";
+
+package api.joestar;
+
+option java_package = "ch.chaosconnect.api.joestar";
+option java_multiple_files = true;
+
+service ChaosConnectService {
+  rpc PlacePiece(api.game.Coordinate) returns (api.common.Empty);
+
+  rpc GetGameUpdates(api.common.Empty)
+      returns (stream api.game.GameUpdateEvent);
+}
+
+service WebLoginService {
+  rpc Login(api.authentication.LoginRequest) returns (api.authentication.TokenResponse);
+  rpc Register(api.authentication.RegisterRequest) returns (api.authentication.TokenResponse);
+  rpc PlayWithoutAccount(api.authentication.PlayWithoutAccountRequest) returns (api.authentication.TokenResponse);
+  rpc RenewToken(api.common.Empty) returns (api.authentication.TokenResponse);
+  rpc UpdateMetaState(api.authentication.UpdateMetaStateRequest) returns (api.authentication.TokenResponse);
+}

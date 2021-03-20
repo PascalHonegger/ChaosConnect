@@ -1,0 +1,122 @@
+syntax = "proto3";
+
+package api.game;
+
+option java_package = "ch.chaosconnect.api.game";
+option java_multiple_files = true;
+
+// Enums
+
+enum Faction {
+  RED = 0;
+  YELLOW = 1;
+}
+
+enum RowColumnAction {
+  ADD = 0;
+  DISABLE = 1;
+  DELETE = 2;
+  CLEAR = 3;
+}
+
+enum PieceAction {
+  PLACE = 0;
+  // DESTROY = 1;
+}
+
+enum QueueAction {
+  ENQUEUE = 0;
+  DEQUEUE = 1;
+}
+
+enum PlayerAction {
+  JOINED = 0;
+  DISCONNECTED = 1;
+  UPDATED = 2;
+}
+
+// DTO
+
+message Piece {
+  string owner = 1;
+  Skin skin = 2;
+}
+
+message Skin {
+  string name = 1;
+  string display_name = 2;
+  uint32 price = 3;
+  Faction faction = 4;
+  string skin_image = 5;
+}
+
+message Coordinate {
+  int32 row = 1;
+  int32 column = 2;
+}
+
+message PlayerState {
+  string display_name = 1;
+  Skin skin = 2;
+}
+
+message GameStateColumn {
+  repeated Piece pieces = 1;
+  repeated Piece queue = 2;
+}
+
+message GameState {
+  repeated GameStateColumn columns = 1;
+  map<string, PlayerState> players = 2;
+  repeated Skin skins = 3;
+}
+
+// Events
+
+message PieceState {
+  Coordinate position = 1;
+  Skin skin = 2;
+  string owner = 3;
+  PieceAction action = 4;
+}
+
+message PieceChanged {
+  repeated PieceState pieces = 1;
+}
+
+message QueueState {
+  Coordinate position = 1;
+  Faction faction = 2;
+  string owner = 3;
+}
+
+message QueueChanged {
+  repeated QueueState pieces = 1;
+}
+
+message ColumnChanged {
+  int32 position = 1;
+  RowColumnAction action = 2;
+}
+
+message RowChanged {
+  int32 position = 1;
+  RowColumnAction action = 2;
+}
+
+message PlayerChanged {
+  string player = 1;
+  PlayerAction action = 2;
+  PlayerState state = 3;
+}
+
+message GameUpdateEvent {
+  oneof action {
+    api.game.GameState game_state = 1;
+    api.game.PieceChanged piece_changed = 2;
+    api.game.QueueChanged queue_changed = 3;
+    api.game.ColumnChanged column_changed = 4;
+    api.game.RowChanged row_changed = 5;
+    api.game.PlayerChanged player_changed = 6;
+  }
+}

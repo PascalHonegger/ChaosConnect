@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { EchoServiceClient } from "./gen/EchoServiceClientPb";
+    import type { EchoServiceClient } from "./gen/joestar/EchoServiceClientPb";
     import { newStreamingRequest, newTodoRequest } from "./Client";
     export let client: EchoServiceClient;
     let responses: any[] = [];

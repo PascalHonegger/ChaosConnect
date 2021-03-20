@@ -1,10 +1,8 @@
 syntax = "proto3";
 
-import "google/protobuf/empty.proto";
+package api.authentication;
 
-package joestar;
-
-option java_package = "ch.chaosconnect.joestar";
+option java_package = "ch.chaosconnect.api.authentication";
 option java_multiple_files = true;
 
 message LoginRequest {
@@ -31,16 +29,4 @@ message UpdateMetaStateRequest {
 
 message TokenResponse {
   string jwt_token = 1;
-}
-
-service LoginService {
-  rpc Login(LoginRequest) returns (TokenResponse);
-
-  rpc Register(RegisterRequest) returns (TokenResponse);
-
-  rpc PlayWithoutAccount(PlayWithoutAccountRequest) returns (TokenResponse);
-
-  rpc RenewToken(google.protobuf.Empty) returns (TokenResponse);
-
-  rpc UpdateMetaState(UpdateMetaStateRequest) returns (TokenResponse);
 }
