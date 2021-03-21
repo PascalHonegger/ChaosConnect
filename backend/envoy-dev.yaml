@@ -26,8 +26,7 @@ static_resources:
                           route:
                             prefix_rewrite: "/"
                             cluster: joestar_service
-                            max_stream_duration:
-                              grpc_timeout_header_max: 0s
+                            max_grpc_timeout: 0s
                         - match:
                             prefix: "/"
                           route:

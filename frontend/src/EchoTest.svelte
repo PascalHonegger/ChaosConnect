@@ -4,7 +4,7 @@
     export let client: EchoServiceClient;
     let responses: any[] = [];
     const listResponse = client.echo(newTodoRequest("OneTimeTest"), null);
-    const streamingResponse = client.serverStreamingEcho(newStreamingRequest("StreamingTest"));
+    const streamingResponse = client.serverStreamingEcho(newStreamingRequest("StreamingTest", 60, 1000));
     streamingResponse.on('data', (d) => responses = [...responses, d]);
     streamingResponse.on('error', (d) => responses = [...responses, d.message]);
     streamingResponse.on('end', () => responses = [...responses, 'deez nutz']);
