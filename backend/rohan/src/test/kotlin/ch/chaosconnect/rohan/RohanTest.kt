@@ -1,7 +1,7 @@
 package ch.chaosconnect.rohan
 import io.micronaut.runtime.EmbeddedApplication
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import javax.inject.Inject
 
@@ -13,7 +13,7 @@ class RohanTest {
 
     @Test
     fun testItWorks() {
-        Assertions.assertTrue(application.isRunning)
+        assertTrue(application.isRunning)
     }
 
 }
