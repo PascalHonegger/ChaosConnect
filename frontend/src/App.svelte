@@ -1,7 +1,10 @@
 <script lang="ts">
+	import JoestarTest from "./JoestarTest.svelte";
+
 	export let name: string;
 
 	import client from "./Client";
+	import joestarClient from './JoestarClient';
 
 	import EchoTest from "./EchoTest.svelte";
 </script>
@@ -9,6 +12,8 @@
 <main>
 	<h1>Hello {name}!</h1>
 	<EchoTest {client} />
+	<hr>
+	<JoestarTest client={joestarClient} />
 	<p>
 		Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn
 		how to build Svelte apps.
