@@ -39,6 +39,8 @@ dependencies {
     runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
     testImplementation("io.micronaut:micronaut-http-client")
     testImplementation("io.mockk:mockk:${Versions.mockkVersion}")
+    testImplementation("app.cash.turbine:turbine:${Versions.turbineVersion}")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.kotlinxVersion}")
 }
 
 application {
