@@ -16,7 +16,7 @@ interface RohanService {
 
 @Singleton
 @Requires(notEnv = ["test"])
-class RohanServiceIml(
+class RohanServiceImpl(
     private val echoService: EchoServiceGrpcKt.EchoServiceCoroutineStub,
     private val gameService: GameServiceGrpcKt.GameServiceCoroutineStub
 ) : RohanService {
