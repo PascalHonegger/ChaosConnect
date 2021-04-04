@@ -2,22 +2,26 @@ version: '3.8'
 services:
   doppio:
     image: "ghcr.io/pascalhonegger/cc-doppio"
+    restart: unless-stopped
     networks:
       - speedwagon_net
 
   speedwagon:
     image: envoyproxy/envoy-alpine:v1.17-latest
+    restart: unless-stopped
     volumes:
       - ./backend/envoy-prod.yaml:/etc/envoy/envoy.yaml:ro
       - ./certs:/etc/envoy/certs:ro
     ports:
       - 80:80
       - 443:443
+      - 9901:9901
     networks:
       - speedwagon_net
 
   joestar:
     image: "ghcr.io/pascalhonegger/cc-joestar"
+    restart: unless-stopped
     environment:
       JOESTAR_PORT: 8080
       ROHAN_SERVER: rohan
@@ -28,6 +32,7 @@ services:
 
   rohan:
     image: "ghcr.io/pascalhonegger/cc-rohan"
+    restart: unless-stopped
     networks:
       - rohan_net
     environment:
