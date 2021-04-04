@@ -7,14 +7,20 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Named
 import javax.inject.Singleton
 
 interface GameStateService {
     /**
-     * Returns a stream of game events, guaranteed to start with a GameState event.
+     * Returns a stream of [GameUpdateEvent], guaranteed to start with a GameState event.
      */
     fun getStateAndUpdates(): Flow<GameUpdateEvent>
+
+    /**
+     * Indicate whether a healthy connection to the Rohan exists.
+     */
+    fun isConnected(): Boolean
 }
 
 private val logger: Logger =
@@ -48,12 +54,16 @@ class GameStateServiceImpl(
     private val flowState =
         MutableStateFlow<GameUpdateResponse>(GameUpdateResponse.getDefaultInstance())
 
+    private val isConnected = AtomicBoolean(false)
+
     override fun getStateAndUpdates(): Flow<GameUpdateEvent> =
         flowState.withIndex().map {
             logger.info(it.value.toString())
             if (it.index == 0) it.value.asGameStateEvent
             else it.value.event
         }
+
+    override fun isConnected() = isConnected.get()
 
     /**
      * Subscribe to [rohanService] and get game updates. If the connection fails or is completed, a new connection is started automatically.
@@ -64,17 +74,20 @@ class GameStateServiceImpl(
         rohanService.getGameUpdates()
             .retry {
                 logger.info("Get game update failed (${it.localizedMessage}), re-try in ${timeout}ms")
+                isConnected.set(false)
                 delay(timeout)
                 return@retry true
             }
             .onCompletion {
                 logger.warn("Game update flow completed, restart in ${timeout}ms")
+                isConnected.set(false)
                 delay(timeout)
                 subscribeToRohanUpdates()
             }
             .withIndex()
             .collect {
                 logger.debug("Received new game state from Rohan, action=${it.value.event.actionCase}")
+                isConnected.set(true)
                 flowState.emit(
                     if (it.index == 0) it.value.withEventAsCurrentState
                     else it.value
