@@ -12,7 +12,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestCoroutineScope
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.time.ExperimentalTime
@@ -89,5 +89,18 @@ class GameStateServiceTest {
                 )
                 cancel()
             }
+        }
+
+    @Test
+    fun `given no events, is not connected`() =
+        runBlocking {
+            assertFalse(service.isConnected())
+        }
+
+    @Test
+    fun `given one event, is connected`() =
+        runBlocking {
+            gameUpdates.emit(initialGameStateResponse)
+            assertTrue(service.isConnected())
         }
 }

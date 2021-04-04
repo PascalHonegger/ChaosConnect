@@ -69,11 +69,20 @@ static_resources:
       type: strict_dns
       http2_protocol_options: { }
       lb_policy: round_robin
+      health_checks:
+      - timeout: 3s
+        interval: 10s
+        interval_jitter: 1s
+        unhealthy_threshold: 3
+        healthy_threshold: 3
+        http_health_check: { path: "/health/readiness" }
       load_assignment:
         cluster_name: cluster_0
         endpoints:
           - lb_endpoints:
               - endpoint:
+                  health_check_config:
+                    port_value: 8086
                   address:
                     socket_address:
                       address: joestar
