@@ -1,6 +1,17 @@
 micronaut:
   application:
     name: rohan
+  server:
+    port: 9096
 grpc:
   server:
     port: '${rohan.port:`9091`}'
+endpoints:
+  all:
+    enabled: false
+  health:
+    details-visible: anonymous
+    enabled: true
+    sensitive: false
+    disk-space:
+      enabled: false
