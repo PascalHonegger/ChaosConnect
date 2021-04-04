@@ -1,6 +1,8 @@
 micronaut:
   application:
     name: joestar
+  server:
+    port: 8086
 grpc:
   server:
     port: '${joestar.port:`8081`}'
@@ -8,3 +10,12 @@ grpc:
     rohan:
       address: '${rohan.server:`localhost`}:${rohan.port:`9091`}'
       plaintext: true
+endpoints:
+  all:
+    enabled: false
+  health:
+    details-visible: anonymous
+    enabled: true
+    sensitive: false
+    disk-space:
+      enabled: false
