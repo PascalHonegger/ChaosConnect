@@ -30,27 +30,27 @@ class GameStateServiceTest {
 
     @BeforeEach
     private fun beforeEach() {
-        initialGameStateResponse = GameUpdateResponse.newBuilder().also {
-            it.event = GameUpdateEvent.newBuilder().also { builder ->
-                builder.gameState = GameState.getDefaultInstance()
+        initialGameStateResponse = GameUpdateResponse.newBuilder().apply {
+            event = GameUpdateEvent.newBuilder().apply {
+                gameState = GameState.getDefaultInstance()
             }.build()
-            it.newState = it.event.gameState
+            newState = event.gameState
         }.build()
 
-        piecePlacedResponse = GameUpdateResponse.newBuilder().also {
-            it.event = GameUpdateEvent.newBuilder().also { builder ->
-                builder.pieceChanged = PieceChanged.getDefaultInstance()
+        piecePlacedResponse = GameUpdateResponse.newBuilder().apply {
+            event = GameUpdateEvent.newBuilder().apply {
+                pieceChanged = PieceChanged.getDefaultInstance()
             }.build()
-            it.newState = GameState.newBuilder().also { builder ->
-                builder.addColumns(
+            newState = GameState.newBuilder().apply {
+                addColumns(
                     GameStateColumn.getDefaultInstance()
                 )
             }.build()
         }.build()
 
         gameUpdates = MutableSharedFlow()
-        rohanService = mockk<RohanService>().also {
-            every { it.getGameUpdates() } returns gameUpdates
+        rohanService = mockk<RohanService>().apply {
+            every { getGameUpdates() } returns gameUpdates
         }
         service = GameStateServiceImpl(rohanService, TestCoroutineScope())
     }
