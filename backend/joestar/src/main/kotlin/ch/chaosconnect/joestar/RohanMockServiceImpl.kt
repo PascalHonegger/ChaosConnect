@@ -20,8 +20,6 @@ class RohanMockServiceImpl : RohanService {
         logger.info("Starting mock rohan impl")
     }
 
-    override suspend fun echo(message: String) = TODO()
-
     private val redSkin = Skin.newBuilder().apply {
         name = "Default Red Skin"
         faction = Faction.RED
