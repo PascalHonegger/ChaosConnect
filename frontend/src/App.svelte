@@ -3,15 +3,11 @@
 
 	export let name: string;
 
-	import client from "./Client";
 	import joestarClient from './JoestarClient';
-
-	import EchoTest from "./EchoTest.svelte";
 </script>
 
 <main>
 	<h1>Hello {name}!</h1>
-	<EchoTest {client} />
 	<hr>
 	<JoestarTest client={joestarClient} />
 	<p>
