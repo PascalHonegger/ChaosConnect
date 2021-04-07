@@ -10,8 +10,8 @@ option java_package = "ch.chaosconnect.api.rohan";
 option java_multiple_files = true;
 
 message GameUpdateResponse {
-    api.game.GameUpdateEvent event = 1;
-    api.game.GameState new_state = 2;
+  api.game.GameUpdateEvent event = 1;
+  api.game.GameState new_state = 2;
 }
 
 service GameService {

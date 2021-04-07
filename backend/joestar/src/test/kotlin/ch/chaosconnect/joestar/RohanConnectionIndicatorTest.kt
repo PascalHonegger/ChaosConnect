@@ -12,16 +12,24 @@ class RohanConnectionIndicatorTest {
     @Test
     fun `connected service is up`() = runBlocking {
         val gameStateService = mockk<GameStateService>()
-        val rohanConnectionIndicator = RohanConnectionIndicator(gameStateService)
+        val rohanConnectionIndicator =
+            RohanConnectionIndicator(gameStateService)
         every { gameStateService.isConnected() } returns true
-        assertEquals(HealthStatus.UP, rohanConnectionIndicator.result.awaitSingle().status)
+        assertEquals(
+            HealthStatus.UP,
+            rohanConnectionIndicator.result.awaitSingle().status
+        )
     }
 
     @Test
     fun `disconnected service is down`() = runBlocking {
         val gameStateService = mockk<GameStateService>()
-        val rohanConnectionIndicator = RohanConnectionIndicator(gameStateService)
+        val rohanConnectionIndicator =
+            RohanConnectionIndicator(gameStateService)
         every { gameStateService.isConnected() } returns false
-        assertEquals(HealthStatus.DOWN, rohanConnectionIndicator.result.awaitSingle().status)
+        assertEquals(
+            HealthStatus.DOWN,
+            rohanConnectionIndicator.result.awaitSingle().status
+        )
     }
 }

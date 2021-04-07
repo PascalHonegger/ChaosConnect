@@ -85,10 +85,12 @@ protobuf {
     }
     plugins {
         id("grpc") {
-            artifact = "io.grpc:protoc-gen-grpc-java:${Versions.protocJavaVersion}"
+            artifact =
+                "io.grpc:protoc-gen-grpc-java:${Versions.protocJavaVersion}"
         }
         id("grpckt") {
-            artifact = "io.grpc:protoc-gen-grpc-kotlin:${Versions.protocKotlinVersion}:jdk7@jar"
+            artifact =
+                "io.grpc:protoc-gen-grpc-kotlin:${Versions.protocKotlinVersion}:jdk7@jar"
         }
     }
     generateProtoTasks {

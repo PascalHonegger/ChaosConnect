@@ -40,7 +40,7 @@ static_resources:
                   name: local_route
                   virtual_hosts:
                     - name: local_service
-                      domains: ["*"]
+                      domains: [ "*" ]
                       routes:
                         - match:
                             prefix: "/api/"
@@ -70,12 +70,12 @@ static_resources:
       http2_protocol_options: { }
       lb_policy: round_robin
       health_checks:
-      - timeout: 3s
-        interval: 10s
-        interval_jitter: 1s
-        unhealthy_threshold: 3
-        healthy_threshold: 3
-        http_health_check: { path: "/health/readiness" }
+        - timeout: 3s
+          interval: 10s
+          interval_jitter: 1s
+          unhealthy_threshold: 3
+          healthy_threshold: 3
+          http_health_check: { path: "/health/readiness" }
       load_assignment:
         cluster_name: cluster_0
         endpoints:

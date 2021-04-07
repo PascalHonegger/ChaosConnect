@@ -88,7 +88,9 @@ class RohanMockServiceImpl : RohanService {
                 event = GameUpdateEvent.newBuilder().apply {
                     pieceChanged = PieceChanged.newBuilder().apply {
                         addPieces(PieceState.newBuilder().apply {
-                            position = Coordinate.newBuilder().setColumn(5).setRow(0).build()
+                            position =
+                                Coordinate.newBuilder().setColumn(5).setRow(0)
+                                    .build()
                             skin = redSkin
                             owner = "Player2"
                             action = PieceAction.PLACE
