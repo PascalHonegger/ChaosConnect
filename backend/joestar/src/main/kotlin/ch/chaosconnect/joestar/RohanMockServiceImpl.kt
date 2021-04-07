@@ -52,6 +52,7 @@ class RohanMockServiceImpl : RohanService {
     override fun getGameUpdates(): Flow<GameUpdateResponse> = flow {
         while (true) {
             val initialGameState = GameState.newBuilder().apply {
+                numberOfRows = 15
                 addAllColumns(
                     listOf(
                         mockColumn(mockRedPiece(), mockRedPiece()),
@@ -65,6 +66,7 @@ class RohanMockServiceImpl : RohanService {
             }.build()
 
             val updatedGameState = GameState.newBuilder().apply {
+                numberOfRows = 20
                 addAllColumns(
                     listOf(
                         mockColumn(mockRedPiece(), mockRedPiece()),

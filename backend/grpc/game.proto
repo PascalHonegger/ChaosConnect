@@ -69,6 +69,7 @@ message GameState {
   repeated GameStateColumn columns = 1;
   map<string, PlayerState> players = 2;
   repeated Skin skins = 3;
+  int32 numberOfRows = 4;
 }
 
 // Events
