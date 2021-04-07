@@ -31,13 +31,13 @@ private const val timeout = 1000L
 private val GameUpdateResponse.asGameStateEvent: GameUpdateEvent
     get() = GameUpdateEvent
         .newBuilder()
-        .also { builder -> builder.gameState = this.newState }
+        .apply { gameState = newState }
         .build()
 
 private val GameUpdateResponse.withEventAsCurrentState: GameUpdateResponse
     get() = GameUpdateResponse
         .newBuilder(this)
-        .also { builder -> builder.event = this.asGameStateEvent }
+        .apply { event = asGameStateEvent }
         .build()
 
 @Singleton
@@ -58,7 +58,6 @@ class GameStateServiceImpl(
 
     override fun getStateAndUpdates(): Flow<GameUpdateEvent> =
         flowState.withIndex().map {
-            logger.info(it.value.toString())
             if (it.index == 0) it.value.asGameStateEvent
             else it.value.event
         }
