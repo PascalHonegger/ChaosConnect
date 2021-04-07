@@ -71,6 +71,7 @@ class GameStateServiceTest {
         gameUpdates.emit(initialGameStateResponse)
         service.getStateAndUpdates().test {
             assertEquals(GameState.getDefaultInstance(), expectItem().gameState)
+            expectNoEvents()
             gameUpdates.emit(piecePlacedResponse)
             assertEquals(piecePlacedResponse.event, expectItem())
             cancel()
