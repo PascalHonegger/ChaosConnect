@@ -3,20 +3,30 @@
 
 	export let name: string;
 
-	import joestarClient from './JoestarClient';
+	import chaosConnectClient from "./JoestarClient";
+	import webLoginClient from "./WebLoginClient";
+
+	import LoginRegister from "./LoginRegister.svelte";
+	import { isLoggedIn } from "./Stores";
 </script>
 
 <main>
-	<h1>Hello {name}!</h1>
-	<hr>
-	<JoestarTest client={joestarClient} />
+	{#if $isLoggedIn}
+		<h1>Hello {name}!</h1>
+		<hr />
+		<JoestarTest client={chaosConnectClient} />
+	{:else}
+		<LoginRegister client={webLoginClient} />
+	{/if}
 	<p>
 		Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn
 		how to build Svelte apps.
 	</p>
 </main>
 <footer>
-	<a href="https://github.com/twitter/twemoji">Twitter Emoji (Twemoji)</a> images licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC-BY 4.0</a>
+	<a href="https://github.com/twitter/twemoji">Twitter Emoji (Twemoji)</a>
+	images licensed under
+	<a href="https://creativecommons.org/licenses/by/4.0/">CC-BY 4.0</a>
 </footer>
 
 <style>
