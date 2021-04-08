@@ -2,12 +2,14 @@ package ch.chaosconnect.joestar
 
 import ch.chaosconnect.api.game.*
 import ch.chaosconnect.api.rohan.GameUpdateResponse
+import ch.chaosconnect.api.user.UserAuthResponse
 import io.micronaut.context.annotation.Requires
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.util.*
 import javax.inject.Singleton
 
 private val logger: Logger =
@@ -16,10 +18,6 @@ private val logger: Logger =
 @Singleton
 @Requires(notEnv = ["test"], property = "mocks.rohan")
 class RohanMockServiceImpl : RohanService {
-    init {
-        logger.info("Starting mock rohan impl")
-    }
-
     private val redSkin = Skin.newBuilder().apply {
         name = "Default Red Skin"
         faction = Faction.RED
@@ -38,7 +36,7 @@ class RohanMockServiceImpl : RohanService {
     }.build()
 
     private fun mockYellowPiece() = Piece.newBuilder().apply {
-        skin = redSkin
+        skin = yellowSkin
         owner = "Player2"
     }.build()
 
@@ -48,6 +46,9 @@ class RohanMockServiceImpl : RohanService {
                 addPieces(piece)
             }
         }.build()
+
+    private fun mockAuthResponse(userIdentifier: String): UserAuthResponse =
+        UserAuthResponse.newBuilder().setIdentifier(userIdentifier).build()
 
     override fun getGameUpdates(): Flow<GameUpdateResponse> = flow {
         while (true) {
@@ -109,5 +110,34 @@ class RohanMockServiceImpl : RohanService {
 
             delay(10_000)
         }
+    }
+
+    override suspend fun placePiece(row: Int, column: Int) = Unit
+
+    override suspend fun login(
+        username: String,
+        password: String
+    ) = mockAuthResponse(username)
+
+    override suspend fun register(
+        displayName: String,
+        username: String,
+        password: String
+    ) = mockAuthResponse(username)
+
+    override suspend fun playWithoutAccount(displayName: String) = mockAuthResponse(UUID.randomUUID().toString())
+
+    override suspend fun setDisplayName(
+        currentUser: String,
+        newDisplayName: String
+    ) = mockAuthResponse(currentUser)
+
+    override suspend fun setPassword(
+        currentUser: String,
+        newPassword: String
+    ) = mockAuthResponse(currentUser)
+
+    init {
+        logger.info("Started mock Rohan implementation")
     }
 }
