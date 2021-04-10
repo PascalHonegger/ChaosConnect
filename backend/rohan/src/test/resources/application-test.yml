@@ -1,0 +1,9 @@
+micronaut:
+  server:
+    port: 20001
+grpc:
+  server:
+    port: 20002
+endpoints:
+  all:
+    enabled: false

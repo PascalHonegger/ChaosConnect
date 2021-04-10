@@ -1,0 +1,15 @@
+micronaut:
+  server:
+    port: 10001
+grpc:
+  server:
+    port: 10002
+  channels:
+    rohan:
+      address: localhost:10003
+      plaintext: true
+endpoints:
+  all:
+    enabled: false
+jwt:
+  secret: kiMu3ODiG8NdA41/6bj5BcsKDUplTh32bmocO3EKbgbOdHGBfST1/dtfuh+hMOTqEGurJgMPI0XCUewlBWEdrw==
