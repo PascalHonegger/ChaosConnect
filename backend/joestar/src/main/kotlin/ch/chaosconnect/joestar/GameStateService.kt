@@ -1,5 +1,6 @@
 package ch.chaosconnect.joestar
 
+import ch.chaosconnect.api.game.Coordinate
 import ch.chaosconnect.api.game.GameUpdateEvent
 import ch.chaosconnect.api.rohan.GameUpdateResponse
 import io.micronaut.context.annotation.Requires
@@ -19,6 +20,11 @@ interface GameStateService {
      * Returns a stream of [GameUpdateEvent], guaranteed to start with a GameState event.
      */
     fun getStateAndUpdates(): Flow<GameUpdateEvent>
+
+    /**
+     * Place a piece at the requested coordinate
+     */
+    suspend fun placePiece(coordinate: Coordinate)
 
     /**
      * Indicate whether a healthy connection to the Rohan exists.
@@ -64,6 +70,11 @@ class GameStateServiceImpl(
             if (it.index == 0) it.value.asGameStateEvent
             else it.value.event
         }
+
+    override suspend fun placePiece(coordinate: Coordinate) = rohanService.placePiece(
+        row = coordinate.row,
+        column = coordinate.column
+    )
 
     override fun isConnected() = isConnected.get()
 
