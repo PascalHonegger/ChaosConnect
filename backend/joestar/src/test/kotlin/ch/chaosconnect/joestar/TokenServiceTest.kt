@@ -12,7 +12,8 @@ const val invalidSecret = "some text which is definitely not base64"
 class TokenServiceTest {
     @Test
     fun `parsed token returns identifier passed when creating token`() {
-        val service = TokenServiceImpl(JwtConfig().apply { secret = validSecret })
+        val service =
+            TokenServiceImpl(JwtConfig().apply { secret = validSecret })
         val token = service.createSignedToken("SomeUsername")
         val decoded = service.parseToken(token)
         assertEquals("SomeUsername", decoded)

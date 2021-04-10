@@ -1,8 +1,6 @@
 package ch.chaosconnect.joestar
 
-import app.cash.turbine.test
 import ch.chaosconnect.api.authentication.LoginRequest
-import ch.chaosconnect.api.common.Empty
 import ch.chaosconnect.api.game.Coordinate
 import ch.chaosconnect.api.joestar.ChaosConnectServiceGrpcKt
 import ch.chaosconnect.api.joestar.WebLoginServiceGrpcKt
@@ -96,6 +94,7 @@ internal class Clients {
             channel
         )
     }
+
     @Bean
     fun webLoginStub(
         @GrpcChannel(GrpcServerChannel.NAME) channel: ManagedChannel
