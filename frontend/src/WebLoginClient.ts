@@ -1,5 +1,5 @@
-import { WebLoginServiceClient } from './gen/JoestarServiceClientPb';
-import { LoginRequest } from "./gen/authentication_pb";
+import {WebLoginServiceClient} from './gen/JoestarServiceClientPb';
+import {LoginRequest} from "./gen/authentication_pb";
 
 export default new WebLoginServiceClient("/api");
 

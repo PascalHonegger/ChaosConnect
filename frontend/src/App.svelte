@@ -1,59 +1,59 @@
 <script lang="ts">
-	import JoestarTest from "./JoestarTest.svelte";
+    import JoestarTest from "./JoestarTest.svelte";
+    import chaosConnectClient from "./JoestarClient";
+    import webLoginClient from "./WebLoginClient";
 
-	export let name: string;
+    import LoginRegister from "./LoginRegister.svelte";
+    import {isLoggedIn} from "./Stores";
 
-	import chaosConnectClient from "./JoestarClient";
-	import webLoginClient from "./WebLoginClient";
-
-	import LoginRegister from "./LoginRegister.svelte";
-	import { isLoggedIn } from "./Stores";
+    export let name: string;
 </script>
 
 <main>
-	{#if $isLoggedIn}
-		<h1>Hello {name}!</h1>
-		<hr />
-		<JoestarTest client={chaosConnectClient} />
-	{:else}
-		<LoginRegister client={webLoginClient} />
-	{/if}
-	<p>
-		Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn
-		how to build Svelte apps.
-	</p>
+    {#if $isLoggedIn}
+        <h1>Hello {name}!</h1>
+        <hr/>
+        <JoestarTest client={chaosConnectClient}/>
+    {:else}
+        <LoginRegister client={webLoginClient}/>
+    {/if}
+    <p>
+        Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to
+        learn
+        how to build Svelte apps.
+    </p>
 </main>
 <footer>
-	<a href="https://github.com/twitter/twemoji">Twitter Emoji (Twemoji)</a>
-	images licensed under
-	<a href="https://creativecommons.org/licenses/by/4.0/">CC-BY 4.0</a>
+    <a href="https://github.com/twitter/twemoji">Twitter Emoji (Twemoji)</a>
+    images licensed under
+    <a href="https://creativecommons.org/licenses/by/4.0/">CC-BY 4.0</a>
 </footer>
 
 <style>
-	main {
-		text-align: center;
-		padding: 1em;
-		max-width: 240px;
-		margin: 0 auto;
-	}
+    main {
+        text-align: center;
+        padding: 1em;
+        max-width: 240px;
+        margin: 0 auto;
+    }
 
-	footer {
-		text-align: center;
-		font-size: small;
-		padding: 1em;
-		margin: 0 auto;
-	}
+    footer {
+        text-align: center;
+        font-size: small;
+        padding: 1em;
+        margin: 0 auto;
+    }
 
-	h1 {
-		color: #ff3e00;
-		text-transform: uppercase;
-		font-size: 4em;
-		font-weight: 100;
-	}
+    h1 {
+        color: #ff3e00;
+        text-transform: uppercase;
+        font-size: 4em;
+        font-weight: 100;
+    }
 
-	@media (min-width: 640px) {
-		main {
-			max-width: none;
-		}
-	}
+    @media (min-width: 640px) {
+        main {
+            max-width: none;
+        }
+    }
 </style>
