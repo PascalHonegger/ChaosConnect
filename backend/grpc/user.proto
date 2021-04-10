@@ -21,10 +21,9 @@ message AddTemporaryUserRequest {
 }
 
 message UpdateUserRequest {
-  string user = 1;
   oneof changed_property {
-    string display_name = 2;
-    string password = 3;
+    string display_name = 1;
+    string password = 2;
   }
 }
 

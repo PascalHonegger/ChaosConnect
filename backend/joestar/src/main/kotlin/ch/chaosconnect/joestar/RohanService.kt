@@ -18,13 +18,7 @@ interface RohanService {
         displayName: String
     ): UserAuthResponse
 
-    suspend fun setDisplayName(
-        currentUser: String,
-        newDisplayName: String
-    ): UserAuthResponse
+    suspend fun setDisplayName(newDisplayName: String): UserAuthResponse
 
-    suspend fun setPassword(
-        currentUser: String,
-        newPassword: String
-    ): UserAuthResponse
+    suspend fun setPassword(newPassword: String): UserAuthResponse
 }

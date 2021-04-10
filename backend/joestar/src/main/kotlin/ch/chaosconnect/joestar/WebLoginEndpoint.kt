@@ -49,12 +49,8 @@ class WebLoginEndpoint(
     override suspend fun updateMetaState(request: UpdateMetaStateRequest) =
         when {
             currentUserIdentifier.get() == null -> null
-            request.hasDisplayName() -> rohanService.setDisplayName(
-                currentUserIdentifier.get(), request.displayName
-            )
-            request.hasPassword() -> rohanService.setPassword(
-                currentUserIdentifier.get(), request.password
-            )
+            request.hasDisplayName() -> rohanService.setDisplayName(request.displayName)
+            request.hasPassword() -> rohanService.setPassword(request.password)
             else -> null
         }.asTokenResponseOrError()
 }
