@@ -14,5 +14,5 @@ class ChaosConnectEndpoint(private val gameStateService: GameStateService) :
         gameStateService.getStateAndUpdates()
 
     override suspend fun placePiece(request: Coordinate): Empty =
-        Empty.getDefaultInstance()
+        gameStateService.placePiece(request).let { Empty.getDefaultInstance() }
 }

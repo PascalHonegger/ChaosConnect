@@ -1,13 +1,9 @@
 package ch.chaosconnect.joestar
 
 import app.cash.turbine.test
-import ch.chaosconnect.api.game.GameState
-import ch.chaosconnect.api.game.GameStateColumn
-import ch.chaosconnect.api.game.GameUpdateEvent
-import ch.chaosconnect.api.game.PieceChanged
+import ch.chaosconnect.api.game.*
 import ch.chaosconnect.api.rohan.GameUpdateResponse
-import io.mockk.every
-import io.mockk.mockk
+import io.mockk.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.runBlocking
@@ -103,5 +99,13 @@ class GameStateServiceTest {
         runBlocking {
             gameUpdates.emit(initialGameStateResponse)
             assertTrue(service.isConnected())
+        }
+
+    @Test
+    fun `placePiece is forwarded to Rohan`() =
+        runBlocking {
+            coJustRun { rohanService.placePiece(row = 1, column = 2) }
+            service.placePiece(Coordinate.newBuilder().setRow(1).setColumn(2).build())
+            coVerify { rohanService.placePiece(row = 1,  column = 2) }
         }
 }
