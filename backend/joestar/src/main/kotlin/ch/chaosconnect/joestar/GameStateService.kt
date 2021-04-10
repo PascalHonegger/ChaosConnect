@@ -71,10 +71,11 @@ class GameStateServiceImpl(
             else it.value.event
         }
 
-    override suspend fun placePiece(coordinate: Coordinate) = rohanService.placePiece(
-        row = coordinate.row,
-        column = coordinate.column
-    )
+    override suspend fun placePiece(coordinate: Coordinate) =
+        rohanService.placePiece(
+            row = coordinate.row,
+            column = coordinate.column
+        )
 
     override fun isConnected() = isConnected.get()
 

@@ -79,7 +79,10 @@ class TokenServiceImpl(jwtConfig: JwtConfig) : TokenService {
             val privateKeyBytes = Decoders.BASE64.decode(jwtConfig.secret)
             key = Keys.hmacShaKeyFor(privateKeyBytes)
         } catch (e: Exception) {
-            logger.error("Expected a base64 string containing a key, failed to parse", e)
+            logger.error(
+                "Expected a base64 string containing a key, failed to parse",
+                e
+            )
             throw e
         }
         logger.info("Parsed private key with algorithm ${key.algorithm}")
