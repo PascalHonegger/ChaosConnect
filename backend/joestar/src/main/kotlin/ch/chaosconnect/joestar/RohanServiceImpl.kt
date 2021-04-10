@@ -60,18 +60,16 @@ class RohanServiceImpl(
                 .build()
         )
 
-    override suspend fun setDisplayName(currentUser: String, newDisplayName: String) =
+    override suspend fun setDisplayName(newDisplayName: String) =
         userService.updateUser(
             UpdateUserRequest.newBuilder()
-                .setUser(currentUser)
                 .setDisplayName(newDisplayName)
                 .build()
         )
 
-    override suspend fun setPassword(currentUser: String, newPassword: String) =
+    override suspend fun setPassword(newPassword: String) =
         userService.updateUser(
             UpdateUserRequest.newBuilder()
-                .setUser(currentUser)
                 .setPassword(newPassword)
                 .build()
         )

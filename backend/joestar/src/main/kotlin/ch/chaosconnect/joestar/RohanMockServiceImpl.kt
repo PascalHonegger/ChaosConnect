@@ -117,25 +117,23 @@ class RohanMockServiceImpl : RohanService {
     override suspend fun login(
         username: String,
         password: String
-    ) = mockAuthResponse(username)
+    ) = mockAuthResponse(UUID.randomUUID().toString())
 
     override suspend fun register(
         displayName: String,
         username: String,
         password: String
-    ) = mockAuthResponse(username)
+    ) = mockAuthResponse(UUID.randomUUID().toString())
 
-    override suspend fun playWithoutAccount(displayName: String) = mockAuthResponse(UUID.randomUUID().toString())
+    override suspend fun playWithoutAccount(displayName: String) =
+        mockAuthResponse(UUID.randomUUID().toString())
 
-    override suspend fun setDisplayName(
-        currentUser: String,
-        newDisplayName: String
-    ) = mockAuthResponse(currentUser)
+    override suspend fun setDisplayName(newDisplayName: String) =
+        mockAuthResponse(currentUserIdentifier.get())
 
-    override suspend fun setPassword(
-        currentUser: String,
-        newPassword: String
-    ) = mockAuthResponse(currentUser)
+    override suspend fun setPassword(newPassword: String) = mockAuthResponse(
+        currentUserIdentifier.get()
+    )
 
     init {
         logger.info("Started mock Rohan implementation")

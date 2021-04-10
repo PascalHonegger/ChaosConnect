@@ -11,6 +11,11 @@ private val authorizationHeader = Metadata.Key.of(
     Metadata.ASCII_STRING_MARSHALLER
 )
 
+private val userIdentifierHeader = Metadata.Key.of(
+    "UserIdentifier",
+    Metadata.ASCII_STRING_MARSHALLER
+)
+
 private const val bearerPrefix = "Bearer"
 
 val currentUserIdentifier: Context.Key<String> = Context.key("UserIdentifier")
@@ -51,5 +56,30 @@ class JwtServerInterceptor(private val tokenService: TokenService) :
             }
         }
         return Contexts.interceptCall(context, call, headers, next)
+    }
+}
+
+@Singleton
+class JwtClientInterceptor : ClientInterceptor {
+
+    override fun <ReqT : Any, RespT : Any> interceptCall(
+        method: MethodDescriptor<ReqT, RespT>,
+        callOptions: CallOptions,
+        next: Channel
+    ): ClientCall<ReqT, RespT> {
+        return object : SimpleForwardingClientCall<ReqT, RespT>(
+            next.newCall(method, callOptions)
+        ) {
+            override fun start(
+                responseListener: Listener<RespT>,
+                headers: Metadata
+            ) {
+                val currentUser = currentUserIdentifier.get()
+                if (currentUser != null) {
+                    headers.put(userIdentifierHeader, currentUser)
+                }
+                super.start(responseListener, headers)
+            }
+        }
     }
 }
