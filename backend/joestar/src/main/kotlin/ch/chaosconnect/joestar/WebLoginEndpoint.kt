@@ -11,8 +11,7 @@ import javax.inject.Singleton
 class WebLoginEndpoint(
     private val tokenService: TokenService,
     private val rohanService: RohanService
-) :
-    WebLoginServiceGrpcKt.WebLoginServiceCoroutineImplBase() {
+) : WebLoginServiceGrpcKt.WebLoginServiceCoroutineImplBase() {
 
     private fun UserAuthResponse?.asTokenResponseOrError(): TokenResponse =
         if (this != null && this.hasIdentifier()) {
