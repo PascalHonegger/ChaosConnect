@@ -7,4 +7,13 @@ import javax.validation.constraints.NotBlank
 class JwtConfig {
     @NotBlank
     lateinit var secret: String
+
+    @NotBlank
+    lateinit var issuer: String
+
+    @NotBlank
+    lateinit var audience: String
+
+    @NotBlank
+    var clockSkew: Long = 0L
 }
