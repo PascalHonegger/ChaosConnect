@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   gen_grpc_joestar_client:
-    image: namely/protoc-all
+    image: namely/protoc-all:1.34_4
     volumes:
       - "./backend/grpc:/defs:ro"
       - "./frontend/src/gen:/generated"
