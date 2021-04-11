@@ -14,10 +14,6 @@ import javax.inject.Singleton
 private val logger =
     LoggerFactory.getLogger(TokenServiceImpl::class.java)
 
-private const val issuer = "Joestar"
-private const val audience = "Doppio"
-private const val clockSkew = 60L // 1 minute
-
 interface TokenService {
     /**
      * Encodes the given user identity into a signed json web token
@@ -33,7 +29,7 @@ interface TokenService {
 }
 
 @Singleton
-class TokenServiceImpl(jwtConfig: JwtConfig) : TokenService {
+class TokenServiceImpl(private val jwtConfig: JwtConfig) : TokenService {
 
     private var key: SecretKey
     private var jwtParser: JwtParser
@@ -46,9 +42,9 @@ class TokenServiceImpl(jwtConfig: JwtConfig) : TokenService {
         val now = Instant.now()
         return Jwts.builder()
             .signWith(key)
-            .setIssuer(issuer)
+            .setIssuer(jwtConfig.issuer)
             .setSubject(identifier)
-            .setAudience(audience)
+            .setAudience(jwtConfig.audience)
             .setIssuedAt(Date.from(now))
             .setExpiration(Date.from(now.plus(1, ChronoUnit.DAYS)))
             .compact()
@@ -88,9 +84,9 @@ class TokenServiceImpl(jwtConfig: JwtConfig) : TokenService {
         logger.info("Parsed private key with algorithm ${key.algorithm}")
         jwtParser = Jwts.parserBuilder()
             .setSigningKey(key)
-            .requireIssuer(issuer)
-            .requireAudience(audience)
-            .setAllowedClockSkewSeconds(clockSkew)
+            .requireIssuer(jwtConfig.issuer)
+            .requireAudience(jwtConfig.audience)
+            .setAllowedClockSkewSeconds(jwtConfig.clockSkew)
             .build()
     }
 }

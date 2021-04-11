@@ -13,7 +13,11 @@ class TokenServiceTest {
     @Test
     fun `parsed token returns identifier passed when creating token`() {
         val service =
-            TokenServiceImpl(JwtConfig().apply { secret = validSecret })
+            TokenServiceImpl(JwtConfig().apply {
+                secret = validSecret
+                issuer = "Me"
+                audience = "You"
+            })
         val token = service.createSignedToken("SomeUsername")
         val decoded = service.parseToken(token)
         assertEquals("SomeUsername", decoded)
@@ -22,7 +26,11 @@ class TokenServiceTest {
     @Test
     fun `invalid secret throws error`() {
         assertThrows<DecodingException> {
-            TokenServiceImpl(JwtConfig().apply { secret = invalidSecret })
+            TokenServiceImpl(JwtConfig().apply {
+                secret = invalidSecret
+                issuer = "Me"
+                audience = "You"
+            })
         }
     }
 }

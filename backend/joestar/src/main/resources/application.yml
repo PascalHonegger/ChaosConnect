@@ -19,3 +19,7 @@ endpoints:
     sensitive: false
     disk-space:
       enabled: false
+jwt:
+  issuer: Joestar
+  audience: Doppio
+  clock-skew: 60
