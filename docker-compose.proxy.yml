@@ -7,6 +7,3 @@ services:
     ports:
       - 5001:5001
       - 9901:9901
-# Required on Linux
-#    extra_hosts:
-#      - "host.docker.internal:host-gateway"
