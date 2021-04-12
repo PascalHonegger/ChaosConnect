@@ -89,6 +89,6 @@ class GameServiceImpl : GameService {
 
     private fun emit(updateEvent: GameUpdateEvent, state: GameState) =
         runBlocking {
-            updates.emit(Pair(updateEvent, state))
+            updates.emit(updateEvent to state)
         }
 }
