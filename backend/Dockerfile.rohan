@@ -3,7 +3,7 @@ FROM gradle:jdk15 as build
 COPY . .
 RUN gradle :rohan:shadowjar --no-daemon
 
-FROM openjdk:15-jdk-alpine
+FROM adoptopenjdk:15-jre-hotspot
 VOLUME /etc/rohan/
 COPY --from=build /home/gradle/rohan/build/libs/rohan-*-all.jar /rohan.jar
 HEALTHCHECK --interval=10s --timeout=5s --retries=5 --start-period=3s \
