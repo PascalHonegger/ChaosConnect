@@ -22,4 +22,5 @@ endpoints:
 jwt:
   issuer: Joestar
   audience: Doppio
-  clock-skew: 60
+  clock-skew: 1m
+  valid-for: 7d
