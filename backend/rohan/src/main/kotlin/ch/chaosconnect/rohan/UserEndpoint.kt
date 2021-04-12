@@ -1,4 +1,4 @@
-package ch.chaosconnect.rohan;
+package ch.chaosconnect.rohan
 
 import ch.chaosconnect.api.rohan.UserServiceGrpcKt
 import ch.chaosconnect.api.user.*
