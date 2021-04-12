@@ -12,8 +12,7 @@ services:
       file: docker-compose.yml
       service: speedwagon
     build:
-      context: ./backend
-      dockerfile: Dockerfile.speedwagon
+      context: ./proxy
     ports:
       - 9901:9901
 
