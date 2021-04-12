@@ -2,31 +2,34 @@ version: '3.3'
 services:
   doppio:
     extends:
-      file: docker-compose.common.yml
+      file: docker-compose.yml
       service: doppio
     build:
       context: ./frontend
-      dockerfile: Dockerfile
 
   speedwagon:
     extends:
-      file: docker-compose.common.yml
+      file: docker-compose.yml
       service: speedwagon
-    volumes:
-      - ./backend/envoy-prod.yaml:/etc/envoy/envoy.yaml:ro
-      - ./certs:/etc/envoy/certs:ro
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.speedwagon
+    ports:
+      - 9901:9901
 
   joestar:
     extends:
-      file: docker-compose.common.yml
+      file: docker-compose.yml
       service: joestar
     build:
       context: ./backend
       dockerfile: Dockerfile.joestar
+    environment:
+      JWT_SECRET: kiMu3ODiG8NdA41/6bj5BcsKDUplTh32bmocO3EKbgbOdHGBfST1/dtfuh+hMOTqEGurJgMPI0XCUewlBWEdrw==
 
   rohan:
     extends:
-      file: docker-compose.common.yml
+      file: docker-compose.yml
       service: rohan
     build:
       context: ./backend

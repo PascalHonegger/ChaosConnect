@@ -6,38 +6,38 @@ The modern, distributed and scalable implementation of a game inspired by Connec
 - There's only one big playing field for all players
 - Each player can make a move after a certain timeout
 - Other players cannot place a chip close to another chip for a certain timeout
-- If more people join, the timeouts are altered and the playing field scales automatically
+- If more people join, the timeouts are altered, and the playing field scales automatically
   - More people => make playing field wider
   - More people => make playing field slightly higher
-  - Less people => Mark (now superfluous) rows and columns as as soon to be deleted, delete after a certain time passed
-- If a disk you placed is part of a 4 disk long line you get points and the associated columns are cleared
+  - Fewer people => Mark (now superfluous) rows and columns as soon to be deleted, delete after a certain time passed
+- If a disk you placed is part of a 4 disk long line you get points, and the associated columns are cleared
 - You get more points if you're on the losing fraction for balance purposes
 - You can exchange your points for perks and skins
 - To ensure fairness, some bots might be added to balance the teams
 
 # Running for Production
-In order to run all services within docker you can run an alternation of one of the following commands:
+The easiest way to get ChaosConnect running is using docker-compose. We do not provider support for running the software components otherwise.
+
+## Prerequisites
+The `docker-compose.yml` file contains a placeholder for the JWT signing key.
+This base64-encoded 512 bit secret is crucial for verifying user authenticity and must be configured before starting.
+
+Another crucial point are HTTPS certificates, which have to be mounted to `/etc/envoy/certs/cc.key` and `/etc/envoy/certs/cc.cert` within the container.
+If you're running on localhost, see the development guide below on how to generate self signed certificates.
+
+## Starting
 
 ```sh
-# Run services hosted under http://localhost:5001, built locally, run 2 joestar instances
-docker-compose -f docker-compose.dev.yml up --build --scale joestar=2
-
-# Generate self-signed certs, files ./certs/cc.key and ./certs/cc.cert are required to run HTTPS
-docker-compose -f docker-compose.gen.yml up gen_self_signed_cert
-
-# Run services under https://localhost/, using certificates from the certs directory, using images published to GitHub Packages
+# Run services under https://localhost/ using images published to GitHub Packages
 # Valid certificates are expected to be placed under ./certs/cc.key and ./certs/cc.cert
-docker-compose -f docker-compose.prod.yml up --scale joestar=5 -d
+# Valid environment variables have to be configured 
+docker-compose up --scale joestar=5 -d
 ```
 
 # Development
-In order to run components in development mode, the following commands are good to get started:
+In order to run components natively in development mode, the following commands are good to get started:
 
 ```sh
-# Generate self-signed certs, puts them in the ./certs directory
-# Ensure the permissions are set such that the envoy docker user can read the certificate
-docker-compose -f docker-compose.gen.yml up gen_self_signed_cert
-
 # Required once at the beginning and afterwards once the protocol buffer contract changes
 docker-compose -f docker-compose.gen.yml up gen_grpc_joestar_client
 
@@ -58,6 +58,17 @@ cd backend
 ./gradlew joestar:run
 # run rohan
 ./gradlew rohan:run
+```
+
+Or if you want to test the release configuration locally, you can build and run them locally:
+
+```sh
+# Generate self-signed certs, puts them in the ./certs directory
+# Ensure the permissions are set such that the envoy docker user can read the certificate
+docker-compose -f docker-compose.gen.yml up gen_self_signed_cert
+
+# Run services hosted under http://localhost:5001, built locally, run 2 joestar instances
+docker-compose -f docker-compose.dev.yml up --build --scale joestar=2
 ```
 
 # Technical Implementation
@@ -83,7 +94,7 @@ We use [Envoy](https://www.envoyproxy.io/) as a reverse proxy to handle load bal
 ## Backend
 The backend is split into two parts:
 * Scaling: Communicates directly with our Frontend, issues and validates JWT, caches game state and sends game updates to all clients
-* Central: Manages the actual game state, synchronizes requests and handels game logic, stores persistent information, such as user credentials and scores, in a json document
+* Central: Manages the actual game state, synchronizes requests and handles game logic, stores persistent information, such as user credentials and scores, in a json document
 
 Both backends use [Micronaut](https://micronaut.io/) with [Kotlin](https://kotlinlang.org/).
 
