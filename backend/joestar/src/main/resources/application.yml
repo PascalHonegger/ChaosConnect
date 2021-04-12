@@ -5,10 +5,10 @@ micronaut:
     port: 8086
 grpc:
   server:
-    port: '${joestar.port:`8081`}'
+    port: '${joestar.port:`8080`}'
   channels:
     rohan:
-      address: '${rohan.server:`localhost`}:${rohan.port:`9091`}'
+      address: '${rohan.server:`localhost`}:${rohan.port:`9090`}'
       plaintext: true
 endpoints:
   all:
