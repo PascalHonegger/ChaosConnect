@@ -41,8 +41,8 @@ class UserEndpoint(private val service: UserService) :
         }
 
     companion object {
-        private fun processRequest(
-            processor: () -> String
+        private suspend fun processRequest(
+            processor: suspend () -> String
         ): UserAuthResponse {
             val builder = UserAuthResponse.newBuilder()
             try {

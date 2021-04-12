@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface GameService {
 
-    fun placePiece(rowIndex: Int, columnIndex: Int)
+    suspend fun placePiece(rowIndex: Int, columnIndex: Int)
 
     fun getGameUpdates(): Flow<Pair<GameUpdateEvent, GameState>>
 }

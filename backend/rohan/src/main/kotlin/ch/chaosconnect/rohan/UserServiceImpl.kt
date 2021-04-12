@@ -9,12 +9,12 @@ class UserServiceImpl : UserService {
 
     private val usersByDisplayName = HashMap<String, User>()
 
-    override fun getUser(username: String, password: String): String =
+    override suspend fun getUser(username: String, password: String): String =
         usersByUserName[username]
             ?.displayName
             ?: throw NoSuchElementException("No user with user name '$username' found")
 
-    override fun addUser(
+    override suspend fun addUser(
         username: String,
         password: String,
         displayName: String
@@ -31,7 +31,7 @@ class UserServiceImpl : UserService {
         return displayName;
     }
 
-    override fun addTemporaryUser(displayName: String): String {
+    override suspend fun addTemporaryUser(displayName: String): String {
         checkDisplayNameAvailable(displayName)
         usersByDisplayName[displayName] = User(
             null,
@@ -41,7 +41,7 @@ class UserServiceImpl : UserService {
         return displayName;
     }
 
-    override fun updateUser(password: String, displayName: String): String {
+    override suspend fun updateUser(password: String, displayName: String): String {
         val user = usersByDisplayName[displayName]
             ?: throw NoSuchElementException("No user with display name '$displayName' found")
         user.displayName = displayName

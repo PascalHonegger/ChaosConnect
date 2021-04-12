@@ -15,7 +15,7 @@ class GameServiceImpl : GameService {
 
     private val updates = MutableSharedFlow<Pair<GameUpdateEvent, GameState>>()
 
-    override fun placePiece(rowIndex: Int, columnIndex: Int) {
+    override suspend fun placePiece(rowIndex: Int, columnIndex: Int) {
         val columnCells: ArrayList<PieceState?>
         try {
             columnCells = columns[columnIndex]
