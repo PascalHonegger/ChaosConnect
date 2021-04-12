@@ -3,7 +3,6 @@ package ch.chaosconnect.rohan
 import ch.chaosconnect.api.game.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.runBlocking
 import javax.inject.Singleton
 
 @Singleton
@@ -87,8 +86,6 @@ class GameServiceImpl : GameService {
     override fun getGameUpdates(): Flow<Pair<GameUpdateEvent, GameState>> =
         updates
 
-    private fun emit(updateEvent: GameUpdateEvent, state: GameState) =
-        runBlocking {
-            updates.emit(updateEvent to state)
-        }
+    private suspend fun emit(updateEvent: GameUpdateEvent, state: GameState) =
+        updates.emit(updateEvent to state)
 }
