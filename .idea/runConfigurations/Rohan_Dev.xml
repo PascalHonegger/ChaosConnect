@@ -7,12 +7,9 @@
     <option name="mainClass" value="ch.chaosconnect.rohan.ApplicationKt" />
     <option name="passParentEnvs" value="true" />
     <option name="programParameters" value="" />
-    <option name="shortenCommandLine" />
+    <option name="shortenCommandLine" value="NONE" />
     <option name="vmParameters" value="" />
     <option name="workingDirectory" value="" />
-    <envs>
-      <env name="ROHAN_PORT" value="9090" />
-    </envs>
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

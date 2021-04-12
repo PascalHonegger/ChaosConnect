@@ -23,9 +23,7 @@ services:
     image: "ghcr.io/pascalhonegger/cc-joestar"
     restart: unless-stopped
     environment:
-      JOESTAR_PORT: 8080
       ROHAN_SERVER: rohan
-      ROHAN_PORT: 9090
     networks:
       - speedwagon_net
       - rohan_net
@@ -35,5 +33,3 @@ services:
     restart: unless-stopped
     networks:
       - rohan_net
-    environment:
-      ROHAN_PORT: 9090

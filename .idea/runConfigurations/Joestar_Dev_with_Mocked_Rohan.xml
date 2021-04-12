@@ -11,8 +11,7 @@
     <option name="vmParameters" value="" />
     <option name="workingDirectory" value="" />
     <envs>
-      <env name="JOESTAR_PORT" value="8080" />
-      <env name="MOCKS_ROHAN" value="true" />
+       <env name="MOCKS_ROHAN" value="true" />
       <env name="JWT_SECRET" value="kiMu3ODiG8NdA41/6bj5BcsKDUplTh32bmocO3EKbgbOdHGBfST1/dtfuh+hMOTqEGurJgMPI0XCUewlBWEdrw==" />
     </envs>
     <method v="2">
