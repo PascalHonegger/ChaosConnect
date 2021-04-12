@@ -7,15 +7,13 @@ services:
       - speedwagon_net
 
   speedwagon:
-    image: envoyproxy/envoy-alpine:v1.17-latest
+    image: "ghcr.io/pascalhonegger/cc-speedwagon"
     restart: unless-stopped
     volumes:
-      - ./backend/envoy-prod.yaml:/etc/envoy/envoy.yaml:ro
       - ./certs:/etc/envoy/certs:ro
     ports:
       - 80:80
       - 443:443
-      - 9901:9901
     networks:
       - speedwagon_net
 
@@ -24,6 +22,7 @@ services:
     restart: unless-stopped
     environment:
       ROHAN_SERVER: rohan
+      JWT_SECRET: base-64-encoded-512-bit-key
     networks:
       - speedwagon_net
       - rohan_net
@@ -33,3 +32,9 @@ services:
     restart: unless-stopped
     networks:
       - rohan_net
+
+networks:
+  speedwagon_net:
+    name: speedwagon_net
+  rohan_net:
+    name: rohan_net
