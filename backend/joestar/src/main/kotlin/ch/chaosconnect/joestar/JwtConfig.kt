@@ -1,6 +1,7 @@
 package ch.chaosconnect.joestar
 
 import io.micronaut.context.annotation.ConfigurationProperties
+import java.time.Duration
 import javax.validation.constraints.NotBlank
 
 @ConfigurationProperties("jwt")
@@ -15,5 +16,7 @@ class JwtConfig {
     lateinit var audience: String
 
     @NotBlank
-    var clockSkew: Long = 0L
+    lateinit var validFor: Duration
+
+    var clockSkew: Duration = Duration.ZERO
 }

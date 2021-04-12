@@ -5,7 +5,6 @@ import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
 import org.slf4j.LoggerFactory
 import java.time.Instant
-import java.time.temporal.ChronoUnit
 import java.util.*
 import javax.crypto.SecretKey
 import javax.inject.Singleton
@@ -46,7 +45,7 @@ class TokenServiceImpl(private val jwtConfig: JwtConfig) : TokenService {
             .setSubject(identifier)
             .setAudience(jwtConfig.audience)
             .setIssuedAt(Date.from(now))
-            .setExpiration(Date.from(now.plus(1, ChronoUnit.DAYS)))
+            .setExpiration(Date.from(now.plus(jwtConfig.validFor)))
             .compact()
     }
 
@@ -86,7 +85,7 @@ class TokenServiceImpl(private val jwtConfig: JwtConfig) : TokenService {
             .setSigningKey(key)
             .requireIssuer(jwtConfig.issuer)
             .requireAudience(jwtConfig.audience)
-            .setAllowedClockSkewSeconds(jwtConfig.clockSkew)
+            .setAllowedClockSkewSeconds(jwtConfig.clockSkew.seconds)
             .build()
     }
 }
