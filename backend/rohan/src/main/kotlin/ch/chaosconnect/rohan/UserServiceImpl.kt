@@ -2,6 +2,7 @@ package ch.chaosconnect.rohan
 
 import javax.inject.Singleton
 
+//  TODO: Ensure thread safety
 @Singleton
 class UserServiceImpl : UserService {
 
