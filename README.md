@@ -23,7 +23,7 @@ The `docker-compose.yml` file contains a placeholder for the JWT signing key.
 This base64-encoded 512 bit secret is crucial for verifying user authenticity and must be configured before starting.
 
 Another crucial point are HTTPS certificates, which have to be mounted to `/etc/envoy/certs/cc.key` and `/etc/envoy/certs/cc.cert` within the container.
-If you're running on localhost, see the development guide below on how to generate self signed certificates.
+If you're running on localhost, see the development guide below on how to generate self-signed certificates.
 
 ## Starting
 
@@ -63,7 +63,7 @@ cd backend
 Or if you want to test the release configuration locally, you can build and run them locally:
 
 ```sh
-# Generate self-signed certs, puts them in the ./certs directory
+# Generate self-signed certs, puts them in the ./proxy/certs directory
 # Ensure the permissions are set such that the envoy docker user can read the certificate
 docker-compose -f docker-compose.gen.yml up gen_self_signed_cert
 
