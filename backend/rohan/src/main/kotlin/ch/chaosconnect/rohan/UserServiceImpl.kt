@@ -42,7 +42,10 @@ class UserServiceImpl : UserService {
         return displayName;
     }
 
-    override suspend fun updateUser(password: String, displayName: String): String {
+    override suspend fun updateUser(
+        password: String,
+        displayName: String
+    ): String {
         val user = usersByDisplayName[displayName]
             ?: throw NoSuchElementException("No user with display name '$displayName' found")
         user.displayName = displayName
