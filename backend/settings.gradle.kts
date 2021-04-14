@@ -4,6 +4,21 @@ rootProject.name = "backend"
 
 enableFeaturePreview("VERSION_CATALOGS")
 
+pluginManagement {
+    val kotlinPluginVersion = "1.4.32"
+    val shadowPluginVersion = "6.1.0"
+    val micronautPluginVersion = "1.4.5"
+    val protobufPluginVersion = "0.8.15"
+    plugins {
+        kotlin("jvm") version kotlinPluginVersion
+        kotlin("kapt") version kotlinPluginVersion
+        kotlin("plugin.allopen") version kotlinPluginVersion
+        id("com.github.johnrengelman.shadow") version shadowPluginVersion
+        id("io.micronaut.application") version micronautPluginVersion
+        id("com.google.protobuf") version protobufPluginVersion
+    }
+}
+
 dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {

@@ -1,12 +1,12 @@
 import com.google.protobuf.gradle.*
 
 plugins {
-    kotlin("jvm") version "1.4.32"
-    kotlin("kapt") version "1.4.32"
-    kotlin("plugin.allopen") version "1.4.32"
-    id("com.github.johnrengelman.shadow") version "6.1.0"
-    id("io.micronaut.application") version "1.4.5"
-    id("com.google.protobuf") version "0.8.15"
+    kotlin("jvm")
+    kotlin("kapt")
+    kotlin("plugin.allopen")
+    id("com.github.johnrengelman.shadow")
+    id("io.micronaut.application")
+    id("com.google.protobuf")
 }
 
 version = meta.versions.main.get()
