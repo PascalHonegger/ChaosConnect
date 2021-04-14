@@ -13,7 +13,7 @@ class RohanTest {
     lateinit var application: EmbeddedApplication<*>
 
     @Test
-    fun testItWorks() {
+    fun `test it works`() {
         assertTrue(application.isRunning)
     }
 

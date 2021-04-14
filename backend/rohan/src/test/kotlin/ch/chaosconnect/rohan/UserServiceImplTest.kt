@@ -51,7 +51,7 @@ internal class UserServiceImplTest {
         }
 
     @Test
-    fun addUser_throwsIllegalStateExceptionForDuplicateUserNames() {
+    fun `addUser throws IllegalStateException for duplicate user names`() {
         runBlocking {
             service.addUser("Bob", "123", "Bob89")
         }
@@ -63,7 +63,7 @@ internal class UserServiceImplTest {
     }
 
     @Test
-    fun addUser_throwsIllegalStateExceptionForDuplicateDisplayNames() {
+    fun `addUser throws IllegalStateException for duplicate display names`() {
         runBlocking {
             service.addUser("Bob", "123", "Eve")
         }
@@ -75,7 +75,7 @@ internal class UserServiceImplTest {
     }
 
     @Test
-    fun addTemporaryUser_throwsIllegalStateExceptionForDuplicateDisplayNamesWithOtherRegularUser() {
+    fun `addTemporaryUser throws IllegalStateException for duplicate display names with other regular user`() {
         runBlocking {
             service.addUser("Bob", "123", "Eve")
         }
@@ -87,7 +87,7 @@ internal class UserServiceImplTest {
     }
 
     @Test
-    fun addTemporaryUser_throwsIllegalStateExceptionForDuplicateDisplayNamesWithOtherTemporaryUser() {
+    fun `addTemporaryUser throws IllegalStateException for duplicate display names with other temporary user`() {
         runBlocking {
             service.addTemporaryUser("Eve")
         }
@@ -99,7 +99,7 @@ internal class UserServiceImplTest {
     }
 
     @Test
-    fun updateUser() {
+    fun `updateUser TODO`() {
         //  TODO: Test authentication failure with old password
     }
 }
