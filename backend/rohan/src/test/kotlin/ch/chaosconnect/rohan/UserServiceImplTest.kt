@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 internal class UserServiceImplTest {
 
@@ -36,12 +38,9 @@ internal class UserServiceImplTest {
         }
     }
 
-    @Test
-    fun getUser_returnsUserIfAddedBefore() {
-        getUser_returnsUserIfAddedBefore("Bob", "123", "Bob89")
-    }
-
-    private fun getUser_returnsUserIfAddedBefore(
+    @ParameterizedTest
+    @CsvSource("Bob,123,Bob89")
+    fun getUser_returnsUserIfAddedBefore(
         username: String,
         password: String,
         displayName: String
