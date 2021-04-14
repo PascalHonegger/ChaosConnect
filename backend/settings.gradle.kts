@@ -26,7 +26,7 @@ dependencyResolutionManagement {
             version("kotlinx", "1.4.3")
             version("micronaut", "2.4.2")
             version("protoc", "3.15.7")
-            version("gen-grpc-java", "1.36.1")
+            version("gen-grpc-java", "1.37.0")
             version("gen-grpc-kotlin", "1.0.0")
             version("jjwt", "0.11.2")
             version("mockk", "1.11.0")
