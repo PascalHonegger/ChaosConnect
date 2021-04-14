@@ -15,7 +15,7 @@ class UserServiceImpl : UserService {
 
     override suspend fun getUser(username: String, password: String): String =
         usersByUserName[username]
-            ?.displayName
+            ?.identifier
             ?: throw NoSuchElementException("No user with user name '$username' found")
 
     override suspend fun addUser(
@@ -28,14 +28,14 @@ class UserServiceImpl : UserService {
         val user = createUser(username, password, displayName)
         usersByUserName[username] = user
         usersByDisplayName[displayName] = user
-        return displayName;
+        return user.identifier;
     }
 
     override suspend fun addTemporaryUser(displayName: String): String {
         checkDisplayNameAvailable(displayName)
         val user = createUser(null, null, displayName)
         usersByDisplayName[displayName] = user
-        return displayName;
+        return user.identifier;
     }
 
     override suspend fun updateUser(
@@ -45,7 +45,7 @@ class UserServiceImpl : UserService {
         val user = usersByDisplayName[displayName]
             ?: throw NoSuchElementException("No user with display name '$displayName' found")
         user.displayName = displayName
-        return displayName
+        return user.identifier
     }
 
     private fun createUser(
