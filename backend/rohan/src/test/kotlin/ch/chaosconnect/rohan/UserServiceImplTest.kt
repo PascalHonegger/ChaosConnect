@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -19,7 +20,7 @@ internal class UserServiceImplTest {
 
     @Test
     fun `getUser throws NoSuchElementException without users`() {
-        assertThrows(NoSuchElementException::class.java) {
+        assertThrows<NoSuchElementException> {
             runBlocking {
                 service.getUser("Bob", "123")
             }
@@ -31,7 +32,7 @@ internal class UserServiceImplTest {
         runBlocking {
             service.addUser("Alice", "456", "Alice89")
         }
-        assertThrows(NoSuchElementException::class.java) {
+        assertThrows<NoSuchElementException> {
             runBlocking {
                 service.getUser("Bob", "123")
             }
@@ -55,7 +56,7 @@ internal class UserServiceImplTest {
         runBlocking {
             service.addUser("Bob", "123", "Bob89")
         }
-        assertThrows(IllegalStateException::class.java) {
+        assertThrows<IllegalStateException> {
             runBlocking {
                 service.addUser("Bob", "456", "Bob90")
             }
@@ -67,7 +68,7 @@ internal class UserServiceImplTest {
         runBlocking {
             service.addUser("Bob", "123", "Eve")
         }
-        assertThrows(IllegalStateException::class.java) {
+        assertThrows<IllegalStateException> {
             runBlocking {
                 service.addUser("Alice", "456", "Eve")
             }
@@ -79,7 +80,7 @@ internal class UserServiceImplTest {
         runBlocking {
             service.addUser("Bob", "123", "Eve")
         }
-        assertThrows(IllegalStateException::class.java) {
+        assertThrows<IllegalStateException> {
             runBlocking {
                 service.addTemporaryUser("Eve")
             }
@@ -91,7 +92,7 @@ internal class UserServiceImplTest {
         runBlocking {
             service.addTemporaryUser("Eve")
         }
-        assertThrows(IllegalStateException::class.java) {
+        assertThrows<IllegalStateException> {
             runBlocking {
                 service.addTemporaryUser("Eve")
             }
