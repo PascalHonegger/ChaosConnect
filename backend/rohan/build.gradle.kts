@@ -39,6 +39,7 @@ dependencies {
     testImplementation(libs.bundles.micronaut.test)
     testImplementation(libs.mockk)
     testImplementation(libs.turbine)
+    testImplementation(libs.junit.params)
     testImplementation(libs.kotlinx.test)
 }
 
