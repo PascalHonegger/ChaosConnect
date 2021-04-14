@@ -1,27 +1,22 @@
 <script lang="ts">
+    import twemoji from "./Twemoji";
+
     import JoestarTest from "./JoestarTest.svelte";
     import chaosConnectClient from "./JoestarClient";
     import webLoginClient from "./WebLoginClient";
 
     import LoginRegister from "./LoginRegister.svelte";
-    import {isLoggedIn} from "./Stores";
-
-    export let name: string;
+    import { isLoggedIn, token } from "./Stores";
 </script>
 
 <main>
+    <h1 use:twemoji>⚔️ ChaosConnect ⚔️</h1>
     {#if $isLoggedIn}
-        <h1>Hello {name}!</h1>
-        <hr/>
-        <JoestarTest client={chaosConnectClient}/>
+        <button on:click={() => token.unset()}>Logout</button>
+        <JoestarTest client={chaosConnectClient} />
     {:else}
-        <LoginRegister client={webLoginClient}/>
+        <LoginRegister client={webLoginClient} />
     {/if}
-    <p>
-        Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to
-        learn
-        how to build Svelte apps.
-    </p>
 </main>
 <footer>
     <a href="https://github.com/twitter/twemoji">Twitter Emoji (Twemoji)</a>
@@ -33,7 +28,6 @@
     main {
         text-align: center;
         padding: 1em;
-        max-width: 240px;
         margin: 0 auto;
     }
 
@@ -45,15 +39,8 @@
     }
 
     h1 {
-        color: #ff3e00;
-        text-transform: uppercase;
+        color: var(--primary-color);
         font-size: 4em;
         font-weight: 100;
-    }
-
-    @media (min-width: 640px) {
-        main {
-            max-width: none;
-        }
     }
 </style>
