@@ -1,10 +1,13 @@
 package ch.chaosconnect.rohan
 
+import java.util.*
 import javax.inject.Singleton
 
 //  TODO: Ensure thread safety
 @Singleton
 class UserServiceImpl : UserService {
+
+    private val usersByIdentifier = HashMap<String, User>()
 
     private val usersByUserName = HashMap<String, User>()
 
@@ -22,11 +25,7 @@ class UserServiceImpl : UserService {
     ): String {
         checkUserNameAvailable(username)
         checkDisplayNameAvailable(displayName)
-        val user = User(
-            username,
-            password,
-            displayName
-        )
+        val user = createUser(username, password, displayName)
         usersByUserName[username] = user
         usersByDisplayName[displayName] = user
         return displayName;
@@ -34,11 +33,8 @@ class UserServiceImpl : UserService {
 
     override suspend fun addTemporaryUser(displayName: String): String {
         checkDisplayNameAvailable(displayName)
-        usersByDisplayName[displayName] = User(
-            null,
-            null,
-            displayName
-        )
+        val user = createUser(null, null, displayName)
+        usersByDisplayName[displayName] = user
         return displayName;
     }
 
@@ -52,21 +48,50 @@ class UserServiceImpl : UserService {
         return displayName
     }
 
+    private fun createUser(
+        username: String?,
+        password: String?,
+        displayName: String
+    ): User {
+        val identifier = createUniqueIdentifier()
+        //  We are very paranoid
+        checkUniquePropertyAvailable(
+            usersByIdentifier,
+            identifier,
+            "User identifier"
+        )
+        val user = User(
+            identifier,
+            username,
+            password,
+            displayName
+        )
+        usersByIdentifier[identifier] = user
+        return user
+    }
+
     private fun checkUserNameAvailable(userName: String) =
-        checkNameAvailable(usersByUserName, userName, "User")
+        checkUniquePropertyAvailable(usersByUserName, userName, "User name")
 
     private fun checkDisplayNameAvailable(displayName: String) =
-        checkNameAvailable(usersByDisplayName, displayName, "Display")
+        checkUniquePropertyAvailable(
+            usersByDisplayName,
+            displayName,
+            "Display name"
+        )
 
     companion object {
 
-        private fun checkNameAvailable(
-            userCache: MutableMap<String, User>,
-            name: String,
-            nameKind: String
+        private fun createUniqueIdentifier(): String =
+            UUID.randomUUID().toString()
+
+        private fun <PropertyT> checkUniquePropertyAvailable(
+            userCache: Map<PropertyT, User>,
+            property: PropertyT,
+            propertyName: String
         ) {
-            if (userCache.containsKey(name)) {
-                throw IllegalStateException("$nameKind name '$name' already in use")
+            if (userCache.containsKey(property)) {
+                throw IllegalStateException("$propertyName '$property' already in use")
             }
         }
     }
