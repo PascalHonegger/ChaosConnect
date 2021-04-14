@@ -9,7 +9,6 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/backend" />
-            <option value="$PROJECT_DIR$/backend/buildSrc" />
             <option value="$PROJECT_DIR$/backend/joestar" />
             <option value="$PROJECT_DIR$/backend/rohan" />
           </set>

@@ -1,23 +1,23 @@
 import com.google.protobuf.gradle.*
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version Versions.kotlinVersion
-    id("org.jetbrains.kotlin.kapt") version Versions.kotlinVersion
-    id("org.jetbrains.kotlin.plugin.allopen") version Versions.kotlinVersion
-    id("com.github.johnrengelman.shadow") version Versions.shadowVersion
-    id("io.micronaut.application") version Versions.micronautGradlePluginVersion
-    id("com.google.protobuf") version Versions.protobufGradlePluginVersion
+    kotlin("jvm") version "1.4.32"
+    kotlin("kapt") version "1.4.32"
+    kotlin("plugin.allopen") version "1.4.32"
+    id("com.github.johnrengelman.shadow") version "6.1.0"
+    id("io.micronaut.application") version "1.4.5"
+    id("com.google.protobuf") version "0.8.15"
 }
 
-version = About.version
-group = About.group
+version = meta.versions.main.get()
+group = "ch.chaosconnect"
 
 repositories {
     mavenCentral()
 }
 
 micronaut {
-    version(Versions.micronautVersion)
+    version(libs.versions.micronaut.get())
     testRuntime("junit5")
     processing {
         incremental(true)
@@ -26,45 +26,38 @@ micronaut {
 }
 
 dependencies {
-    implementation("io.micronaut:micronaut-validation")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlinVersion}")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlinVersion}")
-    implementation("io.micronaut.kotlin:micronaut-kotlin-runtime")
-    implementation("io.micronaut:micronaut-runtime")
-    implementation("io.micronaut:micronaut-management")
-    implementation("io.micronaut:micronaut-http-server-netty")
-    implementation("io.micronaut.grpc:micronaut-grpc-runtime")
-    implementation("javax.annotation:javax.annotation-api")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.kotlinxVersion}")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:${Versions.kotlinxVersion}")
-    implementation("io.grpc:grpc-kotlin-stub:${Versions.protocKotlinVersion}")
-    implementation("io.jsonwebtoken:jjwt-api:${Versions.jjwtVersion}")
-    runtimeOnly("ch.qos.logback:logback-classic")
-    runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
-    runtimeOnly("io.jsonwebtoken:jjwt-impl:${Versions.jjwtVersion}")
-    runtimeOnly("io.jsonwebtoken:jjwt-jackson:${Versions.jjwtVersion}")
-    testImplementation("io.micronaut:micronaut-http-client")
-    testImplementation("io.mockk:mockk:${Versions.mockkVersion}")
-    testImplementation("app.cash.turbine:turbine:${Versions.turbineVersion}")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.kotlinxVersion}")
+    implementation(libs.bundles.micronaut.server)
+    implementation(libs.javax.annotation)
+    implementation(libs.bundles.kotlin)
+    implementation(libs.kotlinx.core)
+    implementation(libs.kotlinx.reactive)
+    implementation(libs.grpc.kotlin)
+    implementation(libs.jjwt.api)
+    runtimeOnly(libs.logback)
+    runtimeOnly(libs.jjwt.impl)
+    runtimeOnly(libs.jjwt.jackson)
+    testImplementation(libs.bundles.micronaut.test)
+    testImplementation(libs.mockk)
+    testImplementation(libs.turbine)
+    testImplementation(libs.kotlinx.test)
 }
 
 application {
     mainClass.set("ch.chaosconnect.joestar.ApplicationKt")
 }
 java {
-    sourceCompatibility = JavaVersion.toVersion(Versions.jvmTargetVersion)
+    sourceCompatibility = JavaVersion.toVersion(targets.versions.jvm.get())
 }
 
 tasks {
     compileKotlin {
         kotlinOptions {
-            jvmTarget = Versions.jvmTargetVersion
+            jvmTarget = targets.versions.jvm.get()
         }
     }
     compileTestKotlin {
         kotlinOptions {
-            jvmTarget = Versions.jvmTargetVersion
+            jvmTarget = targets.versions.jvm.get()
         }
     }
 }
@@ -84,16 +77,16 @@ sourceSets {
 
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:${Versions.protocVersion}"
+        artifact = "com.google.protobuf:protoc:${libs.versions.protoc.get()}"
     }
     plugins {
         id("grpc") {
             artifact =
-                "io.grpc:protoc-gen-grpc-java:${Versions.protocJavaVersion}"
+                "io.grpc:protoc-gen-grpc-java:${libs.versions.gen.grpc.java.get()}"
         }
         id("grpckt") {
             artifact =
-                "io.grpc:protoc-gen-grpc-kotlin:${Versions.protocKotlinVersion}:jdk7@jar"
+                "io.grpc:protoc-gen-grpc-kotlin:${libs.versions.gen.grpc.kotlin.get()}:jdk7@jar"
         }
     }
     generateProtoTasks {
