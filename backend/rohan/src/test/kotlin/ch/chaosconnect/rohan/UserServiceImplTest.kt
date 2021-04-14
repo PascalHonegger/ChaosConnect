@@ -18,7 +18,7 @@ internal class UserServiceImplTest {
     }
 
     @Test
-    fun getUser_throwsNoSuchElementExceptionWithoutUsers() {
+    fun `getUser throws NoSuchElementException without users`() {
         assertThrows(NoSuchElementException::class.java) {
             runBlocking {
                 service.getUser("Bob", "123")
@@ -27,7 +27,7 @@ internal class UserServiceImplTest {
     }
 
     @Test
-    fun getUser_throwsNoSuchElementExceptionWithoutSpecificUsers() {
+    fun `getUser throws NoSuchElementException without specific users`() {
         runBlocking {
             service.addUser("Alice", "456", "Alice89")
         }
@@ -40,7 +40,7 @@ internal class UserServiceImplTest {
 
     @ParameterizedTest
     @CsvSource("Bob,123,Bob89")
-    fun getUser_returnsUserIfAddedBefore(
+    fun `getUser returns user if added before`(
         username: String,
         password: String,
         displayName: String

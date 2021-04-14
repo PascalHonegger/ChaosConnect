@@ -22,7 +22,7 @@ internal class GameServiceImplTest {
 
     //  FIXME [alexandre]: Ensure test termination
     //      @Test
-    fun placePiece_triggersGameUpdates() =
+    fun `placePiece triggers game updates`() =
         runBlocking {
             service.placePiece(0, 3)
             Assertions.assertEquals(
@@ -44,7 +44,7 @@ internal class GameServiceImplTest {
 
     //  FIXME [alexandre]: Ensure test termination
     //      @Test
-    fun getGameUpdates_yieldsInitiallyAnEmptyFlow() =
+    fun `getGameUpdates yields initially an empty flow`() =
         runBlocking {
             Assertions.assertEquals(
                 arrayOf<Pair<GameUpdateEvent, GameState>>(),

@@ -5,12 +5,12 @@ import org.junit.jupiter.api.Test
 internal class GameEndpointTest {
 
     @Test
-    fun placePiece() {
+    fun `placePiece TODO`() {
         //  TODO [alexandre]: Test implementation
     }
 
     @Test
-    fun getGameUpdates() {
+    fun `getGameUpdates TODO`() {
         //  TODO [alexandre]: Test implementation
     }
 }
