@@ -42,25 +42,25 @@ internal class UserServiceImplTest {
     }
 
     @Test
-    fun `addTemporaryUser throws IllegalStateException for duplicate display names with other regular user`() {
+    fun `signInAsTemporaryUser throws IllegalStateException for duplicate display names with other regular user`() {
         runBlocking {
             service.signUpAsRegularUser("Bob", "123", "Eve")
         }
         assertThrows<IllegalStateException> {
             runBlocking {
-                service.addTemporaryUser("Eve")
+                service.signInAsTemporaryUser("Eve")
             }
         }
     }
 
     @Test
-    fun `addTemporaryUser throws IllegalStateException for duplicate display names with other temporary user`() {
+    fun `signInAsTemporaryUser throws IllegalStateException for duplicate display names with other temporary user`() {
         runBlocking {
-            service.addTemporaryUser("Eve")
+            service.signInAsTemporaryUser("Eve")
         }
         assertThrows<IllegalStateException> {
             runBlocking {
-                service.addTemporaryUser("Eve")
+                service.signInAsTemporaryUser("Eve")
             }
         }
     }

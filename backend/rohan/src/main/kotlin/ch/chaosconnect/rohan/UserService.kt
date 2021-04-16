@@ -8,7 +8,7 @@ interface UserService {
         displayName: String
     ): String
 
-    suspend fun addTemporaryUser(displayName: String): String
+    suspend fun signInAsTemporaryUser(displayName: String): String
 
     suspend fun signInAsRegularUser(username: String, password: String): String
 

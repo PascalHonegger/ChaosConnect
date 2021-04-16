@@ -27,7 +27,7 @@ class UserEndpoint(private val service: UserService) :
 
     override suspend fun addTemporaryUser(request: AddTemporaryUserRequest) =
         processRequest {
-            service.addTemporaryUser(
+            service.signInAsTemporaryUser(
                 request.displayName
             )
         }

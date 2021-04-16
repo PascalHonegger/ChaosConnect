@@ -26,7 +26,7 @@ class UserServiceImpl : UserService {
         return user.identifier
     }
 
-    override suspend fun addTemporaryUser(displayName: String): String {
+    override suspend fun signInAsTemporaryUser(displayName: String): String {
         checkDisplayNameAvailable(displayName)
         val user = createUser(null, null, displayName)
         usersByDisplayName[displayName] = user
