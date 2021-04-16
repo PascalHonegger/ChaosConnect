@@ -102,7 +102,12 @@ internal class UserServiceImplTest {
         }
 
     @Test
-    fun `updateUser TODO`() {
+    fun `setPassword TODO`() {
+        //  TODO: Test authentication failure with old password
+    }
+
+    @Test
+    fun `setDisplayName TODO`() {
         //  TODO: Test authentication failure with old password
     }
 }

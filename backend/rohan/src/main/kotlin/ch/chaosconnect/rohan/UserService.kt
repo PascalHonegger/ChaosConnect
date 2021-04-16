@@ -12,5 +12,7 @@ interface UserService {
 
     suspend fun signInAsRegularUser(username: String, password: String): String
 
-    suspend fun updateUser(password: String, displayName: String): String
+    suspend fun setPassword(password: String): String
+
+    suspend fun setDisplayName(displayName: String): String
 }

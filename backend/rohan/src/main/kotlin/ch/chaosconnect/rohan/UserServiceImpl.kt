@@ -41,14 +41,14 @@ class UserServiceImpl : UserService {
             ?.identifier
             ?: throw NoSuchElementException("No user with user name '$username' found")
 
-    override suspend fun updateUser(
-        password: String,
-        displayName: String
-    ): String {
-        val user = usersByDisplayName[displayName]
-            ?: throw NoSuchElementException("No user with display name '$displayName' found")
-        user.displayName = displayName
-        return user.identifier
+    override suspend fun setPassword(password: String): String {
+        //  TODO
+        return ""
+    }
+
+    override suspend fun setDisplayName(displayName: String): String {
+        //  TODO
+        return ""
     }
 
     private fun createUser(

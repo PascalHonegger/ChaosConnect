@@ -34,10 +34,14 @@ class UserEndpoint(private val service: UserService) :
 
     override suspend fun updateUser(request: UpdateUserRequest) =
         processRequest {
-            service.updateUser(
-                request.password,
-                request.displayName
-            )
+            when {
+                request.hasPassword() ->
+                    service.setPassword(request.password)
+                request.hasDisplayName() ->
+                    service.setDisplayName(request.displayName)
+                else ->
+                    throw IllegalArgumentException("Unknown changed property")
+            }
         }
 
     companion object {
