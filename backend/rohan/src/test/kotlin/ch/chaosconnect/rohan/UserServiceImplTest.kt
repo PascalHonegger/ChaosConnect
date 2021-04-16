@@ -18,25 +18,25 @@ internal class UserServiceImplTest {
     }
 
     @Test
-    fun `addUser throws IllegalStateException for duplicate user names`() {
+    fun `signUpAsRegularUser throws IllegalStateException for duplicate user names`() {
         runBlocking {
-            service.addUser("Bob", "123", "Bob89")
+            service.signUpAsRegularUser("Bob", "123", "Bob89")
         }
         assertThrows<IllegalStateException> {
             runBlocking {
-                service.addUser("Bob", "456", "Bob90")
+                service.signUpAsRegularUser("Bob", "456", "Bob90")
             }
         }
     }
 
     @Test
-    fun `addUser throws IllegalStateException for duplicate display names`() {
+    fun `signUpAsRegularUser throws IllegalStateException for duplicate display names`() {
         runBlocking {
-            service.addUser("Bob", "123", "Eve")
+            service.signUpAsRegularUser("Bob", "123", "Eve")
         }
         assertThrows<IllegalStateException> {
             runBlocking {
-                service.addUser("Alice", "456", "Eve")
+                service.signUpAsRegularUser("Alice", "456", "Eve")
             }
         }
     }
@@ -44,7 +44,7 @@ internal class UserServiceImplTest {
     @Test
     fun `addTemporaryUser throws IllegalStateException for duplicate display names with other regular user`() {
         runBlocking {
-            service.addUser("Bob", "123", "Eve")
+            service.signUpAsRegularUser("Bob", "123", "Eve")
         }
         assertThrows<IllegalStateException> {
             runBlocking {
@@ -77,7 +77,7 @@ internal class UserServiceImplTest {
     @Test
     fun `signInAsRegularUser throws NoSuchElementException without specific users`() {
         runBlocking {
-            service.addUser("Alice", "456", "Alice89")
+            service.signUpAsRegularUser("Alice", "456", "Alice89")
         }
         assertThrows<NoSuchElementException> {
             runBlocking {
@@ -94,7 +94,7 @@ internal class UserServiceImplTest {
         displayName: String
     ) =
         runBlocking {
-            service.addUser(username, password, displayName)
+            service.signUpAsRegularUser(username, password, displayName)
             assertEquals(
                 displayName,
                 service.signInAsRegularUser(username, password)

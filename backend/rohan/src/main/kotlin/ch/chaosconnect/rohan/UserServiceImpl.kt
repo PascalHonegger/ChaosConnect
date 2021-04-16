@@ -13,7 +13,7 @@ class UserServiceImpl : UserService {
 
     private val usersByDisplayName = HashMap<String, User>()
 
-    override suspend fun addUser(
+    override suspend fun signUpAsRegularUser(
         username: String,
         password: String,
         displayName: String

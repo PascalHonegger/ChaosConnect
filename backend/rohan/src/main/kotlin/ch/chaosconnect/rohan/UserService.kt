@@ -2,7 +2,7 @@ package ch.chaosconnect.rohan
 
 interface UserService {
 
-    suspend fun addUser(
+    suspend fun signUpAsRegularUser(
         username: String,
         password: String,
         displayName: String
