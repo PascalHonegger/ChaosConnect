@@ -1,12 +1,12 @@
 package ch.chaosconnect.rohan
 
+import io.grpc.Context
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.CsvSource
 
 internal class UserServiceImplTest {
 
@@ -18,56 +18,82 @@ internal class UserServiceImplTest {
     }
 
     @Test
-    fun `signUpAsRegularUser throws IllegalStateException for duplicate user names`() {
-        runBlocking {
-            service.signUpAsRegularUser("Bob", "123", "Bob89")
+    fun `signUpAsRegularUser accepts new signed out users`() {
+        runSignedOut {
+            service.signUpAsRegularUser("bob", "123", "Bob89")
         }
-        assertThrows<IllegalStateException> {
-            runBlocking {
-                service.signUpAsRegularUser("Bob", "456", "Bob90")
+    }
+
+    @Test
+    fun `signUpAsRegularUser accepts new signed out users with unique names`() {
+        runSignedOut {
+            service.signUpAsRegularUser("bob", "pw", "Bob89")
+            service.signUpAsRegularUser("alice", "pw", "Alice90")
+        }
+    }
+
+    @Test
+    fun `signUpAsRegularUser throws when new signed out users use existing names`() {
+        runSignedOut {
+            service.signUpAsRegularUser("bob", "pw", "Bob89")
+            assertThrowsWithMessage<IllegalStateException>("User name 'bob' already in use") {
+                service.signUpAsRegularUser("bob", "pw", "Bob90")
             }
         }
     }
 
     @Test
-    fun `signUpAsRegularUser throws IllegalStateException for duplicate display names`() {
-        runBlocking {
-            service.signUpAsRegularUser("Bob", "123", "Eve")
-        }
-        assertThrows<IllegalStateException> {
-            runBlocking {
-                service.signUpAsRegularUser("Alice", "456", "Eve")
+    fun `signUpAsRegularUser throws for signed in regular users`() {
+        runSignedInAsRegularUser("bob", "pw", "Bob89") {
+            assertThrowsWithMessage<IllegalStateException>("Already signed in as a regular user") {
+                service.signUpAsRegularUser("alice", "pw", "Alice90")
             }
         }
     }
 
     @Test
-    fun `signInAsTemporaryUser throws IllegalStateException for duplicate display names with other regular user`() {
-        runBlocking {
-            service.signUpAsRegularUser("Bob", "123", "Eve")
-        }
-        assertThrows<IllegalStateException> {
-            runBlocking {
-                service.signInAsTemporaryUser("Eve")
-            }
+    fun `signUpAsRegularUser accepts signed in temporary users (upgrade)`() {
+        val displayName = "Bob89"
+        runSignedInAsTemporaryUser(displayName) {
+            service.signUpAsRegularUser("bob", "pw", displayName)
         }
     }
 
     @Test
-    fun `signInAsTemporaryUser throws IllegalStateException for duplicate display names with other temporary user`() {
+    fun `signUpAsRegularUser accepts duplicate display names among regular users`() {
         runBlocking {
-            service.signInAsTemporaryUser("Eve")
-        }
-        assertThrows<IllegalStateException> {
-            runBlocking {
-                service.signInAsTemporaryUser("Eve")
-            }
+            service.signUpAsRegularUser("eve1", "pw", "Eve89")
+            service.signUpAsRegularUser("eve2", "pw", "Eve89")
         }
     }
 
     @Test
-    fun `signInAsRegularUser throws NoSuchElementException without users`() {
-        assertThrows<NoSuchElementException> {
+    fun `signUpAsRegularUser accepts duplicate display names among regular and temporary users`() {
+        runBlocking {
+            service.signInAsTemporaryUser("Eve89")
+            service.signUpAsRegularUser("eve2", "pw", "Eve89")
+        }
+    }
+
+    @Test
+    fun `signInAsTemporaryUser accepts duplicate display names among temporary users`() {
+        runBlocking {
+            service.signInAsTemporaryUser("Eve89")
+            service.signInAsTemporaryUser("Eve89")
+        }
+    }
+
+    @Test
+    fun `signInAsTemporaryUser accepts duplicate display names among temporary and regular user`() {
+        runBlocking {
+            service.signUpAsRegularUser("eve", "pw", "Eve89")
+            service.signInAsTemporaryUser("Eve89")
+        }
+    }
+
+    @Test
+    fun `signInAsRegularUser throws sign-in failure for missing users`() {
+        assertThrowsWithMessage<IllegalAccessException>("Sign-in failed") {
             runBlocking {
                 service.signInAsRegularUser("Bob", "123")
             }
@@ -75,39 +101,131 @@ internal class UserServiceImplTest {
     }
 
     @Test
-    fun `signInAsRegularUser throws NoSuchElementException without specific users`() {
+    fun `signInAsRegularUser throws sign-in failure for bad passwords`() {
+        val name = "bob"
+        val displayName = "Bob89"
         runBlocking {
-            service.signUpAsRegularUser("Alice", "456", "Alice89")
+            service.signUpAsRegularUser(name, "opw", displayName)
         }
-        assertThrows<NoSuchElementException> {
+        assertThrowsWithMessage<IllegalAccessException>("Sign-in failed") {
             runBlocking {
-                service.signInAsRegularUser("Bob", "123")
+                service.signInAsRegularUser("Bob", "npw")
             }
         }
     }
 
-    @ParameterizedTest
-    @CsvSource("Bob,123,Bob89")
-    fun `signInAsRegularUser returns user if added before`(
-        name: String,
-        password: String,
-        displayName: String
+    @Test
+    fun `setPassword throws for signed out users`() =
+        assertThrowsWithMessage<IllegalAccessException>("No active user") {
+            runSignedOut {
+                service.setPassword("pw")
+            }
+        }
+
+    @Test
+    fun `setPassword throws for signed in temporary users`() =
+        assertThrowsWithMessage<IllegalAccessException>("Cannot set password for temporary user") {
+            runSignedInAsTemporaryUser("Bob89") {
+                service.setPassword("pw")
+            }
+        }
+
+    @Test
+    fun `setPassword invalidates old password for signed in regular users`() {
+        val name = "bob"
+        val oldPassword = "opw"
+        runSignedInAsRegularUser(name, oldPassword, "Bob89") {
+            service.setPassword("npw")
+        }
+        assertThrowsWithMessage<IllegalAccessException>("Sign-in failed") {
+            runBlocking {
+                service.signInAsRegularUser(name, oldPassword)
+            }
+        }
+    }
+
+    @Test
+    fun `setPassword validates new password for signed in regular users`() {
+        val name = "bob"
+        val newPassword = "npw"
+        runSignedInAsRegularUser(name, "opw", "Bob89") {
+            service.setPassword(newPassword)
+        }
+        runBlocking {
+            service.signInAsRegularUser(name, newPassword)
+        }
+    }
+
+    @Test
+    fun `setDisplayName throws for signed out users`() =
+        assertThrowsWithMessage<IllegalAccessException>("No active user") {
+            runSignedOut {
+                service.setDisplayName("Bob89")
+            }
+        }
+
+    private fun <T> runSignedInAsTemporaryUser(
+        displayName: String,
+        block: suspend CoroutineScope.() -> T
     ) =
         runBlocking {
-            service.signUpAsRegularUser(name, password, displayName)
-            assertEquals(
-                displayName,
-                service.signInAsRegularUser(name, password)
+            runSignedIn(
+                service.signInAsTemporaryUser(displayName),
+                block
             )
         }
 
-    @Test
-    fun `setPassword TODO`() {
-        //  TODO: Test authentication failure with old password
+    private fun <T> runSignedInAsRegularUser(
+        name: String,
+        password: String,
+        displayName: String,
+        block: suspend CoroutineScope.() -> T
+    ) {
+        runBlocking {
+            runSignedIn(
+                signUpAndInAsRegularUser(name, password, displayName),
+                block
+            )
+        }
     }
 
-    @Test
-    fun `setDisplayName TODO`() {
-        //  TODO: Test authentication failure with old password
+    private suspend fun signUpAndInAsRegularUser(
+        name: String,
+        password: String,
+        displayName: String
+    ): String {
+        val identifier1 =
+            service.signUpAsRegularUser(name, password, displayName)
+        val identifier2 =
+            service.signInAsRegularUser(name, password)
+        assertEquals(identifier1, identifier2)
+        return identifier2
+    }
+
+    companion object {
+
+        private fun <T> runSignedOut(block: suspend CoroutineScope.() -> T) =
+            runBlocking {
+                block()
+            }
+
+        private fun <T> runSignedIn(
+            identifier: String,
+            block: suspend CoroutineScope.() -> T
+        ) =
+            Context
+                .ROOT
+                .withValue(userIdentifierContextKey, identifier)
+                .run {
+                    runBlocking {
+                        block()
+                    }
+                }
+
+        private inline fun <reified T : Throwable> assertThrowsWithMessage(
+            message: String,
+            executable: () -> Unit
+        ) =
+            assertEquals(message, assertThrows<T>(executable).message)
     }
 }
