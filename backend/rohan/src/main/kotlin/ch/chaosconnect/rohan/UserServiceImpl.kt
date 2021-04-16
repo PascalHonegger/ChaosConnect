@@ -9,19 +9,19 @@ class UserServiceImpl : UserService {
 
     private val usersByIdentifier = HashMap<String, User>()
 
-    private val usersByUserName = HashMap<String, User>()
+    private val usersByName = HashMap<String, User>()
 
     private val usersByDisplayName = HashMap<String, User>()
 
     override suspend fun signUpAsRegularUser(
-        username: String,
+        name: String,
         password: String,
         displayName: String
     ): String {
-        checkUserNameAvailable(username)
+        checkNameAvailable(name)
         checkDisplayNameAvailable(displayName)
-        val user = createUser(username, password, displayName)
-        usersByUserName[username] = user
+        val user = createUser(name, password, displayName)
+        usersByName[name] = user
         usersByDisplayName[displayName] = user
         return user.identifier
     }
@@ -33,13 +33,10 @@ class UserServiceImpl : UserService {
         return user.identifier
     }
 
-    override suspend fun signInAsRegularUser(
-        username: String,
-        password: String
-    ): String =
-        usersByUserName[username]
+    override suspend fun signInAsRegularUser(name: String, password: String): String =
+        usersByName[name]
             ?.identifier
-            ?: throw NoSuchElementException("No user with user name '$username' found")
+            ?: throw NoSuchElementException("No user with name '$name' found")
 
     override suspend fun setPassword(password: String): String {
         //  TODO
@@ -52,7 +49,7 @@ class UserServiceImpl : UserService {
     }
 
     private fun createUser(
-        username: String?,
+        name: String?,
         password: String?,
         displayName: String
     ): User {
@@ -65,7 +62,7 @@ class UserServiceImpl : UserService {
         )
         val user = User(
             identifier,
-            username,
+            name,
             password,
             displayName
         )
@@ -73,8 +70,8 @@ class UserServiceImpl : UserService {
         return user
     }
 
-    private fun checkUserNameAvailable(userName: String) =
-        checkUniquePropertyAvailable(usersByUserName, userName, "User name")
+    private fun checkNameAvailable(name: String) =
+        checkUniquePropertyAvailable(usersByName, name, "User name")
 
     private fun checkDisplayNameAvailable(displayName: String) =
         checkUniquePropertyAvailable(

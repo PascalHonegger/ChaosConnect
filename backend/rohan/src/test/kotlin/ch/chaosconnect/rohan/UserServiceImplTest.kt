@@ -89,15 +89,15 @@ internal class UserServiceImplTest {
     @ParameterizedTest
     @CsvSource("Bob,123,Bob89")
     fun `signInAsRegularUser returns user if added before`(
-        username: String,
+        name: String,
         password: String,
         displayName: String
     ) =
         runBlocking {
-            service.signUpAsRegularUser(username, password, displayName)
+            service.signUpAsRegularUser(name, password, displayName)
             assertEquals(
                 displayName,
-                service.signInAsRegularUser(username, password)
+                service.signInAsRegularUser(name, password)
             )
         }
 
