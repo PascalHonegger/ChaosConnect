@@ -11,25 +11,19 @@ class UserServiceImpl : UserService {
 
     private val usersByName = HashMap<String, User>()
 
-    private val usersByDisplayName = HashMap<String, User>()
-
     override suspend fun signUpAsRegularUser(
         name: String,
         password: String,
         displayName: String
     ): String {
         checkNameAvailable(name)
-        checkDisplayNameAvailable(displayName)
         val user = createUser(name, password, displayName)
         usersByName[name] = user
-        usersByDisplayName[displayName] = user
         return user.identifier
     }
 
     override suspend fun signInAsTemporaryUser(displayName: String): String {
-        checkDisplayNameAvailable(displayName)
         val user = createUser(null, null, displayName)
-        usersByDisplayName[displayName] = user
         return user.identifier
     }
 
@@ -72,13 +66,6 @@ class UserServiceImpl : UserService {
 
     private fun checkNameAvailable(name: String) =
         checkUniquePropertyAvailable(usersByName, name, "User name")
-
-    private fun checkDisplayNameAvailable(displayName: String) =
-        checkUniquePropertyAvailable(
-            usersByDisplayName,
-            displayName,
-            "Display name"
-        )
 
     companion object {
 
