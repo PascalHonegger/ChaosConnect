@@ -13,11 +13,6 @@ class UserServiceImpl : UserService {
 
     private val usersByDisplayName = HashMap<String, User>()
 
-    override suspend fun getUser(username: String, password: String): String =
-        usersByUserName[username]
-            ?.identifier
-            ?: throw NoSuchElementException("No user with user name '$username' found")
-
     override suspend fun addUser(
         username: String,
         password: String,
@@ -37,6 +32,14 @@ class UserServiceImpl : UserService {
         usersByDisplayName[displayName] = user
         return user.identifier
     }
+
+    override suspend fun signInAsRegularUser(
+        username: String,
+        password: String
+    ): String =
+        usersByUserName[username]
+            ?.identifier
+            ?: throw NoSuchElementException("No user with user name '$username' found")
 
     override suspend fun updateUser(
         password: String,

@@ -10,7 +10,7 @@ class UserEndpoint(private val service: UserService) :
 
     override suspend fun getUser(request: GetUserRequest) =
         processRequest {
-            service.getUser(
+            service.signInAsRegularUser(
                 request.username,
                 request.password
             )

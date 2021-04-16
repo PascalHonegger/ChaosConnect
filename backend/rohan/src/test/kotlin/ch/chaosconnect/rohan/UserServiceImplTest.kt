@@ -18,39 +18,6 @@ internal class UserServiceImplTest {
     }
 
     @Test
-    fun `getUser throws NoSuchElementException without users`() {
-        assertThrows<NoSuchElementException> {
-            runBlocking {
-                service.getUser("Bob", "123")
-            }
-        }
-    }
-
-    @Test
-    fun `getUser throws NoSuchElementException without specific users`() {
-        runBlocking {
-            service.addUser("Alice", "456", "Alice89")
-        }
-        assertThrows<NoSuchElementException> {
-            runBlocking {
-                service.getUser("Bob", "123")
-            }
-        }
-    }
-
-    @ParameterizedTest
-    @CsvSource("Bob,123,Bob89")
-    fun `getUser returns user if added before`(
-        username: String,
-        password: String,
-        displayName: String
-    ) =
-        runBlocking {
-            service.addUser(username, password, displayName)
-            assertEquals(displayName, service.getUser(username, password))
-        }
-
-    @Test
     fun `addUser throws IllegalStateException for duplicate user names`() {
         runBlocking {
             service.addUser("Bob", "123", "Bob89")
@@ -97,6 +64,42 @@ internal class UserServiceImplTest {
             }
         }
     }
+
+    @Test
+    fun `signInAsRegularUser throws NoSuchElementException without users`() {
+        assertThrows<NoSuchElementException> {
+            runBlocking {
+                service.signInAsRegularUser("Bob", "123")
+            }
+        }
+    }
+
+    @Test
+    fun `signInAsRegularUser throws NoSuchElementException without specific users`() {
+        runBlocking {
+            service.addUser("Alice", "456", "Alice89")
+        }
+        assertThrows<NoSuchElementException> {
+            runBlocking {
+                service.signInAsRegularUser("Bob", "123")
+            }
+        }
+    }
+
+    @ParameterizedTest
+    @CsvSource("Bob,123,Bob89")
+    fun `signInAsRegularUser returns user if added before`(
+        username: String,
+        password: String,
+        displayName: String
+    ) =
+        runBlocking {
+            service.addUser(username, password, displayName)
+            assertEquals(
+                displayName,
+                service.signInAsRegularUser(username, password)
+            )
+        }
 
     @Test
     fun `updateUser TODO`() {
