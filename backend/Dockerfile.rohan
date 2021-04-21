@@ -1,7 +1,7 @@
-FROM gradle:jdk15 as build
+FROM gradle:7.0-jdk11 as build
 
 COPY . .
-RUN gradle :rohan:shadowjar --no-daemon
+RUN gradle :rohan:shadowJar --no-daemon --no-watch-fs
 
 FROM adoptopenjdk:15-jre-hotspot
 VOLUME /etc/rohan/

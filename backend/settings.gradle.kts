@@ -117,7 +117,7 @@ dependencyResolutionManagement {
                 .versionRef("turbine")
         }
         create("targets") {
-            version("jvm", "15")
+            version("jvm", "11")
         }
         create("meta") {
             version("main", "0.1")
