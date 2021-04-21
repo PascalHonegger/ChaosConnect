@@ -28,14 +28,14 @@ class UserServiceImpl : UserService {
         val user = createUser(username, password, displayName)
         usersByUserName[username] = user
         usersByDisplayName[displayName] = user
-        return user.identifier;
+        return user.identifier
     }
 
     override suspend fun addTemporaryUser(displayName: String): String {
         checkDisplayNameAvailable(displayName)
         val user = createUser(null, null, displayName)
         usersByDisplayName[displayName] = user
-        return user.identifier;
+        return user.identifier
     }
 
     override suspend fun updateUser(

@@ -1,4 +1,4 @@
-package ch.chaosconnect.rohan;
+package ch.chaosconnect.rohan
 
 import ch.chaosconnect.api.common.Empty
 import ch.chaosconnect.api.game.Coordinate
