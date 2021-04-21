@@ -2,17 +2,19 @@
     import twemoji from "./Twemoji";
 
     import JoestarTest from "./JoestarTest.svelte";
+    import TokenRefresher from "./TokenRefresher.svelte";
     import chaosConnectClient from "./JoestarClient";
     import webLoginClient from "./WebLoginClient";
 
     import LoginRegister from "./LoginRegister.svelte";
-    import { isLoggedIn, token } from "./Stores";
+    import {isLoggedIn, token} from "./Stores";
 </script>
 
 <main>
     <h1 use:twemoji>⚔️ ChaosConnect ⚔️</h1>
     {#if $isLoggedIn}
         <button on:click={() => token.unset()}>Logout</button>
+        <TokenRefresher client={webLoginClient}/>
         <JoestarTest client={chaosConnectClient} />
     {:else}
         <LoginRegister client={webLoginClient} />
