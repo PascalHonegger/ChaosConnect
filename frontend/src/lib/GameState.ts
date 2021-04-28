@@ -15,7 +15,7 @@ import {
     QueueState,
     PlayerChanged,
     PlayerAction
-} from "./gen/game_pb";
+} from "../gen/game_pb";
 
 
 export interface Player {

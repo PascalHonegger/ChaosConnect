@@ -1,15 +1,14 @@
 <script lang="ts">
-    import twemoji from "./Twemoji";
-    import type { TokenResponse } from "./gen/authentication_pb";
-
-    import type { WebLoginServiceClient } from "./gen/JoestarServiceClientPb";
+    import twemoji from "../lib/Twemoji";
+    import type { TokenResponse } from "../gen/authentication_pb";
+    import type { WebLoginServiceClient } from "../gen/JoestarServiceClientPb";
     import Spinner from "./Spinner.svelte";
-    import { token } from "./Stores";
+    import { token } from "../stores/Auth";
     import {
         newLoginRequest,
         newPlayRequest,
         newRegisterRequest,
-    } from "./WebLoginClient";
+    } from "../lib/WebLoginClient";
 
     export let client: WebLoginServiceClient;
 

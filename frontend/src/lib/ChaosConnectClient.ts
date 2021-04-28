@@ -1,5 +1,6 @@
-import {ChaosConnectServiceClient} from './gen/JoestarServiceClientPb';
-import {Coordinate} from './gen/game_pb';
+
+import { Coordinate } from '../gen/game_pb';
+import { ChaosConnectServiceClient } from '../gen/JoestarServiceClientPb';
 
 export default new ChaosConnectServiceClient("/api");
 

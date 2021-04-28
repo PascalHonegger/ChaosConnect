@@ -10,7 +10,7 @@ const defaults: TwemojiHow = {
 }
 
 export default function twemoji(node: HTMLElement, how: TwemojiHow = {}) {
-    how = {...defaults, ...how};
+    how = { ...defaults, ...how };
     twitterEmoji.parse(node, how)
     afterUpdate(() => {
         twitterEmoji.parse(node, how)

@@ -1,22 +1,19 @@
 <script lang="ts">
-    import twemoji from "./Twemoji";
-
-    import JoestarTest from "./JoestarTest.svelte";
+    import twemoji from "../lib/Twemoji";
     import TokenRefresher from "./TokenRefresher.svelte";
-    import chaosConnectClient from "./ChaosConnectClient";
-    import webLoginClient from "./WebLoginClient";
-
+    import chaosConnectClient from "../lib/ChaosConnectClient";
+    import webLoginClient from "../lib/WebLoginClient";
     import LoginRegister from "./LoginRegister.svelte";
-    import { isLoggedIn, token } from "./Stores";
-	import Grid from "./Grid.svelte";
+    import { isLoggedIn, token } from "../stores/Auth";
+    import Grid from "./Grid.svelte";
 </script>
 
 <main>
     <h1 use:twemoji>⚔️ ChaosConnect ⚔️</h1>
     {#if $isLoggedIn}
         <button on:click={() => token.unset()}>Logout</button>
-        <TokenRefresher client={webLoginClient}/>
-		<Grid client={chaosConnectClient} />
+        <TokenRefresher client={webLoginClient} />
+        <Grid client={chaosConnectClient} />
     {:else}
         <LoginRegister client={webLoginClient} />
     {/if}

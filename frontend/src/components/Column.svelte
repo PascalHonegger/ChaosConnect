@@ -1,13 +1,12 @@
 <script lang="ts">
     import Cell from "./Cell.svelte";
-    import type { Column } from "./GameState";
+    import type { Column } from "../lib/GameState";
 
     export let column: Column;
-    
 </script>
 
-<div class="column" >
-    {#each column.cells as _ }
+<div class="column">
+    {#each column.cells as _}
         <Cell />
     {/each}
 </div>
