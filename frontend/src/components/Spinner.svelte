@@ -1,5 +1,5 @@
 <script lang="ts">
-    import twemoji from "./Twemoji";
+    import twemoji from "../lib/Twemoji";
 </script>
 
 <div use:twemoji class="loader">🕛</div>

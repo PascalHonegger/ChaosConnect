@@ -1,11 +1,11 @@
 <script lang="ts">
     import type { ClientReadableStream } from "grpc-web";
     import Column from "./Column.svelte";
-    import { newEmpty } from "./CommonClient";
-    import { columns, gameState } from "./GameStateStores";
-    import type { GameUpdateEvent } from "./gen/game_pb";
-    import type { ChaosConnectServiceClient } from "./gen/JoestarServiceClientPb";
-    import { authMetadata } from "./Stores";
+    import { newEmpty } from "../lib/CommonClient";
+    import { columns, gameState } from "../stores/GameState";
+    import type { GameUpdateEvent } from "../gen/game_pb";
+    import type { ChaosConnectServiceClient } from "../gen/JoestarServiceClientPb";
+    import { authMetadata } from "../stores/Auth";
 
     export let client: ChaosConnectServiceClient;
 
@@ -13,11 +13,11 @@
         newEmpty(),
         $authMetadata
     ) as ClientReadableStream<GameUpdateEvent>;
-    updateStream.on('data', updateEvent => gameState.apply(updateEvent));
+    updateStream.on("data", (updateEvent) => gameState.apply(updateEvent));
 </script>
 
 <div class="grid">
-    {#each $columns as column }
+    {#each $columns as column}
         <Column {column} />
     {/each}
 </div>

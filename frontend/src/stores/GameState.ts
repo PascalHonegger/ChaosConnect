@@ -1,6 +1,6 @@
 import { derived, writable } from "svelte/store";
-import { applyUpdate, initialGameState } from "./GameState";
-import type { GameUpdateEvent } from "./gen/game_pb";
+import { applyUpdate, initialGameState } from "../lib/GameState";
+import type { GameUpdateEvent } from "../gen/game_pb";
 
 function createGameStateStore() {
     const { subscribe, update } = writable(initialGameState());

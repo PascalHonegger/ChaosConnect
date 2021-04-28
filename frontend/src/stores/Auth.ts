@@ -21,7 +21,7 @@ function createToken() {
 function tryDecode($token: string) {
     try {
         return jwt_decode<JwtPayload>($token);
-    } catch(ex) {
+    } catch (ex) {
         console.warn("Error while parsing toking, ignoring", ex);
         return {};
     }
