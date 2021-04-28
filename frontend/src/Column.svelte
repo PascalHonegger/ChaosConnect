@@ -7,7 +7,7 @@
 </script>
 
 <div class="column" >
-    {#each column.slots as _ }
+    {#each column.cells as _ }
         <Cell />
     {/each}
 </div>

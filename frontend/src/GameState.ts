@@ -1,129 +1,209 @@
-import { ColumnChanged, GameState, GameStateColumn, GameUpdateEvent, RowChanged, RowColumnAction } from "./gen/game_pb";
+import {
+    ColumnChanged,
+    GameState as ApiGameState,
+    GameStateColumn,
+    GameUpdateEvent,
+    Piece as ApiPiece,
+    RowChanged,
+    RowColumnAction,
+    Faction,
+    PlayerState,
+    PieceChanged,
+    PieceAction,
+    PieceState,
+    QueueChanged,
+    QueueState,
+    PlayerChanged,
+    PlayerAction
+} from "./gen/game_pb";
 
-export enum Faction {
-    RED = 'red',
-    YELLOW = 'yellow'
+
+export interface Player {
+    identifier: string;
+    displayName: string;
+}
+
+function newPlayer(identifier: string, playerState: PlayerState): Player {
+    return {
+        identifier,
+        displayName: playerState.getDisplayName(),
+    };
 }
 
 export interface Piece {
-
+    faction: Faction;
+    owner: string;
 }
 
-function newPiece(): Piece {
-    return {};
+function newPiece(piece: ApiPiece | PieceState): Piece {
+    const skin = piece.getSkin();
+    if (skin == null) {
+        throw new Error('Can not get faction of piece without skin field');
+    }
+    return {
+        owner: piece.getOwner(),
+        faction: skin.getFaction()
+    };
 }
 
-export interface Slot {
+function newQueuePiece(queueState: QueueState): Piece {
+    return {
+        owner: queueState.getOwner(),
+        faction: queueState.getFaction()
+    };
+}
+
+export interface Cell {
     disabled: boolean;
     piece: Piece | null;
 }
 
-function newSlot(): Slot {
+function newCell(piece?: ApiPiece | PieceState): Cell {
     return {
         disabled: false,
-        piece: null
+        piece: piece != null ? newPiece(piece) : null
     };
 }
 
-function disabledSlot({ piece }: Slot): Slot {
+function disabledCell(cell: Cell): Cell {
     return {
-        disabled: true,
-        piece
+        ...cell,
+        disabled: true
     }
 }
 
-function clearedSlot({ disabled }: Slot): Slot {
+function clearedCell(cell: Cell): Cell {
     return {
-        disabled,
+        ...cell,
         piece: null
     }
+}
+
+function piecePlacedCell(cell: Cell, piece: ApiPiece | PieceState): Cell {
+    return {
+        ...cell,
+        piece: newPiece(piece)
+    };
 }
 
 export interface Column {
-    slots: Slot[];
+    queue: Piece[];
+    cells: Cell[];
 }
 
 function newColumn(numberOfRows: number, column?: GameStateColumn): Column {
-    const slots: Slot[] = [];
-    while (slots.length < numberOfRows) {
-        slots.push(newSlot());
+    const cells = column?.getPiecesList().map(piece => newCell(piece)) ?? [];
+    while (cells.length < numberOfRows) {
+        cells.push(newCell());
     }
-    column?.getPiecesList().forEach((_, index) => slots[index].piece = newPiece());
-    return { slots };
+    const queue = column?.getQueueList().map(piece => newPiece(piece)) ?? [];
+    return { cells: cells, queue };
 }
 
-function disabledColumn({ slots }: Column): Column {
+function disabledColumn(column: Column): Column {
     return {
-        slots: slots.map(disabledSlot)
+        ...column,
+        cells: column.cells.map(disabledCell),
     };
 }
 
-function clearedColumn({ slots }: Column): Column {
+function clearedColumn(column: Column): Column {
     return {
-        slots: slots.map(clearedSlot)
+        ...column,
+        cells: column.cells.map(clearedCell)
     }
 }
 
-function rowChangeAppliedColumn({ slots }: Column, rowChanged: RowChanged): Column {
+function piecePlacedColumn(column: Column, piece: PieceState, row: number): Column {
+    const cells = [...column.cells];
+    cells[row] = piecePlacedCell(cells[row], piece);
+    return {
+        cells: cells,
+        queue: column.queue.slice(1)
+    };
+}
+
+function pieceEnqueuedColumn(column: Column, piece: QueueState): Column {
+    return {
+        ...column,
+        queue: [...column.queue, newQueuePiece(piece)]
+    };
+}
+
+function rowChangeAppliedColumn(column: Column, rowChanged: RowChanged): Column {
+    const { cells } = column;
     const position = rowChanged.getPosition();
-    let newSlots;
+    let newCells: Cell[];
     switch (rowChanged.getAction()) {
         case RowColumnAction.ADD:
             return {
-                slots: [
-                    ...slots.slice(0, position),
-                    newSlot(),
-                    ...slots.slice(position)
+                ...column,
+                cells: [
+                    ...cells.slice(0, position),
+                    newCell(),
+                    ...cells.slice(position)
                 ]
             };
-        case RowColumnAction.DISABLE: 
-            newSlots = [...slots];
-            newSlots[position] = disabledSlot(newSlots[position]);
+        case RowColumnAction.DISABLE:
+            newCells = [...cells];
+            newCells[position] = disabledCell(newCells[position]);
             return {
-                slots: newSlots
+                ...column,
+                cells: newCells
             };
         case RowColumnAction.DELETE:
             return {
-                slots: slots.filter((_, index) => index !== position)
+                ...column,
+                cells: cells.filter((_, index) => index !== position)
             }
         case RowColumnAction.CLEAR: {
-            newSlots = [...slots];
-            newSlots[position] = clearedSlot(newSlots[position]);
+            newCells = [...cells];
+            newCells[position] = clearedCell(newCells[position]);
             return {
-                slots: newSlots
+                ...column,
+                cells: newCells
             };
         }
     }
 }
 
-export interface LocalGameState {
+export interface GameState {
     numberOfRows: number;
     columns: Column[];
+    playerMap: Map<string, Player>;
 }
 
-export function initialGameState(): LocalGameState {
+export function initialGameState(): GameState {
     return {
         numberOfRows: 0,
-        columns: []
+        columns: [],
+        playerMap: new Map()
     };
 }
 
-function newGameState(gameState: GameState): LocalGameState {
+function newGameState(gameState: ApiGameState): GameState {
+    gameState.getPlayersMap();
     const numberOfRows = gameState.getNumberOfRows();
     const columns = gameState.getColumnsList().map(column => newColumn(numberOfRows, column));
+    const playerMap = new Map<string, Player>();
+    gameState.getPlayersMap().forEach(
+        (player, identifier) => playerMap.set(identifier, newPlayer(identifier, player))
+    );
     return {
         numberOfRows,
-        columns
+        columns,
+        playerMap
     };
 }
 
-function handleColumnChanged({ columns, numberOfRows }: LocalGameState, columnChanged: ColumnChanged): LocalGameState {
+function handleColumnChanged(gameState: GameState, columnChanged: ColumnChanged): GameState {
     const position = columnChanged.getPosition();
-    let newColumns;
+    const { numberOfRows, columns } = gameState;
+    let newColumns: Column[];
     switch (columnChanged.getAction()) {
         case RowColumnAction.ADD:
             return {
-                numberOfRows,
+                ...gameState,
                 columns: [
                     ...columns.slice(0, position),
                     newColumn(numberOfRows),
@@ -132,27 +212,28 @@ function handleColumnChanged({ columns, numberOfRows }: LocalGameState, columnCh
             }
         case RowColumnAction.DISABLE:
             newColumns = [...columns];
-            newColumns[position] = disabledColumn(newColumns[position]); 
+            newColumns[position] = disabledColumn(newColumns[position]);
             return {
-                numberOfRows,
+                ...gameState,
                 columns: newColumns
             }
         case RowColumnAction.DELETE:
             return {
-                numberOfRows,
+                ...gameState,
                 columns: columns.filter((_, index) => index !== position)
             }
         case RowColumnAction.CLEAR:
-            newColumns = [...columns]; 
+            newColumns = [...columns];
             newColumns[position] = clearedColumn(newColumns[position]);
             return {
-                numberOfRows,
+                ...gameState,
                 columns: newColumns
             }
     }
 }
 
-function handleRowChanged({ columns, numberOfRows }: LocalGameState, rowChanged: RowChanged): LocalGameState {
+function handleRowChanged(gameState: GameState, rowChanged: RowChanged): GameState {
+    let { numberOfRows } = gameState;
     switch (rowChanged.getAction()) {
         case RowColumnAction.ADD:
             ++numberOfRows;
@@ -162,20 +243,91 @@ function handleRowChanged({ columns, numberOfRows }: LocalGameState, rowChanged:
             break;
     }
     return {
+        ...gameState,
         numberOfRows,
-        columns: columns.map(column => rowChangeAppliedColumn(column, rowChanged))
+        columns: gameState.columns.map(column => rowChangeAppliedColumn(column, rowChanged))
     }
 }
 
-export function applyUpdate(currentState: LocalGameState, updateEvent: GameUpdateEvent): LocalGameState {
-    if (updateEvent.hasGameState()) {
-        return newGameState(updateEvent.getGameState()!);
+function handlePieceChanged(gameState: GameState, pieceChanged: PieceChanged): GameState {
+    const columns = [...gameState.columns];
+    for (const piece of pieceChanged.getPiecesList()) {
+        switch (piece.getAction()) {
+            case PieceAction.PLACE:
+                const position = piece.getPosition();
+                if (position == null) {
+                    console.warn('PiecePlaced has no position')
+                    continue;
+                }
+                columns[position.getColumn()] = piecePlacedColumn(columns[position.getColumn()], piece, position.getRow());
+                break;
+            default:
+                console.warn('Unknown PieceAction');
+        }
     }
-    if (updateEvent.hasColumnChanged()) {
-        return handleColumnChanged(currentState, updateEvent.getColumnChanged()!);
+    return {
+        ...gameState,
+        columns
+    };
+}
+
+function handleQueueChanged(gameState: GameState, queueChanged: QueueChanged): GameState {
+    const columns = [...gameState.columns];
+    for (const piece of queueChanged.getPiecesList()) {
+        const position = piece.getPosition();
+        if (position == null) {
+            console.warn('QueueChanged has no position');
+            continue;
+        }
+        columns[position.getColumn()] = pieceEnqueuedColumn(columns[position.getColumn()], piece);
     }
-    if (updateEvent.hasRowChanged()) {
-        return handleRowChanged(currentState, updateEvent.getRowChanged()!);
+    return {
+        ...gameState,
+        columns
     }
-    return currentState;
+}
+
+function handlePlayerChanged(gameState: GameState, playerChanged: PlayerChanged): GameState {
+    const playerMap = new Map(gameState.playerMap);
+    const identifier = playerChanged.getPlayer();
+    const playerState = playerChanged.getState();
+    switch (playerChanged.getAction()) {
+        case PlayerAction.JOINED:
+        case PlayerAction.UPDATED:
+            if (playerState == null) {
+                console.warn('PlayerAction JOINED with null playerState');
+                break;
+            }
+            playerMap.set(identifier, newPlayer(identifier, playerState));
+            break;
+        case PlayerAction.DISCONNECTED:
+            playerMap.delete(identifier);
+            break;
+        default:
+            console.warn('Unknown PlayerChanged Action');
+    }
+    return {
+        ...gameState,
+        playerMap
+    }
+}
+
+export function applyUpdate(currentState: GameState, updateEvent: GameUpdateEvent): GameState {
+    switch (updateEvent.getActionCase()) {
+        case GameUpdateEvent.ActionCase.GAME_STATE:
+            return newGameState(updateEvent.getGameState()!);
+        case GameUpdateEvent.ActionCase.PIECE_CHANGED:
+            return handlePieceChanged(currentState, updateEvent.getPieceChanged()!);
+        case GameUpdateEvent.ActionCase.QUEUE_CHANGED:
+            return handleQueueChanged(currentState, updateEvent.getQueueChanged()!);
+        case GameUpdateEvent.ActionCase.COLUMN_CHANGED:
+            return handleColumnChanged(currentState, updateEvent.getColumnChanged()!);
+        case GameUpdateEvent.ActionCase.ROW_CHANGED:
+            return handleRowChanged(currentState, updateEvent.getRowChanged()!)
+        case GameUpdateEvent.ActionCase.PLAYER_CHANGED:
+            return handlePlayerChanged(currentState, updateEvent.getPlayerChanged()!);
+        default:
+            console.warn('Unknown GameUpdateEvent ActionCase');
+            return currentState;
+    }
 }
