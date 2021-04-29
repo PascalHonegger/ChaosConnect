@@ -15,6 +15,9 @@ class GameServiceImpl : GameService {
     private val updates = MutableSharedFlow<Pair<GameUpdateEvent, GameState>>()
 
     override suspend fun placePiece(rowIndex: Int, columnIndex: Int) {
+        val currentUser = userIdentifierContextKey.get()
+            ?: throw IllegalStateException("Cannot place piece without a user")
+
         val columnCells: ArrayList<PieceState?>
         try {
             columnCells = columns[columnIndex]
