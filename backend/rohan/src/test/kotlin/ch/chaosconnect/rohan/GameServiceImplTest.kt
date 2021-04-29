@@ -1,12 +1,12 @@
 package ch.chaosconnect.rohan
 
-import ch.chaosconnect.api.game.GameState
-import ch.chaosconnect.api.game.GameUpdateEvent
+import app.cash.turbine.test
+import ch.chaosconnect.api.game.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.toCollection
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import kotlin.time.ExperimentalTime
 
 @ExperimentalCoroutinesApi
@@ -20,35 +20,64 @@ internal class GameServiceImplTest {
         service = GameServiceImpl()
     }
 
-    //  FIXME [alexandre]: Ensure test termination
-    //      @Test
+    @Test
     fun `placePiece triggers game updates`() =
-        runBlocking {
+        runSignedIn("my-user") {
             service.placePiece(0, 3)
-            Assertions.assertEquals(
-                arrayOf<Pair<GameUpdateEvent, GameState>>(
-                    Pair(
-                        GameUpdateEvent
+            service.getGameUpdates().test {
+                val (event, state) = expectItem()
+                assertEquals(
+                    GameUpdateEvent.newBuilder().setPieceChanged(
+                        PieceChanged
                             .newBuilder()
-                            .build(),
-                        GameState
-                            .newBuilder()
+                            .addPieces(
+                                PieceState.newBuilder()
+                                    .setAction(PieceAction.PLACE)
+                                    .setPosition(
+                                        Coordinate.newBuilder().setRow(0)
+                                            .setColumn(3).build()
+                                    )
+                                    .setOwner("my-user")
+                                    .build()
+                            )
                             .build()
                     )
-                ),
-                service
-                    .getGameUpdates()
-                    .toCollection(ArrayList())
-            )
+                        .build(),
+                    event
+                )
+                assertEquals(
+                    state,
+                    GameState
+                        .newBuilder()
+                        .addColumns(GameStateColumn.newBuilder())
+                        .addColumns(GameStateColumn.newBuilder())
+                        .addColumns(GameStateColumn.newBuilder())
+                        .addColumns(
+                            GameStateColumn.newBuilder().addPieces(
+                                Piece.newBuilder().setOwner("my-user")
+                                    .setSkin(Skin.newBuilder())
+                            )
+                        )
+                        .addColumns(GameStateColumn.newBuilder())
+                        .addColumns(GameStateColumn.newBuilder())
+                        .addColumns(GameStateColumn.newBuilder())
+                        .build()
+                )
+                expectNoEvents()
+                cancel()
+            }
         }
 
-    //  FIXME [alexandre]: Ensure test termination
-    //      @Test
+    @Test
     fun `getGameUpdates yields initially an empty flow`() =
         runBlocking {
-            Assertions.assertEquals(
-                arrayOf<Pair<GameUpdateEvent, GameState>>(),
-                service.getGameUpdates().toCollection(ArrayList())
-            )
+            service.getGameUpdates().test {
+                val (event, state) = expectItem()
+                val expectedState = GameState.getDefaultInstance()
+                assertEquals(expectedState, state)
+                assertEquals(expectedState, event.gameState)
+                expectNoEvents()
+                cancel()
+            }
         }
 }

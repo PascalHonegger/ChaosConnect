@@ -204,24 +204,6 @@ internal class UserServiceImplTest {
 
     companion object {
 
-        private fun <T> runSignedOut(block: suspend CoroutineScope.() -> T) =
-            runBlocking {
-                block()
-            }
-
-        private fun <T> runSignedIn(
-            identifier: String,
-            block: suspend CoroutineScope.() -> T
-        ) =
-            Context
-                .ROOT
-                .withValue(userIdentifierContextKey, identifier)
-                .run {
-                    runBlocking {
-                        block()
-                    }
-                }
-
         private inline fun <reified T : Throwable> assertThrowsWithMessage(
             message: String,
             executable: () -> Unit
