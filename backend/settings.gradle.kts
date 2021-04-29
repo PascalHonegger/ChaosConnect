@@ -8,7 +8,7 @@ pluginManagement {
     val kotlinPluginVersion = "1.4.32"
     val shadowPluginVersion = "7.0.0"
     val micronautPluginVersion = "1.5.0"
-    val protobufPluginVersion = "0.8.15"
+    val protobufPluginVersion = "0.8.16"
     plugins {
         kotlin("jvm") version kotlinPluginVersion
         kotlin("kapt") version kotlinPluginVersion
@@ -25,7 +25,7 @@ dependencyResolutionManagement {
             version("kotlin", "1.4.32")
             version("kotlinx", "1.4.3")
             version("micronaut", "2.5.0")
-            version("protoc", "3.15.7")
+            version("protoc", "3.15.8")
             version("gen-grpc-java", "1.37.0")
             version("gen-grpc-kotlin", "1.0.0")
             version("jjwt", "0.11.2")
