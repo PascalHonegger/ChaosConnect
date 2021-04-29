@@ -3,6 +3,7 @@ package ch.chaosconnect.rohan
 import ch.chaosconnect.api.game.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.runBlocking
 import javax.inject.Singleton
 
 @Singleton
@@ -12,7 +13,7 @@ class GameServiceImpl : GameService {
         ArrayList<PieceState?>(6)
     }
 
-    private val updates = MutableSharedFlow<Pair<GameUpdateEvent, GameState>>()
+    private val updates = MutableSharedFlow<Pair<GameUpdateEvent, GameState>>(1)
 
     override suspend fun placePiece(rowIndex: Int, columnIndex: Int) {
         val currentUser = userIdentifierContextKey.get()
@@ -37,6 +38,7 @@ class GameServiceImpl : GameService {
                     .setColumn(columnIndex)
                     .build()
             )
+            .setOwner(currentUser)
             .build()
         columnCells.add(state)
         emit(
@@ -81,6 +83,14 @@ class GameServiceImpl : GameService {
                 )
                 .build()
         )
+    }
+
+    init {
+        runBlocking {
+            val initialState = GameState.getDefaultInstance()
+            val initialEvent = GameUpdateEvent.newBuilder().setGameState(initialState).build()
+            emit(initialEvent, initialState)
+        }
     }
 
     private fun createIndexOutOfBoundsException(indexKind: String, index: Int) =
