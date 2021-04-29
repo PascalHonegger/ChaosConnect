@@ -8,6 +8,9 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import java.util.stream.Stream
+import javax.security.auth.login.AccountException
+import javax.security.auth.login.CredentialException
+import javax.security.auth.login.FailedLoginException
 
 internal class UserServiceImplTest {
 
@@ -124,7 +127,7 @@ internal class UserServiceImplTest {
     @Test
     fun `signInAsRegularUser throws sign-in failure for missing users`() =
         runSignedOut {
-            assertThrowsWithMessage<IllegalAccessException>("Sign-in failed") {
+            assertThrowsWithMessage<FailedLoginException>("Sign-in failed") {
                 service.signInAsRegularUser("Bob", "123")
             }
         }
@@ -135,14 +138,14 @@ internal class UserServiceImplTest {
             val name = "bob"
             val displayName = "Bob89"
             service.signUpAsRegularUser(name, "opw", displayName)
-            assertThrowsWithMessage<IllegalAccessException>("Sign-in failed") {
+            assertThrowsWithMessage<FailedLoginException>("Sign-in failed") {
                 service.signInAsRegularUser("Bob", "npw")
             }
         }
 
     @Test
     fun `setPassword throws for signed out users`() = runSignedOut {
-        assertThrowsWithMessage<IllegalAccessException>("No active user") {
+        assertThrowsWithMessage<CredentialException>("No active user") {
             service.setPassword("pw")
         }
     }
@@ -150,7 +153,7 @@ internal class UserServiceImplTest {
     @Test
     fun `setPassword throws for signed in temporary users`() =
         runSignedInAsTemporaryUser("Bob89") {
-            assertThrowsWithMessage<IllegalAccessException>("Cannot set password for temporary user") {
+            assertThrowsWithMessage<AccountException>("Cannot set password for temporary user") {
                 service.setPassword("pw")
             }
         }
@@ -162,7 +165,7 @@ internal class UserServiceImplTest {
         runSignedInAsRegularUser(name, oldPassword, "Bob89") {
             service.setPassword("npw")
         }
-        assertThrowsWithMessage<IllegalAccessException>("Sign-in failed") {
+        assertThrowsWithMessage<FailedLoginException>("Sign-in failed") {
             runSignedOut {
                 service.signInAsRegularUser(name, oldPassword)
             }
@@ -183,7 +186,7 @@ internal class UserServiceImplTest {
 
     @Test
     fun `setDisplayName throws for signed out users`() = runSignedOut {
-        assertThrowsWithMessage<IllegalAccessException>("No active user") {
+        assertThrowsWithMessage<CredentialException>("No active user") {
             service.setDisplayName("Bob89")
         }
     }

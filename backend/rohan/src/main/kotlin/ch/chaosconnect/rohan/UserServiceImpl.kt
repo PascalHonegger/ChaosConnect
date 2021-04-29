@@ -2,6 +2,9 @@ package ch.chaosconnect.rohan
 
 import java.util.*
 import javax.inject.Singleton
+import javax.security.auth.login.AccountException
+import javax.security.auth.login.CredentialException
+import javax.security.auth.login.FailedLoginException
 
 //  TODO: Ensure thread safety
 @Singleton
@@ -55,7 +58,7 @@ class UserServiceImpl : UserService {
             if (regularUser != null && regularUser.credentials.password == password) {
                 return@signIn regularUser
             }
-            throw IllegalAccessException("Sign-in failed")
+            throw FailedLoginException("Sign-in failed")
         }
 
     override suspend fun setPassword(password: String): String =
@@ -64,7 +67,7 @@ class UserServiceImpl : UserService {
                 is RegularUser ->
                     credentials.password = password
                 else ->
-                    throw IllegalAccessException("Cannot set password for temporary user")
+                    throw AccountException("Cannot set password for temporary user")
             }
         }
 
@@ -86,7 +89,7 @@ class UserServiceImpl : UserService {
             ?.let {
                 processUserAndReturnIdentifier(it, processor)
             }
-            ?: throw IllegalAccessException("No active user")
+            ?: throw CredentialException("No active user")
 
     private fun getCurrentUser() =
         getCurrentIdentifier()
