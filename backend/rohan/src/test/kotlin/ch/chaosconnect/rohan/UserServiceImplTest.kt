@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
+import java.util.stream.Stream
 
 internal class UserServiceImplTest {
 
@@ -15,25 +18,30 @@ internal class UserServiceImplTest {
         service = UserServiceImpl()
     }
 
-    @Test
-    fun `signUpAsRegularUser does not accept blank name`() = runSignedOut {
-        assertThrows<IllegalArgumentException> {
-            service.signUpAsRegularUser("  ", "123", "Bob89")
-        }
-    }
-
-    @Test
-    fun `signUpAsRegularUser does not accept blank password`() = runSignedOut {
-        assertThrows<IllegalArgumentException> {
-            service.signUpAsRegularUser("löli", "", "Bob89")
-        }
-    }
-
-    @Test
-    fun `signUpAsRegularUser does not accept blank display name`() =
+    @ParameterizedTest
+    @MethodSource("blankStrings")
+    fun `signUpAsRegularUser does not accept blank name`(name: String) =
         runSignedOut {
-            assertThrows<IllegalArgumentException> {
-                service.signUpAsRegularUser("löli", "123", "\t")
+            assertThrowsWithMessage<IllegalArgumentException>("User name may not be blank") {
+                service.signUpAsRegularUser(name, "123", "Bob89")
+            }
+        }
+
+    @ParameterizedTest
+    @MethodSource("blankStrings")
+    fun `signUpAsRegularUser does not accept blank password`(password: String) =
+        runSignedOut {
+            assertThrowsWithMessage<IllegalArgumentException>("Password may not be blank") {
+                service.signUpAsRegularUser("löli", password, "Bob89")
+            }
+        }
+
+    @ParameterizedTest
+    @MethodSource("blankStrings")
+    fun `signUpAsRegularUser does not accept blank display name`(displayName: String) =
+        runSignedOut {
+            assertThrowsWithMessage<IllegalArgumentException>("Display name may not be blank") {
+                service.signUpAsRegularUser("löli", "123", displayName)
             }
         }
 
@@ -90,11 +98,12 @@ internal class UserServiceImplTest {
         }
     }
 
-    @Test
-    fun `signInAsTemporaryUser does not accept blank display name`() =
+    @ParameterizedTest
+    @MethodSource("blankStrings")
+    fun `signInAsTemporaryUser does not accept blank display name`(displayName: String) =
         runSignedOut {
-            assertThrows<IllegalArgumentException> {
-                service.signInAsTemporaryUser("\n")
+            assertThrowsWithMessage<IllegalArgumentException>("Display name may not be blank") {
+                service.signInAsTemporaryUser(displayName)
             }
         }
 
@@ -222,5 +231,9 @@ internal class UserServiceImplTest {
             executable: () -> Unit
         ) =
             assertEquals(message, assertThrows<T>(executable).message)
+
+        @JvmStatic
+        private fun blankStrings() =
+            Stream.of("", " ", "\t")
     }
 }
