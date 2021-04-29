@@ -16,6 +16,10 @@ class UserServiceImpl : UserService {
         password: String,
         displayName: String
     ): String {
+        if (name.isBlank() || password.isBlank() || displayName.isBlank()) {
+            throw IllegalArgumentException("Username, display name and password cannot be blank")
+        }
+
         val identifier = getCurrentIdentifier()
         if (identifier != null) {
             when (usersByIdentifier[identifier]) {
@@ -37,6 +41,9 @@ class UserServiceImpl : UserService {
 
     override suspend fun signInAsTemporaryUser(displayName: String): String =
         signIn {
+            if (displayName.isBlank()) {
+                throw IllegalArgumentException("Display name cannot be blank")
+            }
             createUser(null) {
                 TemporaryUser(it, displayName)
             }

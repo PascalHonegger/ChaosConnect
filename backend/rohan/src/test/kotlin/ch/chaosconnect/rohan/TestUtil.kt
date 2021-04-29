@@ -7,7 +7,7 @@ import kotlinx.coroutines.runBlocking
 fun <T> runSignedIn(
     identifier: String,
     block: suspend CoroutineScope.() -> T
-) =
+): Unit =
     Context
         .ROOT
         .withValue(userIdentifierContextKey, identifier)
@@ -17,7 +17,7 @@ fun <T> runSignedIn(
             }
         }
 
-fun <T> runSignedOut(block: suspend CoroutineScope.() -> T) =
+fun <T> runSignedOut(block: suspend CoroutineScope.() -> T): Unit =
     runBlocking {
         block()
     }

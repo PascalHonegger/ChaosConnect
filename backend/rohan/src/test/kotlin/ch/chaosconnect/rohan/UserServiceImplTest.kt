@@ -1,7 +1,6 @@
 package ch.chaosconnect.rohan
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -17,38 +16,55 @@ internal class UserServiceImplTest {
     }
 
     @Test
-    fun `signUpAsRegularUser accepts new signed out users`() {
-        runSignedOut {
-            service.signUpAsRegularUser("bob", "123", "Bob89")
+    fun `signUpAsRegularUser does not accept blank name`() = runSignedOut {
+        assertThrows<IllegalArgumentException> {
+            service.signUpAsRegularUser("  ", "123", "Bob89")
         }
     }
 
     @Test
-    fun `signUpAsRegularUser accepts new signed out users with unique names`() {
+    fun `signUpAsRegularUser does not accept blank password`() = runSignedOut {
+        assertThrows<IllegalArgumentException> {
+            service.signUpAsRegularUser("löli", "", "Bob89")
+        }
+    }
+
+    @Test
+    fun `signUpAsRegularUser does not accept blank display name`() =
+        runSignedOut {
+            assertThrows<IllegalArgumentException> {
+                service.signUpAsRegularUser("löli", "123", "\t")
+            }
+        }
+
+    @Test
+    fun `signUpAsRegularUser accepts new signed out users`() = runSignedOut {
+        service.signUpAsRegularUser("bob", "123", "Bob89")
+    }
+
+    @Test
+    fun `signUpAsRegularUser accepts new signed out users with unique names`() =
         runSignedOut {
             service.signUpAsRegularUser("bob", "pw", "Bob89")
             service.signUpAsRegularUser("alice", "pw", "Alice90")
         }
-    }
 
     @Test
-    fun `signUpAsRegularUser throws when new signed out users use existing names`() {
+    fun `signUpAsRegularUser throws when new signed out users use existing names`() =
         runSignedOut {
             service.signUpAsRegularUser("bob", "pw", "Bob89")
             assertThrowsWithMessage<IllegalStateException>("User name 'bob' already in use") {
                 service.signUpAsRegularUser("bob", "pw", "Bob90")
             }
         }
-    }
 
     @Test
-    fun `signUpAsRegularUser throws for signed in regular users`() {
+    fun `signUpAsRegularUser throws for signed in regular users`() =
         runSignedInAsRegularUser("bob", "pw", "Bob89") {
             assertThrowsWithMessage<IllegalStateException>("Already signed in as a regular user") {
                 service.signUpAsRegularUser("alice", "pw", "Alice90")
             }
         }
-    }
 
     @Test
     fun `signUpAsRegularUser accepts signed in temporary users (upgrade)`() {
@@ -60,7 +76,7 @@ internal class UserServiceImplTest {
 
     @Test
     fun `signUpAsRegularUser accepts duplicate display names among regular users`() {
-        runBlocking {
+        runSignedOut {
             service.signUpAsRegularUser("eve1", "pw", "Eve89")
             service.signUpAsRegularUser("eve2", "pw", "Eve89")
         }
@@ -68,63 +84,64 @@ internal class UserServiceImplTest {
 
     @Test
     fun `signUpAsRegularUser accepts duplicate display names among regular and temporary users`() {
-        runBlocking {
+        runSignedOut {
             service.signInAsTemporaryUser("Eve89")
             service.signUpAsRegularUser("eve2", "pw", "Eve89")
         }
     }
 
     @Test
-    fun `signInAsTemporaryUser accepts duplicate display names among temporary users`() {
-        runBlocking {
+    fun `signInAsTemporaryUser does not accept blank display name`() =
+        runSignedOut {
+            assertThrows<IllegalArgumentException> {
+                service.signInAsTemporaryUser("\n")
+            }
+        }
+
+    @Test
+    fun `signInAsTemporaryUser accepts duplicate display names among temporary users`() =
+        runSignedOut {
             service.signInAsTemporaryUser("Eve89")
             service.signInAsTemporaryUser("Eve89")
         }
-    }
 
     @Test
-    fun `signInAsTemporaryUser accepts duplicate display names among temporary and regular user`() {
-        runBlocking {
+    fun `signInAsTemporaryUser accepts duplicate display names among temporary and regular user`() =
+        runSignedOut {
             service.signUpAsRegularUser("eve", "pw", "Eve89")
             service.signInAsTemporaryUser("Eve89")
         }
-    }
 
     @Test
-    fun `signInAsRegularUser throws sign-in failure for missing users`() {
-        assertThrowsWithMessage<IllegalAccessException>("Sign-in failed") {
-            runBlocking {
+    fun `signInAsRegularUser throws sign-in failure for missing users`() =
+        runSignedOut {
+            assertThrowsWithMessage<IllegalAccessException>("Sign-in failed") {
                 service.signInAsRegularUser("Bob", "123")
             }
         }
-    }
 
     @Test
-    fun `signInAsRegularUser throws sign-in failure for bad passwords`() {
-        val name = "bob"
-        val displayName = "Bob89"
-        runBlocking {
+    fun `signInAsRegularUser throws sign-in failure for bad passwords`() =
+        runSignedOut {
+            val name = "bob"
+            val displayName = "Bob89"
             service.signUpAsRegularUser(name, "opw", displayName)
-        }
-        assertThrowsWithMessage<IllegalAccessException>("Sign-in failed") {
-            runBlocking {
+            assertThrowsWithMessage<IllegalAccessException>("Sign-in failed") {
                 service.signInAsRegularUser("Bob", "npw")
             }
         }
+
+    @Test
+    fun `setPassword throws for signed out users`() = runSignedOut {
+        assertThrowsWithMessage<IllegalAccessException>("No active user") {
+            service.setPassword("pw")
+        }
     }
 
     @Test
-    fun `setPassword throws for signed out users`() =
-        assertThrowsWithMessage<IllegalAccessException>("No active user") {
-            runSignedOut {
-                service.setPassword("pw")
-            }
-        }
-
-    @Test
     fun `setPassword throws for signed in temporary users`() =
-        assertThrowsWithMessage<IllegalAccessException>("Cannot set password for temporary user") {
-            runSignedInAsTemporaryUser("Bob89") {
+        runSignedInAsTemporaryUser("Bob89") {
+            assertThrowsWithMessage<IllegalAccessException>("Cannot set password for temporary user") {
                 service.setPassword("pw")
             }
         }
@@ -137,7 +154,7 @@ internal class UserServiceImplTest {
             service.setPassword("npw")
         }
         assertThrowsWithMessage<IllegalAccessException>("Sign-in failed") {
-            runBlocking {
+            runSignedOut {
                 service.signInAsRegularUser(name, oldPassword)
             }
         }
@@ -150,24 +167,23 @@ internal class UserServiceImplTest {
         runSignedInAsRegularUser(name, "opw", "Bob89") {
             service.setPassword(newPassword)
         }
-        runBlocking {
+        runSignedOut {
             service.signInAsRegularUser(name, newPassword)
         }
     }
 
     @Test
-    fun `setDisplayName throws for signed out users`() =
+    fun `setDisplayName throws for signed out users`() = runSignedOut {
         assertThrowsWithMessage<IllegalAccessException>("No active user") {
-            runSignedOut {
-                service.setDisplayName("Bob89")
-            }
+            service.setDisplayName("Bob89")
         }
+    }
 
     private fun <T> runSignedInAsTemporaryUser(
         displayName: String,
         block: suspend CoroutineScope.() -> T
     ) =
-        runBlocking {
+        runSignedOut {
             runSignedIn(
                 service.signInAsTemporaryUser(displayName),
                 block
@@ -179,13 +195,11 @@ internal class UserServiceImplTest {
         password: String,
         displayName: String,
         block: suspend CoroutineScope.() -> T
-    ) {
-        runBlocking {
-            runSignedIn(
-                signUpAndInAsRegularUser(name, password, displayName),
-                block
-            )
-        }
+    ) = runSignedOut {
+        runSignedIn(
+            signUpAndInAsRegularUser(name, password, displayName),
+            block
+        )
     }
 
     private suspend fun signUpAndInAsRegularUser(
