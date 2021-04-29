@@ -4,6 +4,8 @@ import io.grpc.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import javax.inject.Singleton
+import javax.security.auth.login.AccountException
+import javax.security.auth.login.LoginException
 
 private val logger: Logger =
     LoggerFactory.getLogger(RequestLoggerInterceptor::class.java)
@@ -30,6 +32,8 @@ class RequestLoggerInterceptor : ServerInterceptor {
 
             if (status.code == Status.Code.UNKNOWN) {
                 val translatedStatus = when (cause) {
+                    is AccountException -> Status.PERMISSION_DENIED
+                    is LoginException -> Status.UNAUTHENTICATED
                     is IllegalArgumentException -> Status.INVALID_ARGUMENT
                     is IllegalStateException -> Status.FAILED_PRECONDITION
                     else -> Status.UNKNOWN
