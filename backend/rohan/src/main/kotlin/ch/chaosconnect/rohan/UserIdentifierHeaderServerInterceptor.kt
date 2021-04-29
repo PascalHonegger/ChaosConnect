@@ -4,6 +4,11 @@ import io.grpc.*
 import io.grpc.Metadata.Key.of
 import javax.inject.Singleton
 
+private const val headerName = "UserIdentifier"
+
+private val metadataKey: Metadata.Key<String> =
+    of(headerName, Metadata.ASCII_STRING_MARSHALLER)
+
 @Singleton
 class UserIdentifierHeaderServerInterceptor : ServerInterceptor {
 
@@ -15,33 +20,11 @@ class UserIdentifierHeaderServerInterceptor : ServerInterceptor {
         return Contexts.interceptCall(
             Context.current().withValue(
                 userIdentifierContextKey,
-                extractAndValidateUserIdentifier(headers)
+                headers.get(metadataKey)
             ),
             call,
             headers,
             next
         )
-    }
-
-    companion object {
-
-        private const val headerName = "UserIdentifier"
-
-        private val metadataKey: Metadata.Key<String> =
-            of(headerName, Metadata.ASCII_STRING_MARSHALLER)
-
-        private fun extractAndValidateUserIdentifier(headers: Metadata): String {
-            val userIdentifier = headers.get(metadataKey)
-            if (userIdentifier == null) {
-                throw Status.UNAUTHENTICATED
-                    .withDescription("'$headerName' header not set")
-                    .asException()
-            } else if (userIdentifier.isEmpty()) {
-                throw Status.UNAUTHENTICATED
-                    .withDescription("'$headerName' header is empty")
-                    .asException()
-            }
-            return userIdentifier
-        }
     }
 }
