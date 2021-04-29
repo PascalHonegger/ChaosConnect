@@ -13,7 +13,7 @@ class GameEndpoint(private val service: GameService) :
     GameServiceGrpcKt.GameServiceCoroutineImplBase() {
 
     override suspend fun placePiece(request: Coordinate): Empty {
-        service.placePiece(request.row, request.column)
+        service.placePiece(rowIndex = request.row, columnIndex = request.column)
         return Empty.getDefaultInstance()
     }
 

@@ -27,7 +27,7 @@ import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
 @MicronautTest
-class ChaosConnectEndpointTest {
+class JoestarEndpointTest {
 
     @Inject
     lateinit var application: EmbeddedApplication<*>
