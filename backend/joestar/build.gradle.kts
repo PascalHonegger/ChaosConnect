@@ -4,6 +4,7 @@ plugins {
     kotlin("jvm")
     kotlin("kapt")
     kotlin("plugin.allopen")
+    kotlin("plugin.serialization")
     id("com.github.johnrengelman.shadow")
     id("io.micronaut.application")
     id("com.google.protobuf")

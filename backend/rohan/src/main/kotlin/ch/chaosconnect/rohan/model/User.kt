@@ -1,25 +1,28 @@
 package ch.chaosconnect.rohan.model
 
-interface User {
-    val identifier: String
-    var displayName: String
+import kotlinx.serialization.Serializable
+
+@Serializable
+sealed class User {
+    abstract val identifier: String
+    abstract val displayName: String
 }
 
-abstract class AbstractUser(
+@Serializable
+data class RegularUser(
     override val identifier: String,
-    override var displayName: String
-) : User
-
-class RegularUser(
-    identifier: String,
-    displayName: String,
+    override val displayName: String,
     val credentials: UserCredentials
-) : AbstractUser(identifier, displayName)
+) : User()
 
-class TemporaryUser(identifier: String, displayName: String) :
-    AbstractUser(identifier, displayName)
+@Serializable
+data class TemporaryUser(
+    override val identifier: String,
+    override val displayName: String
+) : User()
 
-class UserCredentials(
+@Serializable
+data class UserCredentials(
     val name: String,
-    var password: String
+    val password: String
 )

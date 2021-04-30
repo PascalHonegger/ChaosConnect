@@ -13,6 +13,7 @@ pluginManagement {
         kotlin("jvm") version kotlinPluginVersion
         kotlin("kapt") version kotlinPluginVersion
         kotlin("plugin.allopen") version kotlinPluginVersion
+        kotlin("plugin.serialization") version kotlinPluginVersion
         id("com.github.johnrengelman.shadow") version shadowPluginVersion
         id("io.micronaut.application") version micronautPluginVersion
         id("com.google.protobuf") version protobufPluginVersion
@@ -24,6 +25,7 @@ dependencyResolutionManagement {
         create("libs") {
             version("kotlin", "1.4.32")
             version("kotlinx", "1.4.3")
+            version("serialization-json", "1.1.0")
             version("micronaut", "2.5.0")
             version("protoc", "3.15.8")
             version("gen-grpc-java", "1.37.0")
@@ -52,6 +54,10 @@ dependencyResolutionManagement {
                 "org.jetbrains.kotlinx",
                 "kotlinx-coroutines-test"
             ).versionRef("kotlinx")
+            alias("kotlinx-serialization-json").to(
+                "org.jetbrains.kotlinx",
+                "kotlinx-serialization-json"
+            ).versionRef("serialization-json")
 
             alias("micronaut-runtime").to("io.micronaut", "micronaut-runtime")
                 .withoutVersion()
