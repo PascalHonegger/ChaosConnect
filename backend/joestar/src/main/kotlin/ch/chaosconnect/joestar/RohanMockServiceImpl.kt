@@ -18,25 +18,14 @@ private val logger: Logger =
 @Singleton
 @Requires(notEnv = ["test"], property = "mocks.rohan")
 class RohanMockServiceImpl : RohanService {
-    private val redSkin = Skin.newBuilder().apply {
-        name = "Default Red Skin"
-        faction = Faction.RED
-        skinImage = "red.png"
-    }.build()
-
-    private val yellowSkin = Skin.newBuilder().apply {
-        name = "Default Yellow Skin"
-        faction = Faction.YELLOW
-        skinImage = "yellow.png"
-    }.build()
 
     private fun mockRedPiece() = Piece.newBuilder().apply {
-        skin = redSkin
+        faction = Faction.RED
         owner = "Player1"
     }.build()
 
     private fun mockYellowPiece() = Piece.newBuilder().apply {
-        skin = yellowSkin
+        faction = Faction.YELLOW
         owner = "Player2"
     }.build()
 
@@ -94,7 +83,7 @@ class RohanMockServiceImpl : RohanService {
                             position =
                                 Coordinate.newBuilder().setColumn(5).setRow(0)
                                     .build()
-                            skin = redSkin
+                            faction = Faction.RED
                             owner = "Player2"
                             action = PieceAction.PLACE
                         }.build())
