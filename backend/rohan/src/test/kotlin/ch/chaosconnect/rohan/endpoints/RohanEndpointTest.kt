@@ -30,7 +30,7 @@ import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
 @MicronautTest
-class RohanEndpointTest {
+internal class RohanEndpointTest {
 
     @Inject
     lateinit var application: EmbeddedApplication<*>

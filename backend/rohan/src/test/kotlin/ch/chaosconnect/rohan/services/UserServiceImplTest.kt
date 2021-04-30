@@ -1,26 +1,31 @@
 package ch.chaosconnect.rohan.services
 
+import ch.chaosconnect.rohan.assertThrowsWithMessage
+import ch.chaosconnect.rohan.meta.StorageConfig
 import ch.chaosconnect.rohan.runSignedIn
 import ch.chaosconnect.rohan.runSignedOut
 import kotlinx.coroutines.CoroutineScope
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import java.util.stream.Stream
 import javax.security.auth.login.AccountException
-import javax.security.auth.login.CredentialException
 import javax.security.auth.login.FailedLoginException
+import kotlin.io.path.ExperimentalPathApi
 
+@ExperimentalPathApi
+@ExperimentalStdlibApi
 internal class UserServiceImplTest {
 
+    private lateinit var storage: StorageService
     private lateinit var service: UserService
 
     @BeforeEach
     fun setUp() {
-        service = UserServiceImpl()
+        storage = StorageServiceImpl(StorageConfig())
+        service = UserServiceImpl(storage)
     }
 
     @ParameterizedTest
@@ -54,22 +59,6 @@ internal class UserServiceImplTest {
     fun `signUpAsRegularUser accepts new signed out users`() = runSignedOut {
         service.signUpAsRegularUser("bob", "123", "Bob89")
     }
-
-    @Test
-    fun `signUpAsRegularUser accepts new signed out users with unique names`() =
-        runSignedOut {
-            service.signUpAsRegularUser("bob", "pw", "Bob89")
-            service.signUpAsRegularUser("alice", "pw", "Alice90")
-        }
-
-    @Test
-    fun `signUpAsRegularUser throws when new signed out users use existing names`() =
-        runSignedOut {
-            service.signUpAsRegularUser("bob", "pw", "Bob89")
-            assertThrowsWithMessage<IllegalStateException>("User name 'bob' already in use") {
-                service.signUpAsRegularUser("bob", "pw", "Bob90")
-            }
-        }
 
     @Test
     fun `signUpAsRegularUser throws for signed in regular users`() =
@@ -147,7 +136,7 @@ internal class UserServiceImplTest {
 
     @Test
     fun `setPassword throws for signed out users`() = runSignedOut {
-        assertThrowsWithMessage<CredentialException>("No active user") {
+        assertThrowsWithMessage<IllegalStateException>("No active user") {
             service.setPassword("pw")
         }
     }
@@ -188,7 +177,7 @@ internal class UserServiceImplTest {
 
     @Test
     fun `setDisplayName throws for signed out users`() = runSignedOut {
-        assertThrowsWithMessage<CredentialException>("No active user") {
+        assertThrowsWithMessage<IllegalStateException>("No active user") {
             service.setDisplayName("Bob89")
         }
     }
@@ -230,12 +219,6 @@ internal class UserServiceImplTest {
     }
 
     companion object {
-
-        private inline fun <reified T : Throwable> assertThrowsWithMessage(
-            message: String,
-            executable: () -> Unit
-        ) =
-            assertEquals(message, assertThrows<T>(executable).message)
 
         @JvmStatic
         private fun blankStrings() =
