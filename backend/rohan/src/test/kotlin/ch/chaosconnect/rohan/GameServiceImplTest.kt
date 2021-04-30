@@ -55,7 +55,7 @@ internal class GameServiceImplTest {
                         .addColumns(
                             GameStateColumn.newBuilder().addPieces(
                                 Piece.newBuilder().setOwner("my-user")
-                                    .setSkin(Skin.newBuilder())
+                                    .setFaction(Faction.RED)
                             )
                         )
                         .addColumns(GameStateColumn.newBuilder())

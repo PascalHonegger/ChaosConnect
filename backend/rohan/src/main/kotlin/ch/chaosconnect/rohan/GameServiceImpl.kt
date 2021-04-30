@@ -75,7 +75,7 @@ class GameServiceImpl : GameService {
                                 Piece
                                     .newBuilder()
                                     .setOwner(cell?.owner)
-                                    .setSkin(cell?.skin)
+                                    .setFaction(cell?.faction)
                                     .build()
                             })
                             .build()
