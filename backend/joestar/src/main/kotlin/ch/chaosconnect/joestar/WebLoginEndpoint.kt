@@ -39,9 +39,12 @@ class WebLoginEndpoint(
         ).asTokenResponseOrError()
 
     override suspend fun renewToken(request: Empty) =
-        when (currentUserIdentifier.get()) {
+        when (val existingToken = currentUserIdentifier.get()) {
             null -> null
-            else -> rohanService.playWithoutAccount(currentUserIdentifier.get())
+            // We assume that the user still exists in the backend
+            // If not, game service calls made with an invalid user will fail
+            else -> UserAuthResponse.newBuilder().setIdentifier(existingToken)
+                .build()
         }.asTokenResponseOrError()
 
 

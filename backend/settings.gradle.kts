@@ -115,6 +115,11 @@ dependencyResolutionManagement {
 
             alias("turbine").to("app.cash.turbine", "turbine")
                 .versionRef("turbine")
+
+            alias("junit-params").to(
+                "org.junit.jupiter",
+                "junit-jupiter-params"
+            ).withoutVersion()
         }
         create("targets") {
             version("jvm", "11")
