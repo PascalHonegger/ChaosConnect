@@ -21,14 +21,26 @@ import {
 export interface Player {
     identifier: string;
     displayName: string;
+    faction: Faction;
+    disconnected: boolean;
 }
 
 function newPlayer(identifier: string, playerState: PlayerState): Player {
     return {
         identifier,
         displayName: playerState.getDisplayName(),
+        faction: playerState.getFaction(),
+        disconnected: false
     };
 }
+
+function disconnectedPlayer(player: Player): Player
+{
+    return {
+        ...player,
+        disconnected: true
+    };
+} 
 
 export interface Piece {
     faction: Faction;
@@ -297,7 +309,10 @@ function handlePlayerChanged(gameState: GameState, playerChanged: PlayerChanged)
             playerMap.set(identifier, newPlayer(identifier, playerState));
             break;
         case PlayerAction.DISCONNECTED:
-            playerMap.delete(identifier);
+            const player = playerMap.get(identifier);
+            if (player != null) {
+                playerMap.set(identifier, disconnectedPlayer(player));
+            }
             break;
         default:
             console.warn('Unknown PlayerChanged Action');
