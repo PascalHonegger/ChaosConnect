@@ -5,7 +5,7 @@
     import webLoginClient from "../lib/WebLoginClient";
     import LoginRegister from "./LoginRegister.svelte";
     import { isLoggedIn, token } from "../stores/Auth";
-    import Grid from "./Grid.svelte";
+    import Game from "./Game.svelte";
 </script>
 
 <main>
@@ -13,7 +13,7 @@
     {#if $isLoggedIn}
         <button on:click={() => token.unset()}>Logout</button>
         <TokenRefresher client={webLoginClient} />
-        <Grid client={chaosConnectClient} />
+        <Game client={chaosConnectClient} />
     {:else}
         <LoginRegister client={webLoginClient} />
     {/if}
