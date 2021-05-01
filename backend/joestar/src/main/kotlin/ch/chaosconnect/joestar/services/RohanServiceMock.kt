@@ -54,6 +54,16 @@ class RohanServiceMock : RohanService {
                         mockColumn()
                     )
                 )
+                putAllPlayers(mapOf(
+                    "Player1" to PlayerState.newBuilder().apply {
+                        displayName = "JoJo"
+                        faction = Faction.RED
+                    }.build(),
+                    "Player2" to PlayerState.newBuilder().apply {
+                        displayName = "Dio"
+                        faction = Faction.YELLOW
+                    }.build()
+                ))
             }.build()
 
             val updatedGameState = GameState.newBuilder().apply {
