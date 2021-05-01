@@ -36,13 +36,9 @@ export interface Piece {
 }
 
 function newPiece(piece: ApiPiece | PieceState): Piece {
-    const skin = piece.getSkin();
-    if (skin == null) {
-        throw new Error('Can not get faction of piece without skin field');
-    }
     return {
         owner: piece.getOwner(),
-        faction: skin.getFaction()
+        faction: piece.getFaction()
     };
 }
 
