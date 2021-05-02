@@ -65,11 +65,7 @@
 
     .players,
     .no-players-message {
-        padding-left: 1.5rem;
-    }
-
-    .players {
-        padding-left: 1.5rem;
+        padding-left: var(--piece-size);
     }
 
     .game {

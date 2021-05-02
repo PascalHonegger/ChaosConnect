@@ -14,8 +14,8 @@
 <style>
     .cell {
         border: 1px solid black;
-        width: 1.5rem;
-        height: 1.5rem;
+        width: var(--piece-size);
+        height: var(--piece-size);
     }
 
     .disabled {

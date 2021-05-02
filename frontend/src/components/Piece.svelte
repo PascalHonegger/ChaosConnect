@@ -19,9 +19,9 @@
 
 <style>
     .piece {
-        width: 1.5rem;
-        height: 1.5rem;
-        border-radius: 0.75rem;
+        width: var(--piece-size);
+        height: var(--piece-size);
+        border-radius: calc(var(--piece-size) / 2);
     }
 
     .red {
