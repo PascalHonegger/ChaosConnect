@@ -2,6 +2,7 @@ package ch.chaosconnect.joestar.endpoints
 
 import ch.chaosconnect.api.authentication.LoginRequest
 import ch.chaosconnect.api.game.PlacePieceRequest
+import ch.chaosconnect.api.game.StartPlayingRequest
 import ch.chaosconnect.api.joestar.ChaosConnectServiceGrpcKt
 import ch.chaosconnect.api.joestar.WebLoginServiceGrpcKt
 import ch.chaosconnect.api.user.UserAuthResponse
@@ -52,10 +53,18 @@ class JoestarEndpointTest {
     }
 
     @Test
-    fun `getGameUpdates throws unauthenticated exception`(): Unit =
+    fun `placePiece throws unauthenticated exception`(): Unit =
         runBlocking {
             assertThrows<StatusException> {
                 chaosConnectServiceStub.placePiece(PlacePieceRequest.getDefaultInstance())
+            }
+        }
+
+    @Test
+    fun `startPlaying throws unauthenticated exception`(): Unit =
+        runBlocking {
+            assertThrows<StatusException> {
+                chaosConnectServiceStub.startPlaying(StartPlayingRequest.getDefaultInstance())
             }
         }
 

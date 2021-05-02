@@ -1,7 +1,9 @@
 package ch.chaosconnect.joestar.services
 
 import ch.chaosconnect.api.common.Empty
+import ch.chaosconnect.api.game.Faction
 import ch.chaosconnect.api.game.PlacePieceRequest
+import ch.chaosconnect.api.game.StartPlayingRequest
 import ch.chaosconnect.api.rohan.GameServiceGrpcKt
 import ch.chaosconnect.api.rohan.GameUpdateResponse
 import ch.chaosconnect.api.rohan.UserServiceGrpcKt
@@ -27,6 +29,12 @@ class RohanServiceImpl(
     override suspend fun placePiece(column: Int) {
         gameService.placePiece(
             PlacePieceRequest.newBuilder().setColumn(column).build()
+        )
+    }
+
+    override suspend fun startPlaying(faction: Faction) {
+        gameService.startPlaying(
+            StartPlayingRequest.newBuilder().setFaction(faction).build()
         )
     }
 

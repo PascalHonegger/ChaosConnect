@@ -1,5 +1,6 @@
 package ch.chaosconnect.joestar.services
 
+import ch.chaosconnect.api.game.Faction
 import ch.chaosconnect.api.game.GameUpdateEvent
 import ch.chaosconnect.api.rohan.GameUpdateResponse
 import io.micronaut.context.annotation.Requires
@@ -55,6 +56,9 @@ class GameStateServiceImpl(
 
     override suspend fun placePiece(column: Int) =
         rohanService.placePiece(column = column)
+
+    override suspend fun startPlaying(faction: Faction) =
+        rohanService.startPlaying(faction = faction)
 
     override fun isConnected() = isConnected.get()
 
