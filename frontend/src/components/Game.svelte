@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { ClientReadableStream } from "grpc-web";
-    import Column from "./Column.svelte";
+    import Column from "./Grid.svelte";
     import { newEmpty } from "../lib/CommonClient";
     import {
         columns,
@@ -12,6 +12,7 @@
     import { authMetadata } from "../stores/Auth";
     import { onMount } from "svelte";
     import Piece from "./Piece.svelte";
+import Grid from "./Grid.svelte";
 
     export let client: ChaosConnectServiceClient;
 
@@ -45,11 +46,7 @@
         {/each}
     </ul>
 
-    <div class="grid">
-        {#each $columns as column}
-            <Column {column} />
-        {/each}
-    </div>
+    <Grid />
 </div>
 
 <style>
@@ -71,10 +68,5 @@
     .game {
         display: grid;
         grid-template-columns: 1fr 6fr;
-    }
-
-    .grid {
-        display: flex;
-        justify-self: center;
     }
 </style>
