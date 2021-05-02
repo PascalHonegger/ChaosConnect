@@ -79,8 +79,8 @@ class StorageServiceImpl(config: StorageConfig) : StorageService {
             return updatedScore
         }
 
-    override fun getUser(identifier: String): User? =
-        lock.read { dataStore[identifier]?.user }
+    override fun getUser(identifier: String): UserScore? =
+        lock.read { dataStore[identifier] }
 
     override fun findUser(
         username: String,

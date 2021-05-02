@@ -2,104 +2,210 @@ package ch.chaosconnect.rohan.services
 
 import ch.chaosconnect.api.game.*
 import ch.chaosconnect.rohan.meta.userIdentifierContextKey
+import ch.chaosconnect.rohan.model.UserScore
+import io.micronaut.scheduling.annotation.Scheduled
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
+import java.util.*
 import javax.inject.Singleton
 
-@Singleton
-class GameServiceImpl : GameService {
+const val initialWidth = 7
+const val initialHeight = 6
+const val inactiveTimeoutMinutes = 30
 
-    private val columns = Array(7) {
-        ArrayList<PieceState?>(6)
+data class ActivePlayerState(
+    val lastActive: LocalDateTime,
+    val faction: Faction?,
+    val userScore: UserScore
+)
+
+@Singleton
+class GameServiceImpl(private val storageService: StorageService) :
+    GameService {
+
+    private val mutex = Mutex()
+    private val updates = MutableSharedFlow<Pair<GameUpdateEvent, GameState>>(1)
+    private val activePlayers = mutableMapOf<String, ActivePlayerState>()
+    private val columns = mutableListOf<MutableList<PieceState>>()
+    private val queues = mutableListOf<Queue<QueueState>>()
+    private val numberOfRows = initialHeight
+    private val numberOfColumns get() = columns.size
+
+    override suspend fun startPlaying(faction: Faction): Unit = mutex.withLock {
+        val currentUser = userIdentifierContextKey.get()
+            ?: error("Cannot start playing without a user")
+        activePlayers.compute(currentUser) { _, user ->
+            when (user) {
+                null -> ActivePlayerState(
+                    lastActive = LocalDateTime.now(),
+                    faction = faction,
+                    userScore = storageService.getUser(currentUser)
+                        ?: error("User $currentUser not found in storage")
+                )
+                else -> user.copy(
+                    lastActive = LocalDateTime.now(),
+                    faction = faction
+                )
+            }
+        }
     }
 
-    private val updates = MutableSharedFlow<Pair<GameUpdateEvent, GameState>>(1)
-
-    override suspend fun placePiece(rowIndex: Int, columnIndex: Int) {
+    override suspend fun placePiece(columnIndex: Int): Unit = mutex.withLock {
         val currentUser = userIdentifierContextKey.get()
-            ?: throw IllegalStateException("Cannot place piece without a user")
+            ?: error("Cannot place piece without a user")
 
-        val columnCells: ArrayList<PieceState?>
-        try {
-            columnCells = columns[columnIndex]
-        } catch (exception: IndexOutOfBoundsException) {
-            throw createIndexOutOfBoundsException("column", columnIndex)
+        require(columnIndex < numberOfColumns) { "Column out of bounds" }
+
+        val user = activePlayers.compute(currentUser) { _, user ->
+            user?.copy(lastActive = LocalDateTime.now())
+        } ?: error("User $currentUser not actively playing")
+
+        check(queues.none { it.any { queue -> queue.owner == currentUser } }) {
+            "User already has piece enqueued"
         }
-        if (rowIndex != columnCells.size) {
-            throw createIndexOutOfBoundsException("row", rowIndex)
+
+        check(columns[columnIndex].size < numberOfRows) {
+            "Column is already full"
         }
-        val state = PieceState
+
+        val state = QueueState
             .newBuilder()
-            .setAction(PieceAction.PLACE)
-            .setPosition(
-                Coordinate
-                    .newBuilder()
-                    .setRow(rowIndex)
-                    .setColumn(columnIndex)
-                    .build()
-            )
+            .setColumn(columnIndex)
+            .setFaction(user.faction)
             .setOwner(currentUser)
             .build()
-        columnCells.add(state)
-        emit(
-            GameUpdateEvent
+
+        queues[columnIndex].add(state)
+
+        emitCurrentState {
+            queueChanged = QueueChanged
                 .newBuilder()
-                .setColumnChanged(
-                    ColumnChanged
-                        .newBuilder()
-                        .setPosition(columnIndex)
-                        .setAction(RowColumnAction.ADD)
-                        .build()
-                )
-                .setRowChanged(
-                    RowChanged
-                        .newBuilder()
-                        .setPosition(rowIndex)
-                        .setAction(RowColumnAction.ADD)
-                        .build()
-                )
-                .setPieceChanged(
-                    PieceChanged
-                        .newBuilder()
-                        .addPieces(state)
-                        .build()
-                )
-                .build(),
-            GameState
-                .newBuilder()
-                .addAllColumns(
-                    columns.map { column ->
-                        GameStateColumn
-                            .newBuilder()
-                            .addAllPieces(column.map { cell ->
-                                Piece
-                                    .newBuilder()
-                                    .setOwner(cell?.owner)
-                                    .setFaction(cell?.faction)
-                                    .build()
-                            })
-                            .build()
-                    }
-                )
+                .addPieces(state)
                 .build()
-        )
+        }
+    }
+
+    @Scheduled(fixedDelay = "5s")
+    fun processQueueTick() = runBlocking {
+        mutex.withLock {
+            val queueToProcess =
+                queues.filter { it.isNotEmpty() }.randomOrNull()
+                    ?: return@withLock
+
+            val enqueueTask = queueToProcess.poll()
+            val column = columns[enqueueTask.column]
+            val state = PieceState.newBuilder()
+                .setAction(PieceAction.PLACE)
+                .setFaction(enqueueTask.faction)
+                .setOwner(enqueueTask.owner)
+                .setColumn(enqueueTask.column)
+                .build()
+            column.add(state)
+
+            if (column.size == numberOfRows - 1) {
+                queues[enqueueTask.column].clear()
+            }
+
+            emitCurrentState {
+                pieceChanged = PieceChanged
+                    .newBuilder()
+                    .addPieces(state)
+                    .build()
+            }
+        }
+    }
+
+    @Scheduled(fixedDelay = "1m")
+    fun cleanupTick() = runBlocking {
+        mutex.withLock {
+            val inactivePlayers = activePlayers.filterValues { player ->
+                player.lastActive.until(
+                    LocalDateTime.now(),
+                    ChronoUnit.MINUTES
+                ) > inactiveTimeoutMinutes
+            }
+            for (id in inactivePlayers.keys) {
+                activePlayers.remove(id)
+                emitCurrentState {
+                    playerChanged = PlayerChanged.newBuilder()
+                        .setAction(PlayerAction.DISCONNECT)
+                        .setPlayer(id)
+                        .build()
+                }
+            }
+        }
+    }
+
+    @Scheduled(fixedDelay = "30s")
+    fun resizeFieldTick() = runBlocking {
+        mutex.withLock {
+            // TODO Some logic with amount of active players
+//                emitCurrentState {
+//                    rowChanged = RowChanged
+//                        .newBuilder()
+//                        .setPosition(32)
+//                        .setAction(RowColumnAction.ADD)
+//                        .build()
+//                }
+        }
     }
 
     init {
-        runBlocking {
-            val initialState = GameState.getDefaultInstance()
-            val initialEvent = GameUpdateEvent.newBuilder().setGameState(initialState).build()
-            emit(initialEvent, initialState)
-        }
+        repeat(initialWidth) { columns.add(mutableListOf()) }
+        repeat(initialWidth) { queues.add(LinkedList()) }
+        runBlocking { emitCurrentState() }
     }
-
-    private fun createIndexOutOfBoundsException(indexKind: String, index: Int) =
-        IndexOutOfBoundsException("Invalid $indexKind index: $index")
 
     override fun getGameUpdates(): Flow<Pair<GameUpdateEvent, GameState>> =
         updates
 
-    private suspend fun emit(updateEvent: GameUpdateEvent, state: GameState) =
-        updates.emit(updateEvent to state)
+    private suspend fun emitCurrentState(setChangeReason: (GameUpdateEvent.Builder.() -> Unit)? = null) {
+        val state =
+            GameState
+                .newBuilder()
+                .addAllColumns(
+                    (0 until numberOfColumns).map { index ->
+                        GameStateColumn
+                            .newBuilder()
+                            .addAllPieces(
+                                columns[index].map {
+                                    Piece
+                                        .newBuilder()
+                                        .setOwner(it.owner)
+                                        .setFaction(it.faction)
+                                        .build()
+                                })
+                            .addAllQueue(
+                                queues[index].map {
+                                    Piece
+                                        .newBuilder()
+                                        .setOwner(it.owner)
+                                        .setFaction(it.faction)
+                                        .build()
+                                })
+                            .build()
+                    }
+                )
+                .setNumberOfRows(numberOfRows)
+                .putAllPlayers(activePlayers.mapValues { (_, player) ->
+                    PlayerState.newBuilder()
+                        .setDisplayName(player.userScore.user.displayName)
+                        .setScore(player.userScore.score)
+                        .setFaction(player.faction)
+                        .build()
+                })
+                .build()
+        val eventBuilder = GameUpdateEvent.newBuilder()
+        if (setChangeReason != null) {
+            eventBuilder.setChangeReason()
+        } else {
+            eventBuilder.gameState = state
+        }
+        updates.emit(eventBuilder.build() to state)
+    }
 }

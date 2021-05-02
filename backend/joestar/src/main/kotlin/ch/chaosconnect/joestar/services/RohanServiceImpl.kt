@@ -1,7 +1,7 @@
 package ch.chaosconnect.joestar.services
 
 import ch.chaosconnect.api.common.Empty
-import ch.chaosconnect.api.game.Coordinate
+import ch.chaosconnect.api.game.PlacePieceRequest
 import ch.chaosconnect.api.rohan.GameServiceGrpcKt
 import ch.chaosconnect.api.rohan.GameUpdateResponse
 import ch.chaosconnect.api.rohan.UserServiceGrpcKt
@@ -24,9 +24,9 @@ class RohanServiceImpl(
         return gameService.getGameUpdates(Empty.getDefaultInstance())
     }
 
-    override suspend fun placePiece(row: Int, column: Int) {
+    override suspend fun placePiece(column: Int) {
         gameService.placePiece(
-            Coordinate.newBuilder().setRow(row).setColumn(column).build()
+            PlacePieceRequest.newBuilder().setColumn(column).build()
         )
     }
 

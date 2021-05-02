@@ -21,7 +21,6 @@ enum RowColumnAction {
 
 enum PieceAction {
   PLACE = 0;
-  // DESTROY = 1;
 }
 
 enum QueueAction {
@@ -30,9 +29,9 @@ enum QueueAction {
 }
 
 enum PlayerAction {
-  JOINED = 0;
-  DISCONNECTED = 1;
-  UPDATED = 2;
+  JOIN = 0;
+  DISCONNECT = 1;
+  UPDATE = 2;
 }
 
 // DTO
@@ -42,14 +41,10 @@ message Piece {
   Faction faction = 2;
 }
 
-message Coordinate {
-  int32 row = 1;
-  int32 column = 2;
-}
-
 message PlayerState {
   string display_name = 1;
   Faction faction = 2;
+  int64 score = 3;
 }
 
 message GameStateColumn {
@@ -66,7 +61,7 @@ message GameState {
 // Events
 
 message PieceState {
-  Coordinate position = 1;
+  int32 column = 1;
   Faction faction = 2;
   string owner = 3;
   PieceAction action = 4;
@@ -77,7 +72,7 @@ message PieceChanged {
 }
 
 message QueueState {
-  Coordinate position = 1;
+  int32 column = 1;
   Faction faction = 2;
   string owner = 3;
 }
@@ -100,6 +95,14 @@ message PlayerChanged {
   string player = 1;
   PlayerAction action = 2;
   PlayerState state = 3;
+}
+
+message StartPlayingRequest {
+  api.game.Faction faction = 1;
+}
+
+message PlacePieceRequest {
+  int32 column = 1;
 }
 
 message GameUpdateEvent {

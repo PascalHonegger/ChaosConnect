@@ -1,7 +1,8 @@
 package ch.chaosconnect.rohan.endpoints
 
 import ch.chaosconnect.api.common.Empty
-import ch.chaosconnect.api.game.Coordinate
+import ch.chaosconnect.api.game.PlacePieceRequest
+import ch.chaosconnect.api.game.StartPlayingRequest
 import ch.chaosconnect.api.rohan.GameServiceGrpcKt
 import ch.chaosconnect.api.rohan.GameUpdateResponse
 import ch.chaosconnect.rohan.services.GameService
@@ -13,8 +14,13 @@ import javax.inject.Singleton
 class GameEndpoint(private val service: GameService) :
     GameServiceGrpcKt.GameServiceCoroutineImplBase() {
 
-    override suspend fun placePiece(request: Coordinate): Empty {
-        service.placePiece(rowIndex = request.row, columnIndex = request.column)
+    override suspend fun startPlaying(request: StartPlayingRequest): Empty {
+        service.startPlaying(faction = request.faction)
+        return Empty.getDefaultInstance()
+    }
+
+    override suspend fun placePiece(request: PlacePieceRequest): Empty {
+        service.placePiece(columnIndex = request.column)
         return Empty.getDefaultInstance()
     }
 

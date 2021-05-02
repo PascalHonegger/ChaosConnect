@@ -74,7 +74,7 @@ internal class StorageServiceImplTest {
         assertEquals(addedUser.identifier, updatedUser.identifier)
         assertEquals("Dummy User", addedUser.displayName)
         assertEquals("New Name", updatedUser.displayName)
-        assertEquals(updatedUser, service.getUser(updatedUser.identifier))
+        assertEquals(updatedUser, service.getUser(updatedUser.identifier)?.user)
     }
 
     @Test
@@ -92,7 +92,7 @@ internal class StorageServiceImplTest {
         assertEquals(addedUser.displayName, updatedUser.displayName)
         assertTrue(addedUser is TemporaryUser)
         assertTrue(updatedUser is RegularUser)
-        assertEquals(updatedUser, service.getUser(updatedUser.identifier))
+        assertEquals(updatedUser, service.getUser(updatedUser.identifier)?.user)
         assertEquals(updatedUser, service.findUser("dummy"))
     }
 

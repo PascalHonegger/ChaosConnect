@@ -1,6 +1,5 @@
 package ch.chaosconnect.joestar.services
 
-import ch.chaosconnect.api.game.Coordinate
 import ch.chaosconnect.api.game.GameUpdateEvent
 import kotlinx.coroutines.flow.Flow
 
@@ -13,7 +12,7 @@ interface GameStateService {
     /**
      * Place a piece at the requested coordinate
      */
-    suspend fun placePiece(coordinate: Coordinate)
+    suspend fun placePiece(column: Int)
 
     /**
      * Indicate whether a healthy connection to the Rohan exists.
