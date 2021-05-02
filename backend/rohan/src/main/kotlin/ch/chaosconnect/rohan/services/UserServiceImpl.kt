@@ -38,7 +38,7 @@ class UserServiceImpl(private val storageService: StorageService) :
             }
             else -> storageService.updateUser(currentIdentifier) {
                 when (it) {
-                    is RegularUser -> throw IllegalStateException("Already signed in as a regular user")
+                    is RegularUser -> error("Already signed in as a regular user")
                     is TemporaryUser -> RegularUser(
                         identifier = it.identifier,
                         displayName = it.displayName,
@@ -92,7 +92,7 @@ class UserServiceImpl(private val storageService: StorageService) :
     private fun signIn(userProvider: () -> User): String =
         when (getCurrentIdentifier()) {
             null -> userProvider().identifier
-            else -> throw IllegalStateException("Already signed in")
+            else -> error("Already signed in")
         }
 
     private fun signUp(userProvider: () -> User): String =

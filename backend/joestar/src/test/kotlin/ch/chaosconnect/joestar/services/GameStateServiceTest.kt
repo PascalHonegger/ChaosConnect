@@ -1,7 +1,10 @@
 package ch.chaosconnect.joestar.services
 
 import app.cash.turbine.test
-import ch.chaosconnect.api.game.*
+import ch.chaosconnect.api.game.GameState
+import ch.chaosconnect.api.game.GameStateColumn
+import ch.chaosconnect.api.game.GameUpdateEvent
+import ch.chaosconnect.api.game.PieceChanged
 import ch.chaosconnect.api.rohan.GameUpdateResponse
 import io.mockk.coJustRun
 import io.mockk.coVerify
@@ -107,10 +110,8 @@ class GameStateServiceTest {
     @Test
     fun `placePiece is forwarded to Rohan`() =
         runBlocking {
-            coJustRun { rohanService.placePiece(row = 1, column = 2) }
-            service.placePiece(
-                Coordinate.newBuilder().setRow(1).setColumn(2).build()
-            )
-            coVerify { rohanService.placePiece(row = 1, column = 2) }
+            coJustRun { rohanService.placePiece(column = 2) }
+            service.placePiece(2)
+            coVerify { rohanService.placePiece(column = 2) }
         }
 }

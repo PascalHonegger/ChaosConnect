@@ -1,7 +1,7 @@
 package ch.chaosconnect.joestar.endpoints
 
 import ch.chaosconnect.api.authentication.LoginRequest
-import ch.chaosconnect.api.game.Coordinate
+import ch.chaosconnect.api.game.PlacePieceRequest
 import ch.chaosconnect.api.joestar.ChaosConnectServiceGrpcKt
 import ch.chaosconnect.api.joestar.WebLoginServiceGrpcKt
 import ch.chaosconnect.api.user.UserAuthResponse
@@ -55,7 +55,7 @@ class JoestarEndpointTest {
     fun `getGameUpdates throws unauthenticated exception`(): Unit =
         runBlocking {
             assertThrows<StatusException> {
-                chaosConnectServiceStub.placePiece(Coordinate.getDefaultInstance())
+                chaosConnectServiceStub.placePiece(PlacePieceRequest.getDefaultInstance())
             }
         }
 

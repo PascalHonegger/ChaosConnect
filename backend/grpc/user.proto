@@ -33,4 +33,3 @@ message UserAuthResponse {
     string failure_reason = 2;
   }
 }
-

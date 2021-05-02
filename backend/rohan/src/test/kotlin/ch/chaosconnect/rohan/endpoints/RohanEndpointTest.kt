@@ -2,9 +2,7 @@ package ch.chaosconnect.rohan.endpoints
 
 import app.cash.turbine.test
 import ch.chaosconnect.api.common.Empty
-import ch.chaosconnect.api.game.Coordinate
-import ch.chaosconnect.api.game.GameState
-import ch.chaosconnect.api.game.GameUpdateEvent
+import ch.chaosconnect.api.game.*
 import ch.chaosconnect.api.rohan.GameServiceGrpcKt
 import ch.chaosconnect.api.rohan.UserServiceGrpcKt
 import ch.chaosconnect.api.user.GetUserRequest
@@ -123,12 +121,22 @@ internal class RohanEndpointTest {
     @Test
     fun `placePiece places piece`(): Unit =
         runBlocking {
-            coJustRun { gameService.placePiece(rowIndex = 0, columnIndex = 3) }
+            coJustRun { gameService.placePiece(columnIndex = 3) }
             gameServiceStub.placePiece(
-                Coordinate.newBuilder()
-                    .setRow(0).setColumn(3).build()
+                PlacePieceRequest.newBuilder().setColumn(3).build()
             )
-            coVerify { gameService.placePiece(rowIndex = 0, columnIndex = 3) }
+            coVerify { gameService.placePiece(columnIndex = 3) }
+        }
+
+    @Test
+    fun `startPlaying starts a session`(): Unit =
+        runBlocking {
+            coJustRun { gameService.startPlaying(faction = Faction.YELLOW) }
+            gameServiceStub.startPlaying(
+                StartPlayingRequest.newBuilder()
+                    .setFaction(Faction.YELLOW).build()
+            )
+            coVerify { gameService.startPlaying(faction = Faction.YELLOW) }
         }
 
     @Test

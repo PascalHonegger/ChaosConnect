@@ -81,9 +81,7 @@ class RohanServiceMock : RohanService {
                 event = GameUpdateEvent.newBuilder().apply {
                     pieceChanged = PieceChanged.newBuilder().apply {
                         addPieces(PieceState.newBuilder().apply {
-                            position =
-                                Coordinate.newBuilder().setColumn(5).setRow(0)
-                                    .build()
+                            column = 5
                             faction = Faction.RED
                             owner = "Player2"
                             action = PieceAction.PLACE
@@ -102,7 +100,7 @@ class RohanServiceMock : RohanService {
         }
     }
 
-    override suspend fun placePiece(row: Int, column: Int) = Unit
+    override suspend fun placePiece(column: Int) = Unit
 
     override suspend fun login(
         username: String,

@@ -15,7 +15,8 @@ message GameUpdateResponse {
 }
 
 service GameService {
-  rpc PlacePiece(api.game.Coordinate) returns (api.common.Empty);
+  rpc StartPlaying(api.game.StartPlayingRequest) returns (api.common.Empty);
+  rpc PlacePiece(api.game.PlacePieceRequest) returns (api.common.Empty);
 
   rpc GetGameUpdates(api.common.Empty)
       returns (stream GameUpdateResponse);

@@ -40,8 +40,7 @@ class UserEndpoint(private val service: UserService) :
                     service.setPassword(request.password)
                 request.hasDisplayName() ->
                     service.setDisplayName(request.displayName)
-                else ->
-                    throw IllegalArgumentException("Unknown changed property")
+                else -> error("Unknown changed property")
             }
         }
 
