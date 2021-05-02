@@ -1,4 +1,4 @@
-import { derived, writable } from "svelte/store";
+import { derived, Writable, writable } from "svelte/store";
 import { applyUpdate, initialGameState, Player } from "../lib/GameState";
 import { Faction, GameUpdateEvent } from "../gen/game_pb";
 
@@ -29,4 +29,11 @@ export const factions = derived(playerMap, $playerMap => {
         players.sort((p1, p2) => Number(p2.disconnected) - Number(p1.disconnected))
     );
     return factions;
+});
+
+export const player: Writable<Player> = writable({
+    identifier: 'Player1',
+    displayName: 'JoJo',
+    disconnected: false,
+    faction: Faction.RED
 });
