@@ -1,5 +1,6 @@
 package ch.chaosconnect.joestar.services
 
+import ch.chaosconnect.api.game.Faction
 import ch.chaosconnect.api.rohan.GameUpdateResponse
 import ch.chaosconnect.api.user.UserAuthResponse
 import kotlinx.coroutines.flow.Flow
@@ -7,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 interface RohanService {
     fun getGameUpdates(): Flow<GameUpdateResponse>
     suspend fun placePiece(column: Int)
+    suspend fun startPlaying(faction: Faction)
     suspend fun login(username: String, password: String): UserAuthResponse
     suspend fun register(
         displayName: String,
