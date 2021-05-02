@@ -18,11 +18,18 @@ const val initialWidth = 7
 const val initialHeight = 6
 const val inactiveTimeoutMinutes = 30
 
-data class ActivePlayerState(
+private data class ActivePlayerState(
     val lastActive: LocalDateTime,
     val faction: Faction?,
     val userScore: UserScore
 )
+
+private fun ActivePlayerState.asPlayerState(): PlayerState =
+    PlayerState.newBuilder()
+        .setFaction(faction)
+        .setDisplayName(userScore.user.displayName)
+        .setScore(userScore.score)
+        .build()
 
 @Singleton
 class GameServiceImpl(private val storageService: StorageService) :
@@ -39,7 +46,7 @@ class GameServiceImpl(private val storageService: StorageService) :
     override suspend fun startPlaying(faction: Faction): Unit = mutex.withLock {
         val currentUser = userIdentifierContextKey.get()
             ?: error("Cannot start playing without a user")
-        activePlayers.compute(currentUser) { _, user ->
+        val playerState = activePlayers.compute(currentUser) { _, user ->
             when (user) {
                 null -> ActivePlayerState(
                     lastActive = LocalDateTime.now(),
@@ -52,6 +59,14 @@ class GameServiceImpl(private val storageService: StorageService) :
                     faction = faction
                 )
             }
+        } ?: error("User $currentUser not found in activePlayers")
+
+        emitCurrentState {
+            playerChanged = PlayerChanged.newBuilder()
+                .setAction(PlayerAction.JOIN)
+                .setPlayer(currentUser)
+                .setState(playerState.asPlayerState())
+                .build()
         }
     }
 
@@ -192,13 +207,7 @@ class GameServiceImpl(private val storageService: StorageService) :
                     }
                 )
                 .setNumberOfRows(numberOfRows)
-                .putAllPlayers(activePlayers.mapValues { (_, player) ->
-                    PlayerState.newBuilder()
-                        .setDisplayName(player.userScore.user.displayName)
-                        .setScore(player.userScore.score)
-                        .setFaction(player.faction)
-                        .build()
-                })
+                .putAllPlayers(activePlayers.mapValues { (_, player) -> player.asPlayerState() })
                 .build()
         val eventBuilder = GameUpdateEvent.newBuilder()
         if (setChangeReason != null) {
