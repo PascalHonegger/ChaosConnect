@@ -33,7 +33,6 @@ export const player: Readable<Player|null> = derived([playerMap, userIdentifier]
     if ($userIdentifier == null) {
         return null;
     }
-    $playerMap.forEach((player) => console.log(player));
     return $playerMap.get($userIdentifier) ?? null;
 });
 
