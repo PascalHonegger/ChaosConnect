@@ -151,7 +151,7 @@ class StorageServiceImpl(config: StorageConfig) :
         }
     }
 
-    override fun storeDataTick() = store()
+    override suspend fun storeDataTick() = store()
 
     @EventListener
     fun onShutdownEvent(event: ShutdownEvent) = store()

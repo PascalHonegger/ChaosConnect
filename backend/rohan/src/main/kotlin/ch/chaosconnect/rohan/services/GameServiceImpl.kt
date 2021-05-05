@@ -105,7 +105,7 @@ class GameServiceImpl(private val storageService: StorageService) :
         }
     }
 
-    override fun processQueueTick() = runBlocking {
+    override suspend fun processQueueTick() =
         mutex.withLock {
             val queueToProcess =
                 queues.filter { it.isNotEmpty() }.randomOrNull()
@@ -132,9 +132,8 @@ class GameServiceImpl(private val storageService: StorageService) :
                     .build()
             }
         }
-    }
 
-    override fun cleanupTick() = runBlocking {
+    override suspend fun cleanupTick() =
         mutex.withLock {
             val inactivePlayers = activePlayers.filterValues { player ->
                 player.lastActive.until(
@@ -152,9 +151,8 @@ class GameServiceImpl(private val storageService: StorageService) :
                 }
             }
         }
-    }
 
-    override fun resizeFieldTick() = runBlocking {
+    override suspend fun resizeFieldTick() =
         mutex.withLock {
             // TODO Some logic with amount of active players
 //                emitCurrentState {
@@ -165,7 +163,6 @@ class GameServiceImpl(private val storageService: StorageService) :
 //                        .build()
 //                }
         }
-    }
 
     init {
         repeat(initialWidth) { columns.add(mutableListOf()) }
