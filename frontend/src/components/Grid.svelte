@@ -3,6 +3,8 @@
     import type { Column } from "../lib/GameState";
     import Piece from "./Piece.svelte";
     import { columns, player } from "../stores/GameState";
+    import { placePiece } from "../lib/ChaosConnectClient";
+    import { authMetadata } from "../stores/Auth";
 
     let previewColumn: Column | null = null;
 </script>
@@ -11,7 +13,7 @@
     <div>
         {#each $columns as column}
             <div class="preview">
-                {#if previewColumn === column}
+                {#if previewColumn === column && $player != null}
                     <Piece faction={$player.faction} />
                 {/if}
             </div>
@@ -29,11 +31,12 @@
     </div>
 
     <div>
-        {#each $columns as column}
+        {#each $columns as column, index}
             <div
                 class="column"
                 on:mouseenter={() => (previewColumn = column)}
                 on:mouseleave={() => (previewColumn = null)}
+                on:click={() => placePiece(index, $authMetadata)}
             >
                 {#each column.cells as cell}
                     <Cell {cell} />
