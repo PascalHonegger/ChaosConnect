@@ -21,7 +21,7 @@ import kotlin.time.ExperimentalTime
 @ExperimentalTime
 internal class GameServiceImplTest {
 
-    private lateinit var service: GameService
+    private lateinit var service: GameServiceImpl
     private lateinit var storage: StorageService
 
     private fun dummyScore(id: String) =
@@ -104,4 +104,19 @@ internal class GameServiceImplTest {
                 cancel()
             }
         }
+
+    @Test
+    fun `processQueueTick TODO`() {
+        //  TODO: Add tests
+    }
+
+    @Test
+    fun `cleanupTick TODO`() {
+        //  TODO: Add tests
+    }
+
+    @Test
+    fun `resizeFieldTick TODO`() {
+        //  TODO: Add tests
+    }
 }

@@ -7,7 +7,6 @@ import ch.chaosconnect.rohan.model.User
 import ch.chaosconnect.rohan.model.UserScore
 import io.micronaut.context.event.ShutdownEvent
 import io.micronaut.runtime.event.annotation.EventListener
-import io.micronaut.scheduling.annotation.Scheduled
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -32,7 +31,9 @@ private fun createUniqueIdentifier() =
 @ExperimentalPathApi
 @ExperimentalStdlibApi
 @Singleton
-class StorageServiceImpl(config: StorageConfig) : StorageService {
+class StorageServiceImpl(config: StorageConfig) :
+    StorageService,
+    ScheduledStorageService {
     private val lock = ReentrantReadWriteLock()
     private val dataStore = HashMap<String, UserScore>()
 
@@ -150,8 +151,7 @@ class StorageServiceImpl(config: StorageConfig) : StorageService {
         }
     }
 
-    @Scheduled(initialDelay = "1m", fixedDelay = "15m")
-    fun storeDataTick() = store()
+    override fun storeDataTick() = store()
 
     @EventListener
     fun onShutdownEvent(event: ShutdownEvent) = store()

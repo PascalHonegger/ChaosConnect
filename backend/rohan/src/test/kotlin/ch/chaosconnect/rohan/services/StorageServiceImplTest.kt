@@ -18,7 +18,7 @@ import kotlin.io.path.ExperimentalPathApi
 @ExperimentalStdlibApi
 internal class StorageServiceImplTest {
 
-    private lateinit var service: StorageService
+    private lateinit var service: StorageServiceImpl
 
     @BeforeEach
     fun setUp() {
@@ -118,6 +118,11 @@ internal class StorageServiceImplTest {
         val addedUser = service.addUser { TemporaryUser(it, "Dummy User") }
         val updatedScore = service.updateScore(addedUser.identifier) { it + 1 }
         assertEquals(1, updatedScore)
+    }
+
+    @Test
+    fun `storeDataTick TODO`() {
+        //  TODO: Add tests
     }
 
     companion object {
