@@ -18,6 +18,8 @@ import {
 } from "../gen/game_pb";
 
 
+export const factions = Object.freeze([Faction.RED, Faction.YELLOW]);
+
 export interface Player {
     identifier: string;
     displayName: string;
@@ -122,9 +124,10 @@ function clearedColumn(column: Column): Column {
     }
 }
 
-function piecePlacedColumn(column: Column, piece: PieceState, row: number): Column {
+function piecePlacedColumn(column: Column, piece: PieceState): Column {
     const cells = [...column.cells];
-    cells[row] = piecePlacedCell(cells[row], piece);
+    const index = cells.findIndex(c => c.piece == null);
+    cells[index] = piecePlacedCell(cells[index], piece);
     return {
         cells: cells,
         queue: column.queue.slice(1)
@@ -262,12 +265,7 @@ function handlePieceChanged(gameState: GameState, pieceChanged: PieceChanged): G
     for (const piece of pieceChanged.getPiecesList()) {
         switch (piece.getAction()) {
             case PieceAction.PLACE:
-                const position = piece.getPosition();
-                if (position == null) {
-                    console.warn('PiecePlaced has no position')
-                    continue;
-                }
-                columns[position.getColumn()] = piecePlacedColumn(columns[position.getColumn()], piece, position.getRow());
+                columns[piece.getColumn()] = piecePlacedColumn(columns[piece.getColumn()], piece);
                 break;
             default:
                 console.warn('Unknown PieceAction');
@@ -282,12 +280,8 @@ function handlePieceChanged(gameState: GameState, pieceChanged: PieceChanged): G
 function handleQueueChanged(gameState: GameState, queueChanged: QueueChanged): GameState {
     const columns = [...gameState.columns];
     for (const piece of queueChanged.getPiecesList()) {
-        const position = piece.getPosition();
-        if (position == null) {
-            console.warn('QueueChanged has no position');
-            continue;
-        }
-        columns[position.getColumn()] = pieceEnqueuedColumn(columns[position.getColumn()], piece);
+        const columnIndex = piece.getColumn();
+        columns[columnIndex] = pieceEnqueuedColumn(columns[columnIndex], piece);
     }
     return {
         ...gameState,
@@ -300,15 +294,15 @@ function handlePlayerChanged(gameState: GameState, playerChanged: PlayerChanged)
     const identifier = playerChanged.getPlayer();
     const playerState = playerChanged.getState();
     switch (playerChanged.getAction()) {
-        case PlayerAction.JOINED:
-        case PlayerAction.UPDATED:
+        case PlayerAction.JOIN:
+        case PlayerAction.UPDATE:
             if (playerState == null) {
                 console.warn('PlayerAction JOINED with null playerState');
                 break;
             }
             playerMap.set(identifier, newPlayer(identifier, playerState));
             break;
-        case PlayerAction.DISCONNECTED:
+        case PlayerAction.DISCONNECT:
             const player = playerMap.get(identifier);
             if (player != null) {
                 playerMap.set(identifier, disconnectedPlayer(player));
