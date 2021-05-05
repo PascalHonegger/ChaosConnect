@@ -1,20 +1,19 @@
 import {
+    ColumnAction,
     ColumnChanged,
+    Faction,
     GameState as ApiGameState,
     GameStateColumn,
     GameUpdateEvent,
     Piece as ApiPiece,
-    RowChanged,
-    RowColumnAction,
-    Faction,
-    PlayerState,
-    PieceChanged,
     PieceAction,
+    PieceChanged,
     PieceState,
-    QueueChanged,
-    QueueState,
+    PlayerAction,
     PlayerChanged,
-    PlayerAction
+    PlayerState,
+    QueueChanged,
+    QueueState
 } from "../gen/game_pb";
 
 
@@ -141,43 +140,6 @@ function pieceEnqueuedColumn(column: Column, piece: QueueState): Column {
     };
 }
 
-function rowChangeAppliedColumn(column: Column, rowChanged: RowChanged): Column {
-    const { cells } = column;
-    const position = rowChanged.getPosition();
-    let newCells: Cell[];
-    switch (rowChanged.getAction()) {
-        case RowColumnAction.ADD:
-            return {
-                ...column,
-                cells: [
-                    ...cells.slice(0, position),
-                    newCell(),
-                    ...cells.slice(position)
-                ]
-            };
-        case RowColumnAction.DISABLE:
-            newCells = [...cells];
-            newCells[position] = disabledCell(newCells[position]);
-            return {
-                ...column,
-                cells: newCells
-            };
-        case RowColumnAction.DELETE:
-            return {
-                ...column,
-                cells: cells.filter((_, index) => index !== position)
-            }
-        case RowColumnAction.CLEAR: {
-            newCells = [...cells];
-            newCells[position] = clearedCell(newCells[position]);
-            return {
-                ...column,
-                cells: newCells
-            };
-        }
-    }
-}
-
 export interface GameState {
     numberOfRows: number;
     columns: Column[];
@@ -212,7 +174,7 @@ function handleColumnChanged(gameState: GameState, columnChanged: ColumnChanged)
     const { numberOfRows, columns } = gameState;
     let newColumns: Column[];
     switch (columnChanged.getAction()) {
-        case RowColumnAction.ADD:
+        case ColumnAction.ADD:
             return {
                 ...gameState,
                 columns: [
@@ -221,42 +183,25 @@ function handleColumnChanged(gameState: GameState, columnChanged: ColumnChanged)
                     ...columns.slice(position)
                 ]
             }
-        case RowColumnAction.DISABLE:
+        case ColumnAction.DISABLE:
             newColumns = [...columns];
             newColumns[position] = disabledColumn(newColumns[position]);
             return {
                 ...gameState,
                 columns: newColumns
             }
-        case RowColumnAction.DELETE:
+        case ColumnAction.DELETE:
             return {
                 ...gameState,
                 columns: columns.filter((_, index) => index !== position)
             }
-        case RowColumnAction.CLEAR:
+        case ColumnAction.CLEAR:
             newColumns = [...columns];
             newColumns[position] = clearedColumn(newColumns[position]);
             return {
                 ...gameState,
                 columns: newColumns
             }
-    }
-}
-
-function handleRowChanged(gameState: GameState, rowChanged: RowChanged): GameState {
-    let { numberOfRows } = gameState;
-    switch (rowChanged.getAction()) {
-        case RowColumnAction.ADD:
-            ++numberOfRows;
-            break;
-        case RowColumnAction.DELETE:
-            --numberOfRows;
-            break;
-    }
-    return {
-        ...gameState,
-        numberOfRows,
-        columns: gameState.columns.map(column => rowChangeAppliedColumn(column, rowChanged))
     }
 }
 
@@ -327,8 +272,6 @@ export function applyUpdate(currentState: GameState, updateEvent: GameUpdateEven
             return handleQueueChanged(currentState, updateEvent.getQueueChanged()!);
         case GameUpdateEvent.ActionCase.COLUMN_CHANGED:
             return handleColumnChanged(currentState, updateEvent.getColumnChanged()!);
-        case GameUpdateEvent.ActionCase.ROW_CHANGED:
-            return handleRowChanged(currentState, updateEvent.getRowChanged()!)
         case GameUpdateEvent.ActionCase.PLAYER_CHANGED:
             return handlePlayerChanged(currentState, updateEvent.getPlayerChanged()!);
         default:
