@@ -5,19 +5,29 @@
     import type { GameUpdateEvent } from "../gen/game_pb";
     import type { ChaosConnectServiceClient } from "../gen/JoestarServiceClientPb";
     import { authMetadata } from "../stores/Auth";
-    import { onMount } from "svelte";
+    import { onDestroy, onMount } from "svelte";
     import Grid from "./Grid.svelte";
     import PlayerList from "./PlayerList.svelte";
     import FactionSelect from "./FactionSelect.svelte";
 
     export let client: ChaosConnectServiceClient;
 
+    function applyGameUpdate(gameUpdateEvent: GameUpdateEvent) {
+        gameState.apply(gameUpdateEvent);
+    }
+
+    let updateStream: ClientReadableStream<GameUpdateEvent>;
     onMount(() => {
-        const updateStream = client.getGameUpdates(
+        gameState.reset();
+        updateStream = client.getGameUpdates(
             newEmpty(),
             $authMetadata
         ) as ClientReadableStream<GameUpdateEvent>;
-        updateStream.on("data", (updateEvent) => gameState.apply(updateEvent));
+        updateStream.on('data', applyGameUpdate);
+    });
+    onDestroy(() => {
+        updateStream.cancel();
+        updateStream.removeListener('data', applyGameUpdate);
     });
 </script>
 
