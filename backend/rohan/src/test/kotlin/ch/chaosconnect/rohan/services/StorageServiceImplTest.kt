@@ -8,9 +8,11 @@ import ch.chaosconnect.rohan.model.UserCredentials
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ArgumentsProvider
+import org.junit.jupiter.params.provider.ArgumentsSource
 import java.util.stream.Stream
 import kotlin.io.path.ExperimentalPathApi
 
@@ -51,7 +53,7 @@ internal class StorageServiceImplTest {
     }
 
     @ParameterizedTest
-    @MethodSource("usernames")
+    @ArgumentsSource(UsernamesProvider::class)
     fun `can not add user with duplicate usernames`(
         username1: String,
         username2: String
@@ -167,9 +169,8 @@ internal class StorageServiceImplTest {
         //  TODO: Add tests
     }
 
-    companion object {
-        @JvmStatic
-        private fun usernames() =
+    private class UsernamesProvider : ArgumentsProvider {
+        override fun provideArguments(extensionContext: ExtensionContext): Stream<out Arguments> =
             Stream.of(
                 Arguments.of("username", "username"),
                 Arguments.of("username", "USERNAME"),

@@ -28,7 +28,6 @@ micronaut {
 
 dependencies {
     implementation(libs.bundles.micronaut.server)
-    implementation(libs.javax.annotation)
     implementation(libs.bundles.kotlin)
     implementation(libs.kotlinx.core)
     implementation(libs.kotlinx.reactive)
