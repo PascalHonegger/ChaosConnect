@@ -203,6 +203,7 @@ class GameServiceImpl(private val storageService: StorageService) :
                                         .setFaction(it.faction)
                                         .build()
                                 })
+                            .setDisabled(index % 3 == 0) // TODO
                             .build()
                     }
                 )
