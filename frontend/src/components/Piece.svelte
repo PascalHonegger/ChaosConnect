@@ -7,7 +7,7 @@
     export let faction: Faction|null = null;
 
     $: faction = piece?.faction ?? faction;
-    $: playerName = piece == null ? null : $playerMap.get(piece.owner)?.displayName ?? 'Disconnected player';
+    $: playerName = piece == null ? null : ($playerMap.get(piece.owner)?.displayName ?? 'Disconnected player');
 </script>
 
 <div
