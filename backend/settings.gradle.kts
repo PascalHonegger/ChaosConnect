@@ -127,7 +127,7 @@ dependencyResolutionManagement {
             ).withoutVersion()
         }
         create("targets") {
-            version("jvm", "11")
+            version("jvm", "15")
         }
         create("meta") {
             version("main", "0.1")

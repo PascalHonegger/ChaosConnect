@@ -1,9 +1,9 @@
-FROM gradle:7.0-jdk11 as build
+FROM gradle:7.0-jdk16 as build
 
 COPY . .
 RUN gradle :rohan:shadowJar --no-daemon --no-watch-fs
 
-FROM adoptopenjdk:15-jre-hotspot
+FROM adoptopenjdk:16-jre-hotspot
 RUN mkdir /etc/rohan
 ENV STORAGE_PATH="/etc/rohan/data.json"
 VOLUME /etc/rohan/
