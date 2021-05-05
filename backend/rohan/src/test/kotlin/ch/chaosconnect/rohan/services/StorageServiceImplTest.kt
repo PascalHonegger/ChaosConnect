@@ -117,7 +117,7 @@ internal class StorageServiceImplTest {
     fun `can update score of a user`() {
         val addedUser = service.addUser { TemporaryUser(it, "Dummy User") }
         val updatedScore = service.updateScore(addedUser.identifier) { it + 1 }
-        assertEquals(1, updatedScore)
+        assertEquals(1, updatedScore.score)
     }
 
     @Test

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { playersByFaction } from "../stores/GameState";
+    import {playersByFaction} from "../stores/GameState";
     import Piece from "./Piece.svelte";
 </script>
 
@@ -11,7 +11,7 @@
                 <ul class="players">
                     {#each players as player}
                         <li>
-                            {player.displayName}
+                            {player.displayName} with {player.score} points
                             {#if player.disconnected}(Disconnected){/if}
                         </li>
                     {/each}

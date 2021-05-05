@@ -7,7 +7,7 @@ import ch.chaosconnect.rohan.model.UserScore
 interface StorageService {
     fun addUser(processor: (String) -> User): User
     fun updateUser(identifier: String, processor: (User) -> User): User
-    fun updateScore(identifier: String, processor: (Long) -> Long): Long
+    fun updateScore(identifier: String, processor: (Long) -> Long): UserScore
     fun getUser(identifier: String): UserScore?
     fun findUser(
         username: String,

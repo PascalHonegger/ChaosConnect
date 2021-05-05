@@ -21,6 +21,7 @@ enum ColumnAction {
 
 enum PieceAction {
   PLACE = 0;
+  SCORE = 1;
 }
 
 enum QueueAction {
@@ -39,6 +40,7 @@ enum PlayerAction {
 message Piece {
   string owner = 1;
   Faction faction = 2;
+  bool scored = 3;
 }
 
 message PlayerState {
@@ -63,9 +65,11 @@ message GameState {
 
 message PieceState {
   int32 column = 1;
-  Faction faction = 2;
-  string owner = 3;
-  PieceAction action = 4;
+  int32 row = 2;
+  Faction faction = 3;
+  string owner = 4;
+  PieceAction action = 5;
+  bool scored = 6;
 }
 
 message PieceChanged {
