@@ -1,12 +1,20 @@
 
-import { Coordinate } from '../gen/game_pb';
+import type { Metadata } from 'grpc-web';
+import { Faction, PlacePieceRequest, StartPlayingRequest } from '../gen/game_pb';
 import { ChaosConnectServiceClient } from '../gen/JoestarServiceClientPb';
 
-export default new ChaosConnectServiceClient("/api");
+const client = new ChaosConnectServiceClient('/api');
 
-export function newCoordinate(row: number, column: number): Coordinate {
-    const coordinate = new Coordinate();
-    coordinate.setColumn(column);
-    coordinate.setRow(row);
-    return coordinate;
+export default client;
+
+export async function startPlaying(faction: Faction, metadata: Metadata) {
+    const request = new StartPlayingRequest();
+    request.setFaction(faction);
+    return client.startPlaying(request, metadata);
+}
+
+export async function placePiece(column: number, metadata: Metadata) {
+    const request = new PlacePieceRequest();
+    request.setColumn(column);
+    return client.placePiece(request, metadata);
 }
