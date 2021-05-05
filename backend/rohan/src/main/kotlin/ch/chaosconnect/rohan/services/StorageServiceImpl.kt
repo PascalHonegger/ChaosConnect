@@ -69,15 +69,15 @@ class StorageServiceImpl(config: StorageConfig) :
     override fun updateScore(
         identifier: String,
         processor: (Long) -> Long
-    ): Long =
+    ): UserScore =
         lock.write {
             val entry = dataStore[identifier]
             check(entry != null) {
                 "Cannot update score with identifier $identifier - no corresponding entry found"
             }
-            val updatedScore = processor(entry.score)
-            dataStore[identifier] = entry.copy(score = updatedScore)
-            return updatedScore
+            val updatedUser = entry.copy(score = processor(entry.score))
+            dataStore[identifier] = updatedUser
+            return updatedUser
         }
 
     override fun getUser(identifier: String): UserScore? =

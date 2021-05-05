@@ -1,13 +1,13 @@
 <script lang="ts">
-    import type { Cell } from "../lib/GameState";
+    import type {Cell} from "../lib/GameState";
     import Piece from "./Piece.svelte";
 
     export let cell: Cell;
 </script>
 
-<div class="cell" class:disabled={cell.disabled}>
+<div class="cell" class:disabled={cell.disabled} class:scored={cell.scored}>
     {#if cell.piece}
-        <Piece piece={cell.piece} /> 
+        <Piece piece={cell.piece}/>
     {/if}
 </div>
 
@@ -20,5 +20,9 @@
 
     .disabled {
         background: gray;
+    }
+
+    .scored {
+        background: gold;
     }
 </style>

@@ -2,7 +2,7 @@ package ch.chaosconnect.rohan.services
 
 import ch.chaosconnect.api.game.*
 import ch.chaosconnect.rohan.meta.userIdentifierContextKey
-import ch.chaosconnect.rohan.model.UserScore
+import ch.chaosconnect.rohan.model.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.runBlocking
@@ -19,16 +19,16 @@ const val inactiveTimeoutMinutes = 30
 
 private data class ActivePlayerState(
     val lastActive: LocalDateTime,
-    val faction: Faction?,
+    val faction: Faction,
     val userScore: UserScore
-)
-
-private fun ActivePlayerState.asPlayerState(): PlayerState =
-    PlayerState.newBuilder()
-        .setFaction(faction)
-        .setDisplayName(userScore.user.displayName)
-        .setScore(userScore.score)
-        .build()
+) {
+    fun toPlayerState(): PlayerState =
+        PlayerState.newBuilder()
+            .setFaction(faction)
+            .setDisplayName(userScore.user.displayName)
+            .setScore(userScore.score)
+            .build()
+}
 
 @Singleton
 class GameServiceImpl(private val storageService: StorageService) :
@@ -38,8 +38,8 @@ class GameServiceImpl(private val storageService: StorageService) :
     private val mutex = Mutex()
     private val updates = MutableSharedFlow<Pair<GameUpdateEvent, GameState>>(1)
     private val activePlayers = mutableMapOf<String, ActivePlayerState>()
-    private val columns = mutableListOf<MutableList<PieceState>>()
-    private val queues = mutableListOf<Queue<QueueState>>()
+    private val columns = mutableListOf<GameColumn>()
+    private val queues = mutableListOf<GameColumnQueue>()
     private val numberOfRows = initialHeight
     private val numberOfColumns get() = columns.size
 
@@ -65,7 +65,7 @@ class GameServiceImpl(private val storageService: StorageService) :
             playerChanged = PlayerChanged.newBuilder()
                 .setAction(PlayerAction.JOIN)
                 .setPlayer(currentUser)
-                .setState(playerState.asPlayerState())
+                .setState(playerState.toPlayerState())
                 .build()
         }
     }
@@ -88,49 +88,110 @@ class GameServiceImpl(private val storageService: StorageService) :
             "Column is already full"
         }
 
-        val state = QueueState
-            .newBuilder()
-            .setColumn(columnIndex)
-            .setFaction(user.faction)
-            .setOwner(currentUser)
-            .build()
+        val state = QueueCell(owner = currentUser, faction = user.faction)
 
         queues[columnIndex].add(state)
 
         emitCurrentState {
             queueChanged = QueueChanged
                 .newBuilder()
-                .addPieces(state)
+                .addPieces(state.toQueueState(columnIndex))
                 .build()
         }
     }
 
     override suspend fun processQueueTick() =
         mutex.withLock {
-            val queueToProcess =
-                queues.filter { it.isNotEmpty() }.randomOrNull()
+            val (columnIndex, queueToProcess) =
+                queues.withIndex()
+                    .filter { it.value.isNotEmpty() }
+                    .randomOrNull()
                     ?: return@withLock
 
             val enqueueTask = queueToProcess.poll()
-            val column = columns[enqueueTask.column]
-            val state = PieceState.newBuilder()
-                .setAction(PieceAction.PLACE)
-                .setFaction(enqueueTask.faction)
-                .setOwner(enqueueTask.owner)
-                .setColumn(enqueueTask.column)
-                .build()
+            val column = columns[columnIndex]
+            val state = GameCell(
+                owner = enqueueTask.owner,
+                faction = enqueueTask.faction,
+                scored = false
+            )
             column.add(state)
+            val rowIndex = column.size - 1
 
             if (column.size == numberOfRows - 1) {
-                queues[enqueueTask.column].clear()
+                queueToProcess.clear()
             }
 
             emitCurrentState {
                 pieceChanged = PieceChanged
                     .newBuilder()
-                    .addPieces(state)
+                    .addPieces(
+                        state.toPieceState(
+                            action = PieceAction.PLACE,
+                            columnIndex = columnIndex,
+                            rowIndex = rowIndex
+                        )
+                    )
                     .build()
             }
+
+            val winningPieces = getWinningPieces(
+                gameBoard = columns,
+                placedColumn = columnIndex,
+                placedRow = rowIndex
+            )
+
+            if (winningPieces.isNotEmpty()) {
+                val addedScores = mutableMapOf<String, Long>()
+
+                // Player who placed last piece gets one point per piece
+                addedScores[state.owner] = winningPieces.size.toLong()
+
+                // Additionally give one piece to each owner of every piece
+                for ((piece, pieceColumn, pieceRow) in winningPieces) {
+                    columns.getPieceOrNull(column = pieceColumn, row = pieceRow)
+                    columns[pieceColumn][pieceRow] = piece.copy(scored = true)
+                    addedScores.compute(piece.owner) { _, score ->
+                        (score ?: 0) + 1
+                    }
+                }
+
+                // Emit piece changes as they're now marked as scored
+                emitCurrentState {
+                    pieceChanged = PieceChanged
+                        .newBuilder()
+                        .addAllPieces(
+                            winningPieces.map {
+                                it.piece.toPieceState(
+                                    action = PieceAction.SCORE,
+                                    columnIndex = it.column,
+                                    rowIndex = it.row
+                                )
+                            }
+                        )
+                        .build()
+                }
+
+                // Add scores to users and updated users
+                for ((user, addedScore) in addedScores) {
+                    val updatedUserScore =
+                        storageService.updateScore(user) { it + addedScore }
+                    val updatedUser = activePlayers.compute(user) { _, player ->
+                        player?.copy(userScore = updatedUserScore)
+                    }
+                    if (updatedUser != null) {
+                        emitCurrentState {
+                            playerChanged = PlayerChanged
+                                .newBuilder()
+                                .setPlayer(user)
+                                .setAction(PlayerAction.UPDATE)
+                                .setState(updatedUser.toPlayerState())
+                                .build()
+                        }
+                    }
+                }
+            }
+
         }
 
     override suspend fun cleanupTick() =
@@ -164,12 +225,6 @@ class GameServiceImpl(private val storageService: StorageService) :
 //                }
         }
 
-    init {
-        repeat(initialWidth) { columns.add(mutableListOf()) }
-        repeat(initialWidth) { queues.add(LinkedList()) }
-        runBlocking { emitCurrentState() }
-    }
-
     override fun getGameUpdates(): Flow<Pair<GameUpdateEvent, GameState>> =
         updates
 
@@ -187,6 +242,7 @@ class GameServiceImpl(private val storageService: StorageService) :
                                         .newBuilder()
                                         .setOwner(it.owner)
                                         .setFaction(it.faction)
+                                        .setScored(it.scored)
                                         .build()
                                 })
                             .addAllQueue(
@@ -195,6 +251,7 @@ class GameServiceImpl(private val storageService: StorageService) :
                                         .newBuilder()
                                         .setOwner(it.owner)
                                         .setFaction(it.faction)
+                                        .setScored(false)
                                         .build()
                                 })
                             .setDisabled(index % 3 == 0) // TODO
@@ -202,7 +259,7 @@ class GameServiceImpl(private val storageService: StorageService) :
                     }
                 )
                 .setNumberOfRows(numberOfRows)
-                .putAllPlayers(activePlayers.mapValues { (_, player) -> player.asPlayerState() })
+                .putAllPlayers(activePlayers.mapValues { (_, player) -> player.toPlayerState() })
                 .build()
         val eventBuilder = GameUpdateEvent.newBuilder()
         if (setChangeReason != null) {
@@ -211,5 +268,11 @@ class GameServiceImpl(private val storageService: StorageService) :
             eventBuilder.gameState = state
         }
         updates.emit(eventBuilder.build() to state)
+    }
+
+    init {
+        repeat(initialWidth) { columns.add(mutableListOf()) }
+        repeat(initialWidth) { queues.add(LinkedList()) }
+        runBlocking { emitCurrentState() }
     }
 }

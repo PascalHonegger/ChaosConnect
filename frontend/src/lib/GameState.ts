@@ -23,6 +23,7 @@ export interface Player {
     identifier: string;
     displayName: string;
     faction: Faction;
+    score: number;
     disconnected: boolean;
 }
 
@@ -31,6 +32,7 @@ function newPlayer(identifier: string, playerState: PlayerState): Player {
         identifier,
         displayName: playerState.getDisplayName(),
         faction: playerState.getFaction(),
+        score: playerState.getScore(),
         disconnected: false
     };
 }
@@ -64,12 +66,14 @@ function newQueuePiece(queueState: QueueState): Piece {
 
 export interface Cell {
     disabled: boolean;
+    scored: boolean;
     piece: Piece | null;
 }
 
 function newCell(piece?: ApiPiece | PieceState): Cell {
     return {
         disabled: false,
+        scored: piece?.getScored() ?? false,
         piece: piece != null ? newPiece(piece) : null
     };
 }
@@ -92,6 +96,13 @@ function piecePlacedCell(cell: Cell, piece: ApiPiece | PieceState): Cell {
     return {
         ...cell,
         piece: newPiece(piece)
+    };
+}
+
+function pieceScoredCell(cell: Cell): Cell {
+    return {
+        ...cell,
+        scored: true
     };
 }
 
@@ -131,6 +142,15 @@ function piecePlacedColumn(column: Column, piece: PieceState): Column {
     return {
         cells: cells,
         queue: column.queue.slice(1)
+    };
+}
+
+function pieceScoredColumn(column: Column, row: number): Column {
+    const cells = [...column.cells];
+    cells[row] = pieceScoredCell(cells[row]);
+    return {
+        cells: cells,
+        queue: column.queue
     };
 }
 
@@ -212,6 +232,9 @@ function handlePieceChanged(gameState: GameState, pieceChanged: PieceChanged): G
         switch (piece.getAction()) {
             case PieceAction.PLACE:
                 columns[piece.getColumn()] = piecePlacedColumn(columns[piece.getColumn()], piece);
+                break;
+            case PieceAction.SCORE:
+                columns[piece.getColumn()] = pieceScoredColumn(columns[piece.getColumn()], piece.getRow());
                 break;
             default:
                 console.warn('Unknown PieceAction');

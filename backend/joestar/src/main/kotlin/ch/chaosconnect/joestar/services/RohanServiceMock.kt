@@ -91,9 +91,11 @@ class RohanServiceMock : RohanService {
                     pieceChanged = PieceChanged.newBuilder().apply {
                         addPieces(PieceState.newBuilder().apply {
                             column = 5
+                            row = 0
                             faction = Faction.RED
                             owner = "Player2"
                             action = PieceAction.PLACE
+                            scored = false
                         }.build())
                     }.build()
                 }.build()
