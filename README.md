@@ -1,4 +1,4 @@
-# ChaosConnect
+# ChaosConnect [![ChaosConnect Status](https://github.com/PascalHonegger/ChaosConnect/actions/workflows/chaos-connect.yml/badge.svg)](https://github.com/PascalHonegger/ChaosConnect/actions/workflows/chaos-connect.yml)
 The modern, distributed and scalable implementation of a game inspired by Connect Four.
 
 # Gameplay
