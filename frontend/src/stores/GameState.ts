@@ -10,6 +10,9 @@ function createGameStateStore() {
         subscribe,
         apply(updateEvent: GameUpdateEvent) {
             update(currentState => applyUpdate(currentState, updateEvent));
+        },
+        reset() {
+            update(initialGameState);
         }
     }
 }
