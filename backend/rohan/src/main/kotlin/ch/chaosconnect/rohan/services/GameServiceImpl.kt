@@ -3,7 +3,6 @@ package ch.chaosconnect.rohan.services
 import ch.chaosconnect.api.game.*
 import ch.chaosconnect.rohan.meta.userIdentifierContextKey
 import ch.chaosconnect.rohan.model.UserScore
-import io.micronaut.scheduling.annotation.Scheduled
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.runBlocking
@@ -33,7 +32,8 @@ private fun ActivePlayerState.asPlayerState(): PlayerState =
 
 @Singleton
 class GameServiceImpl(private val storageService: StorageService) :
-    GameService {
+    GameService,
+    ScheduledGameService {
 
     private val mutex = Mutex()
     private val updates = MutableSharedFlow<Pair<GameUpdateEvent, GameState>>(1)
@@ -105,8 +105,7 @@ class GameServiceImpl(private val storageService: StorageService) :
         }
     }
 
-    @Scheduled(fixedDelay = "5s")
-    fun processQueueTick() = runBlocking {
+    override fun processQueueTick() = runBlocking {
         mutex.withLock {
             val queueToProcess =
                 queues.filter { it.isNotEmpty() }.randomOrNull()
@@ -135,8 +134,7 @@ class GameServiceImpl(private val storageService: StorageService) :
         }
     }
 
-    @Scheduled(fixedDelay = "1m")
-    fun cleanupTick() = runBlocking {
+    override fun cleanupTick() = runBlocking {
         mutex.withLock {
             val inactivePlayers = activePlayers.filterValues { player ->
                 player.lastActive.until(
@@ -156,8 +154,7 @@ class GameServiceImpl(private val storageService: StorageService) :
         }
     }
 
-    @Scheduled(fixedDelay = "30s")
-    fun resizeFieldTick() = runBlocking {
+    override fun resizeFieldTick() = runBlocking {
         mutex.withLock {
             // TODO Some logic with amount of active players
 //                emitCurrentState {
