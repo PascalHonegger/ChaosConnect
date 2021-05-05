@@ -50,6 +50,7 @@ message PlayerState {
 message GameStateColumn {
   repeated Piece pieces = 1;
   repeated Piece queue = 2;
+  bool disabled = 3;
 }
 
 message GameState {

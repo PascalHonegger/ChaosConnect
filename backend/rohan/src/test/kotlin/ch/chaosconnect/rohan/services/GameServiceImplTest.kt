@@ -59,18 +59,23 @@ internal class GameServiceImplTest {
                 assertEquals(
                     GameState
                         .newBuilder()
-                        .addColumns(GameStateColumn.newBuilder())
-                        .addColumns(GameStateColumn.newBuilder())
-                        .addColumns(GameStateColumn.newBuilder())
                         .addColumns(
-                            GameStateColumn.newBuilder().addQueue(
-                                Piece.newBuilder().setOwner("my-user")
-                                    .setFaction(Faction.YELLOW)
-                            )
+                            GameStateColumn.newBuilder().setDisabled(true)
                         )
                         .addColumns(GameStateColumn.newBuilder())
                         .addColumns(GameStateColumn.newBuilder())
+                        .addColumns(
+                            GameStateColumn.newBuilder().setDisabled(true)
+                                .addQueue(
+                                    Piece.newBuilder().setOwner("my-user")
+                                        .setFaction(Faction.YELLOW)
+                                )
+                        )
                         .addColumns(GameStateColumn.newBuilder())
+                        .addColumns(GameStateColumn.newBuilder())
+                        .addColumns(
+                            GameStateColumn.newBuilder().setDisabled(true)
+                        )
                         .putPlayers(
                             "my-user",
                             PlayerState.newBuilder()

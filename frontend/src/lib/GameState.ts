@@ -106,7 +106,8 @@ function newColumn(numberOfRows: number, column?: GameStateColumn): Column {
         cells.push(newCell());
     }
     const queue = column?.getQueueList().map(piece => newPiece(piece)) ?? [];
-    return { cells: cells, queue };
+    const computedColumn: Column = {cells, queue};
+    return column?.getDisabled() ? disabledColumn(computedColumn) : computedColumn;
 }
 
 function disabledColumn(column: Column): Column {
