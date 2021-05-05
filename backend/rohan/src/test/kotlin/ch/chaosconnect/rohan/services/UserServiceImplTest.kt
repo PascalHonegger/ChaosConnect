@@ -8,8 +8,11 @@ import kotlinx.coroutines.CoroutineScope
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.ArgumentsProvider
+import org.junit.jupiter.params.provider.ArgumentsSource
 import java.util.stream.Stream
 import javax.security.auth.login.AccountException
 import javax.security.auth.login.FailedLoginException
@@ -29,7 +32,7 @@ internal class UserServiceImplTest {
     }
 
     @ParameterizedTest
-    @MethodSource("blankStrings")
+    @ArgumentsSource(BlankStringProvider::class)
     fun `signUpAsRegularUser does not accept blank name`(name: String) =
         runSignedOut {
             assertThrowsWithMessage<IllegalArgumentException>("User name may not be blank") {
@@ -38,7 +41,7 @@ internal class UserServiceImplTest {
         }
 
     @ParameterizedTest
-    @MethodSource("blankStrings")
+    @ArgumentsSource(BlankStringProvider::class)
     fun `signUpAsRegularUser does not accept blank password`(password: String) =
         runSignedOut {
             assertThrowsWithMessage<IllegalArgumentException>("Password may not be blank") {
@@ -47,7 +50,7 @@ internal class UserServiceImplTest {
         }
 
     @ParameterizedTest
-    @MethodSource("blankStrings")
+    @ArgumentsSource(BlankStringProvider::class)
     fun `signUpAsRegularUser does not accept blank display name`(displayName: String) =
         runSignedOut {
             assertThrowsWithMessage<IllegalArgumentException>("Display name may not be blank") {
@@ -93,7 +96,7 @@ internal class UserServiceImplTest {
     }
 
     @ParameterizedTest
-    @MethodSource("blankStrings")
+    @ArgumentsSource(BlankStringProvider::class)
     fun `signInAsTemporaryUser does not accept blank display name`(displayName: String) =
         runSignedOut {
             assertThrowsWithMessage<IllegalArgumentException>("Display name may not be blank") {
@@ -218,10 +221,8 @@ internal class UserServiceImplTest {
         return identifier2
     }
 
-    companion object {
-
-        @JvmStatic
-        private fun blankStrings() =
-            Stream.of("", " ", "\t")
+    private class BlankStringProvider : ArgumentsProvider {
+        override fun provideArguments(extensionContext: ExtensionContext): Stream<out Arguments> =
+            Stream.of(Arguments.of(""), Arguments.of(" "), Arguments.of("\t"))
     }
 }

@@ -5,7 +5,7 @@ rootProject.name = "backend"
 enableFeaturePreview("VERSION_CATALOGS")
 
 pluginManagement {
-    val kotlinPluginVersion = "1.4.32"
+    val kotlinPluginVersion = "1.5.0"
     val shadowPluginVersion = "7.0.0"
     val micronautPluginVersion = "1.5.0"
     val protobufPluginVersion = "0.8.16"
@@ -23,16 +23,16 @@ pluginManagement {
 dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
-            version("kotlin", "1.4.32")
-            version("kotlinx", "1.4.3")
-            version("serialization-json", "1.1.0")
+            version("kotlin", "1.5.0")
+            version("kotlinx", "1.5.0-RC")
+            version("serialization-json", "1.2.0")
             version("micronaut", "2.5.0")
             version("protoc", "3.15.8")
             version("gen-grpc-java", "1.37.0")
-            version("gen-grpc-kotlin", "1.0.0")
+            version("gen-grpc-kotlin", "1.1.0")
             version("jjwt", "0.11.2")
             version("mockk", "1.11.0")
-            version("turbine", "0.4.1")
+            version("turbine", "0.5.0-rc1")
             version("argon2-jvm", "2.10.1")
 
             alias("kotlin-stdlib").to(
@@ -102,11 +102,6 @@ dependencyResolutionManagement {
                 "micronaut-http-client"
             ).withoutVersion()
             bundle("micronaut-test", listOf("micronaut-http-client"))
-
-            alias("javax-annotation").to(
-                "javax.annotation",
-                "javax.annotation-api"
-            ).withoutVersion()
 
             alias("jjwt-api").to("io.jsonwebtoken", "jjwt-api")
                 .versionRef("jjwt")

@@ -1,15 +1,17 @@
 package ch.chaosconnect.rohan.utilities
 
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ArgumentsProvider
+import org.junit.jupiter.params.provider.ArgumentsSource
 import java.util.stream.Stream
 
 internal class CollectionResizingSuggestionCalculatorTest {
 
     @ParameterizedTest
-    @MethodSource("argumentsArrays")
+    @ArgumentsSource(UsernamesProvider::class)
     fun `calculateCollectionResizingSuggestions calculates collection resizing suggestions in a balanced way`(
         expectedTrimmingIndices: Pair<Int, Int>,
         collection: Collection<Char>,
@@ -24,21 +26,19 @@ internal class CollectionResizingSuggestionCalculatorTest {
             }
         )
 
-    companion object {
+    private class UsernamesProvider : ArgumentsProvider {
+        override fun provideArguments(extensionContext: ExtensionContext): Stream<out Arguments> =
+            Stream.of(
+                arguments(0 to 0, "", -1),
+                arguments(0 to 0, "", 0),
+                arguments(0 to 1, "", 1),
+                arguments(1 to 1, "", 2),
+                arguments(1 to 2, "", 3),
+                arguments(2 to 2, "", 4),
 
-        @JvmStatic
-        private fun argumentsArrays() = Stream.of(
-
-            arguments(0 to 0, "", -1),
-            arguments(0 to 0, "", 0),
-            arguments(0 to 1, "", 1),
-            arguments(1 to 1, "", 2),
-            arguments(1 to 2, "", 3),
-            arguments(2 to 2, "", 4),
-
-            arguments(0 to 0, "K", -1),
-            arguments(0 to 0, "K", 0),
-            arguments(0 to 0, "K", 1),
+                arguments(0 to 0, "K", -1),
+                arguments(0 to 0, "K", 0),
+                arguments(0 to 0, "K", 1),
             arguments(0 to 1, "K", 2),
             arguments(1 to 1, "K", 3),
             arguments(1 to 2, "K", 4),

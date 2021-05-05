@@ -5,9 +5,11 @@ import ch.chaosconnect.rohan.model.GameCell
 import ch.chaosconnect.rohan.model.GameColumn
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ArgumentsProvider
+import org.junit.jupiter.params.provider.ArgumentsSource
 import java.util.stream.Stream
 
 fun mockPiece(
@@ -91,7 +93,7 @@ fun List<PieceWithCoordinate>.asGameBoard(): List<GameColumn> {
 
 internal class Connect4EngineKtTest {
     @ParameterizedTest
-    @MethodSource("losingMoves")
+    @ArgumentsSource(MovesProvider::class)
     fun `does not identify pieces if not connected`(
         placedPiece: PieceWithCoordinate,
         gameBoard: List<PieceWithCoordinate>
@@ -106,7 +108,7 @@ internal class Connect4EngineKtTest {
     }
 
     @ParameterizedTest
-    @MethodSource("winningMoves")
+    @ArgumentsSource(WinningMovesProvider::class)
     fun `does identify all pieces if at least 4 are connected`(
         placedPiece: PieceWithCoordinate,
         gameBoard: List<PieceWithCoordinate>,
@@ -124,9 +126,8 @@ internal class Connect4EngineKtTest {
         )
     }
 
-    companion object {
-        @JvmStatic
-        private fun winningMoves() =
+    private class WinningMovesProvider : ArgumentsProvider {
+        override fun provideArguments(extensionContext: ExtensionContext): Stream<out Arguments> =
             Stream.of(
                 Arguments.of(
                     mockPiece(3, 0, Faction.RED),
@@ -167,9 +168,11 @@ internal class Connect4EngineKtTest {
                     )
                 ),
             )
+    }
 
-        @JvmStatic
-        private fun losingMoves() =
+
+    private class MovesProvider : ArgumentsProvider {
+        override fun provideArguments(extensionContext: ExtensionContext): Stream<out Arguments> =
             Stream.of(
                 Arguments.of(
                     mockPiece(3, 0, Faction.YELLOW),
