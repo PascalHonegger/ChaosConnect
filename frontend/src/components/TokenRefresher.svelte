@@ -1,10 +1,10 @@
 <script lang="ts">
-    import type {WebLoginServiceClient} from "./gen/JoestarServiceClientPb";
-    import type {Error} from "grpc-web";
-    import {StatusCode} from "grpc-web";
-    import {authMetadata, token} from "./Stores";
-    import {onMount} from "svelte";
-    import {newEmpty} from "./CommonClient";
+    import type { WebLoginServiceClient } from "../gen/JoestarServiceClientPb";
+    import type { Error } from "grpc-web";
+    import { StatusCode } from "grpc-web";
+    import { authMetadata, token } from "../stores/Auth";
+    import { onMount } from "svelte";
+    import { newEmpty } from "../lib/CommonClient";
 
     export let client: WebLoginServiceClient;
 

@@ -30,11 +30,10 @@ class RohanServiceMock : RohanService {
         owner = "Player2"
     }.build()
 
-    private fun mockColumn(vararg pieces: Piece) =
+    private fun mockColumn(pieces: List<Piece> = listOf(), queue: List<Piece> = listOf()) =
         GameStateColumn.newBuilder().apply {
-            for (piece in pieces) {
-                addPieces(piece)
-            }
+            addAllPieces(pieces)
+            addAllQueue(queue)
         }.build()
 
     private fun mockAuthResponse(userIdentifier: String): UserAuthResponse =
@@ -46,26 +45,36 @@ class RohanServiceMock : RohanService {
                 numberOfRows = 15
                 addAllColumns(
                     listOf(
-                        mockColumn(mockRedPiece(), mockRedPiece()),
-                        mockColumn(mockYellowPiece()),
-                        mockColumn(mockYellowPiece()),
-                        mockColumn(mockRedPiece(), mockYellowPiece()),
-                        mockColumn(mockYellowPiece(), mockRedPiece()),
-                        mockColumn()
+                        mockColumn(listOf(mockRedPiece(), mockRedPiece()), listOf(mockYellowPiece())),
+                        mockColumn(listOf(mockYellowPiece())),
+                        mockColumn(listOf(mockYellowPiece())),
+                        mockColumn(listOf(mockRedPiece(), mockYellowPiece())),
+                        mockColumn(listOf(mockYellowPiece(), mockRedPiece())),
+                        mockColumn(listOf(), listOf(mockRedPiece()))
                     )
                 )
+                putAllPlayers(mapOf(
+                    "Player1" to PlayerState.newBuilder().apply {
+                        displayName = "JoJo"
+                        faction = Faction.RED
+                    }.build(),
+                    "Player2" to PlayerState.newBuilder().apply {
+                        displayName = "Dio"
+                        faction = Faction.YELLOW
+                    }.build()
+                ))
             }.build()
 
             val updatedGameState = GameState.newBuilder().apply {
                 numberOfRows = 20
                 addAllColumns(
                     listOf(
-                        mockColumn(mockRedPiece(), mockRedPiece()),
-                        mockColumn(mockYellowPiece()),
-                        mockColumn(mockYellowPiece()),
-                        mockColumn(mockRedPiece(), mockYellowPiece()),
-                        mockColumn(mockYellowPiece(), mockRedPiece()),
-                        mockColumn(mockRedPiece())
+                        mockColumn(listOf(mockRedPiece(), mockRedPiece(), mockYellowPiece())),
+                        mockColumn(listOf(mockYellowPiece())),
+                        mockColumn(listOf(mockYellowPiece())),
+                        mockColumn(listOf(mockRedPiece()), listOf(mockYellowPiece())),
+                        mockColumn(listOf(mockYellowPiece(), mockRedPiece())),
+                        mockColumn(listOf(mockRedPiece()))
                     )
                 )
             }.build()

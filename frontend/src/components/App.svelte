@@ -1,21 +1,19 @@
 <script lang="ts">
-    import twemoji from "./Twemoji";
-
-    import JoestarTest from "./JoestarTest.svelte";
+    import twemoji from "../lib/Twemoji";
     import TokenRefresher from "./TokenRefresher.svelte";
-    import chaosConnectClient from "./JoestarClient";
-    import webLoginClient from "./WebLoginClient";
-
+    import chaosConnectClient from "../lib/ChaosConnectClient";
+    import webLoginClient from "../lib/WebLoginClient";
     import LoginRegister from "./LoginRegister.svelte";
-    import {isLoggedIn, token} from "./Stores";
+    import { isLoggedIn, token } from "../stores/Auth";
+    import Game from "./Game.svelte";
 </script>
 
 <main>
     <h1 use:twemoji>⚔️ ChaosConnect ⚔️</h1>
     {#if $isLoggedIn}
         <button on:click={() => token.unset()}>Logout</button>
-        <TokenRefresher client={webLoginClient}/>
-        <JoestarTest client={chaosConnectClient} />
+        <TokenRefresher client={webLoginClient} />
+        <Game client={chaosConnectClient} />
     {:else}
         <LoginRegister client={webLoginClient} />
     {/if}
@@ -28,9 +26,10 @@
 
 <style>
     main {
-        text-align: center;
         padding: 1em;
         margin: 0 auto;
+        display: flex;
+        flex-direction: column;
     }
 
     footer {
@@ -44,5 +43,6 @@
         color: var(--primary-color);
         font-size: 4em;
         font-weight: 100;
+        text-align: center;
     }
 </style>

@@ -12,7 +12,7 @@ enum Faction {
   YELLOW = 1;
 }
 
-enum RowColumnAction {
+enum ColumnAction {
   ADD = 0;
   DISABLE = 1;
   DELETE = 2;
@@ -50,6 +50,7 @@ message PlayerState {
 message GameStateColumn {
   repeated Piece pieces = 1;
   repeated Piece queue = 2;
+  bool disabled = 3;
 }
 
 message GameState {
@@ -83,12 +84,7 @@ message QueueChanged {
 
 message ColumnChanged {
   int32 position = 1;
-  RowColumnAction action = 2;
-}
-
-message RowChanged {
-  int32 position = 1;
-  RowColumnAction action = 2;
+  ColumnAction action = 2;
 }
 
 message PlayerChanged {
@@ -111,7 +107,6 @@ message GameUpdateEvent {
     api.game.PieceChanged piece_changed = 2;
     api.game.QueueChanged queue_changed = 3;
     api.game.ColumnChanged column_changed = 4;
-    api.game.RowChanged row_changed = 5;
-    api.game.PlayerChanged player_changed = 6;
+    api.game.PlayerChanged player_changed = 5;
   }
 }
