@@ -1,9 +1,9 @@
-FROM gradle:7.0-jdk11 as build
+FROM gradle:7.0-jdk16 as build
 
 COPY . .
 RUN gradle :joestar:shadowJar --no-daemon --no-watch-fs
 
-FROM adoptopenjdk:15-jre-hotspot
+FROM adoptopenjdk:16-jre-hotspot
 COPY --from=build /home/gradle/joestar/build/libs/joestar-*-all.jar /joestar.jar
 HEALTHCHECK --interval=10s --timeout=5s --retries=5 --start-period=3s \
   CMD wget --no-verbose --tries=1 --spider http://localhost:9096/health/liveness || exit 1
