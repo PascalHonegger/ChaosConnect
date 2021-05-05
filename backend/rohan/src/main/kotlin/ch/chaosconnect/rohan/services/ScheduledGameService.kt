@@ -2,9 +2,9 @@ package ch.chaosconnect.rohan.services
 
 interface ScheduledGameService {
 
-    fun processQueueTick()
+    suspend fun processQueueTick()
 
-    fun cleanupTick()
+    suspend fun cleanupTick()
 
-    fun resizeFieldTick()
+    suspend fun resizeFieldTick()
 }
