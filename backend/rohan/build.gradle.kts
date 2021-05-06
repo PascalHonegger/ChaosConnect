@@ -35,6 +35,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.grpc.kotlin)
     implementation(libs.jjwt.api)
+    implementation(libs.argon2.jvm)
     runtimeOnly(libs.logback)
     runtimeOnly(libs.jjwt.impl)
     runtimeOnly(libs.jjwt.jackson)

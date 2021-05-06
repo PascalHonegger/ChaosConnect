@@ -78,6 +78,48 @@ internal class StorageServiceImplTest {
     }
 
     @Test
+    fun `get user does not include sensitive information`() {
+        val addedUser = service.addUser {
+            RegularUser(
+                identifier = it,
+                displayName = "Dummy User",
+                credentials = UserCredentials("dummy", "some-password-hash")
+            )
+        }
+        val loadedUser = service.getUser(addedUser.identifier)
+        assertEquals(
+            "",
+            (loadedUser?.user as RegularUser).credentials.passwordHash
+        )
+    }
+
+    @Test
+    fun `update user does not include sensitive information`() {
+        val addedUser = service.addUser {
+            RegularUser(
+                identifier = it,
+                displayName = "Dummy User",
+                credentials = UserCredentials("dummy", "some-password-hash")
+            )
+        }
+        val updatedUser = service.updateUser(addedUser.identifier) { it }
+        assertEquals("", (updatedUser as RegularUser).credentials.passwordHash)
+    }
+
+    @Test
+    fun `update score does not include sensitive information`() {
+        val addedUser = service.addUser {
+            RegularUser(
+                identifier = it,
+                displayName = "Dummy User",
+                credentials = UserCredentials("dummy", "some-password-hash")
+            )
+        }
+        val updatedUser = service.updateScore(addedUser.identifier) { it }
+        assertEquals("", (updatedUser.user as RegularUser).credentials.passwordHash)
+    }
+
+    @Test
     fun `can update a temporary to a regular user`() {
         val addedUser = service.addUser { TemporaryUser(it, "Dummy User") }
         val updatedUser = service.updateUser(addedUser.identifier) {
@@ -107,7 +149,7 @@ internal class StorageServiceImplTest {
         }
         assertEquals(addedUser, service.findUser("myuser"))
         assertEquals(addedUser, service.findUser("myuser") {
-            it.credentials.password == "123"
+            it.credentials.passwordHash == "123"
         })
         assertNull(service.findUser("myuser") { false })
         assertNull(service.findUser("OtherUser"))

@@ -33,6 +33,7 @@ dependencyResolutionManagement {
             version("jjwt", "0.11.2")
             version("mockk", "1.11.0")
             version("turbine", "0.4.1")
+            version("argon2-jvm", "2.10.1")
 
             alias("kotlin-stdlib").to(
                 "org.jetbrains.kotlin",
@@ -113,6 +114,9 @@ dependencyResolutionManagement {
                 .versionRef("jjwt")
             alias("jjwt-jackson").to("io.jsonwebtoken", "jjwt-jackson")
                 .versionRef("jjwt")
+
+            alias("argon2-jvm").to("de.mkammerer", "argon2-jvm")
+                .versionRef("argon2-jvm")
 
             alias("logback").to("ch.qos.logback", "logback-classic")
                 .withoutVersion()
