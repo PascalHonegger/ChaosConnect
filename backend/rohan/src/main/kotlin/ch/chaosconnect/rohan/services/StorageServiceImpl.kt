@@ -28,6 +28,19 @@ private val logger: Logger =
 private fun createUniqueIdentifier() =
     UUID.randomUUID().toString()
 
+private fun UserScore.removeSensitiveInformation() = copy(
+    user = user.removeSensitiveInformation()
+)
+
+private fun User.removeSensitiveInformation() = when (this) {
+    is RegularUser -> removeSensitiveInformation()
+    is TemporaryUser -> removeSensitiveInformation()
+}
+
+private fun TemporaryUser.removeSensitiveInformation() = this
+private fun RegularUser.removeSensitiveInformation() =
+    copy(credentials = credentials.copy(passwordHash = ""))
+
 @ExperimentalPathApi
 @ExperimentalStdlibApi
 @Singleton
@@ -48,7 +61,7 @@ class StorageServiceImpl(config: StorageConfig) :
             val newUser = processor(identifier)
             requireUsernameUnique(newUser)
             dataStore[identifier] = UserScore(user = newUser, score = 0)
-            return newUser
+            return newUser.removeSensitiveInformation()
         }
 
     override fun updateUser(
@@ -63,7 +76,7 @@ class StorageServiceImpl(config: StorageConfig) :
             val updatedUser = processor(entry.user)
             requireUsernameUnique(updatedUser)
             dataStore[identifier] = entry.copy(user = updatedUser)
-            return updatedUser
+            return updatedUser.removeSensitiveInformation()
         }
 
     override fun updateScore(
@@ -77,11 +90,11 @@ class StorageServiceImpl(config: StorageConfig) :
             }
             val updatedUser = entry.copy(score = processor(entry.score))
             dataStore[identifier] = updatedUser
-            return updatedUser
+            return updatedUser.removeSensitiveInformation()
         }
 
     override fun getUser(identifier: String): UserScore? =
-        lock.read { dataStore[identifier] }
+        lock.read { dataStore[identifier]?.removeSensitiveInformation() }
 
     override fun findUser(
         username: String,
@@ -92,10 +105,9 @@ class StorageServiceImpl(config: StorageConfig) :
                 .map { it.user }
                 .filterIsInstance<RegularUser>()
                 .find {
-                    it.credentials.name.lowercase() == username.lowercase() && additionalFilter(
-                        it
-                    )
-                }
+                    it.credentials.name.lowercase() == username.lowercase()
+                            && additionalFilter(it)
+                }?.removeSensitiveInformation()
         }
 
     private fun requireUsernameUnique(changedUser: User): Unit =

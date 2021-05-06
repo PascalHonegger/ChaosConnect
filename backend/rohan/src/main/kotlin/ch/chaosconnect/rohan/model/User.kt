@@ -24,5 +24,5 @@ data class TemporaryUser(
 @Serializable
 data class UserCredentials(
     val name: String,
-    val password: String
+    val passwordHash: String
 )
