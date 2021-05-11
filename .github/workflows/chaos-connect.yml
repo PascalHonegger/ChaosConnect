@@ -16,10 +16,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Use latest Node.js 15
+      - name: Use latest Node.js 16
         uses: actions/setup-node@v2
         with:
-          node-version: "15"
+          node-version: "16"
       - name: Install dependencies
         run: npm ci
         working-directory: frontend
