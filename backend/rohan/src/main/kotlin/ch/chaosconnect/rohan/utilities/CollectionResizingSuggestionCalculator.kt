@@ -27,13 +27,7 @@ fun <T> calculateCollectionResizingSuggestions(
             tailSuggestion = totalSuggestion - headSuggestion
         }
         else -> {
-
-            assert(indexOfFirstElementToKeep >= 0)
-            assert(indexOfFirstElementToKeep < size)
-
             val indexOfLastElementToKeep = collection.indexOfLast(keep)
-            assert(indexOfLastElementToKeep >= 0)
-            assert(indexOfLastElementToKeep < size)
 
             val minimalSize =
                 indexOfLastElementToKeep - indexOfFirstElementToKeep + 1
