@@ -87,7 +87,7 @@ message QueueChanged {
 }
 
 message ColumnChanged {
-  int32 position = 1;
+  repeated int32 positions = 1;
   ColumnAction action = 2;
 }
 

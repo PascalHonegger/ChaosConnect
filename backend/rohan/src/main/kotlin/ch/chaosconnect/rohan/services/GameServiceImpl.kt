@@ -238,65 +238,53 @@ class GameServiceImpl(private val storageService: StorageService) :
                 max(columnsHeadSuggestion, queuesHeadSuggestion)
             val tailSuggestion =
                 max(columnsTailSuggestion, queuesTailSuggestion)
-            when (headSuggestion.sign) {
-                -1 ->
-                    //  TODO: Improve performance if necessary
-                    repeat(-headSuggestion) {
-                        emitCurrentState {
-                            columnChanged = ColumnChanged
-                                .newBuilder()
-                                .setPosition(0)
-                                .setAction(ColumnAction.DELETE)
-                                .build()
-                            //  TODO: Emit other changes if necessary
-                        }
-                        columns.removeFirst()
-                        queues.removeFirst()
-                    }
-                1 ->
-                    //  TODO: Improve performance if necessary
-                    repeat(headSuggestion) {
-                        emitCurrentState {
-                            columnChanged = ColumnChanged
-                                .newBuilder()
-                                .setPosition(0)
-                                .setAction(ColumnAction.ADD)
-                                .build()
-                            //  TODO: Emit other changes if necessary
-                        }
-                        columns.add(0, mutableListOf())
-                        queues.add(0, LinkedList())
-                    }
+
+            // Add new columns
+            val addedIndices = mutableListOf<Int>()
+            if (headSuggestion > 0) {
+                repeat(headSuggestion) {
+                    columns.add(0, CompleteColumn())
+                    addedIndices += it
+                }
             }
-            when (tailSuggestion.sign) {
-                -1 ->
-                    //  TODO: Improve performance if necessary
-                    repeat(-tailSuggestion) {
-                        emitCurrentState {
-                            columnChanged = ColumnChanged
-                                .newBuilder()
-                                .setPosition(columns.size)
-                                .setAction(ColumnAction.DELETE)
-                                .build()
-                            //  TODO: Emit other changes if necessary
-                        }
-                        columns.removeLast()
-                        queues.removeLast()
-                    }
-                1 ->
-                    //  TODO: Improve performance if necessary
-                    repeat(tailSuggestion) {
-                        emitCurrentState {
-                            columnChanged = ColumnChanged
-                                .newBuilder()
-                                .setPosition(columns.size)
-                                .setAction(ColumnAction.ADD)
-                                .build()
-                            //  TODO: Emit other changes if necessary
-                        }
-                        columns.add(mutableListOf())
-                        queues.add(LinkedList())
-                    }
+            if (tailSuggestion > 0) {
+                repeat(tailSuggestion) {
+                    addedIndices += columns.size
+                    columns.add(CompleteColumn())
+                }
+            }
+            if (addedIndices.isNotEmpty()) {
+                emitCurrentState {
+                    columnChanged = ColumnChanged
+                        .newBuilder()
+                        .addAllPositions(addedIndices)
+                        .setAction(ColumnAction.ADD)
+                        .build()
+                }
+            }
+
+            // Delete existing columns
+            val deletedIndices = mutableListOf<Int>()
+            if (headSuggestion < 0) {
+                repeat(-headSuggestion) {
+                    columns.removeFirst()
+                    deletedIndices += it
+                }
+            }
+            if (tailSuggestion < 0) {
+                repeat(-tailSuggestion) {
+                    columns.removeLast()
+                    deletedIndices += columns.size
+                }
+            }
+            if (deletedIndices.isNotEmpty()) {
+                emitCurrentState {
+                    columnChanged = ColumnChanged
+                        .newBuilder()
+                        .addAllPositions(deletedIndices)
+                        .setAction(ColumnAction.DELETE)
+                        .build()
+                }
             }
         }
 
