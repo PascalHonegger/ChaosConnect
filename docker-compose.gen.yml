@@ -1,4 +1,4 @@
-version: '3.3'
+version: '3'
 services:
   gen_grpc_joestar_client:
     image: namely/protoc-all:1.34_4
