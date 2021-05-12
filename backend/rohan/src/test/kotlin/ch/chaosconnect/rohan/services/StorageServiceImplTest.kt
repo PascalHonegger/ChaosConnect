@@ -14,10 +14,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.ArgumentsProvider
 import org.junit.jupiter.params.provider.ArgumentsSource
 import java.util.stream.Stream
-import kotlin.io.path.ExperimentalPathApi
 
-@ExperimentalPathApi
-@ExperimentalStdlibApi
 internal class StorageServiceImplTest {
 
     private lateinit var service: StorageServiceImpl
