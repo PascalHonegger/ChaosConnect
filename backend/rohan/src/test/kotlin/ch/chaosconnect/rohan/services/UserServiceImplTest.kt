@@ -16,10 +16,7 @@ import org.junit.jupiter.params.provider.ArgumentsSource
 import java.util.stream.Stream
 import javax.security.auth.login.AccountException
 import javax.security.auth.login.FailedLoginException
-import kotlin.io.path.ExperimentalPathApi
 
-@ExperimentalPathApi
-@ExperimentalStdlibApi
 internal class UserServiceImplTest {
 
     private lateinit var storage: StorageService

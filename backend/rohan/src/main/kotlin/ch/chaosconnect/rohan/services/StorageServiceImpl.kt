@@ -20,8 +20,6 @@ import kotlin.concurrent.read
 import kotlin.concurrent.write
 import kotlin.io.path.*
 
-@ExperimentalPathApi
-@ExperimentalStdlibApi
 private val logger: Logger =
     LoggerFactory.getLogger(StorageServiceImpl::class.java)
 
@@ -41,8 +39,6 @@ private fun TemporaryUser.removeSensitiveInformation() = this
 private fun RegularUser.removeSensitiveInformation() =
     copy(credentials = credentials.copy(passwordHash = ""))
 
-@ExperimentalPathApi
-@ExperimentalStdlibApi
 @Singleton
 class StorageServiceImpl(config: StorageConfig) :
     StorageService,

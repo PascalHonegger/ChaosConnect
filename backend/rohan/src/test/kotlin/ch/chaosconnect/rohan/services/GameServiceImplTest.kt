@@ -7,17 +7,12 @@ import ch.chaosconnect.rohan.model.UserScore
 import ch.chaosconnect.rohan.runSignedIn
 import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import kotlin.io.path.ExperimentalPathApi
 import kotlin.time.ExperimentalTime
 
-@ExperimentalStdlibApi
-@ExperimentalPathApi
-@ExperimentalCoroutinesApi
 @ExperimentalTime
 internal class GameServiceImplTest {
 
