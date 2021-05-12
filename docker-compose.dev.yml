@@ -1,38 +1,44 @@
-version: '3.3'
+version: '3'
 services:
   doppio:
-    extends:
-      file: docker-compose.yml
-      service: doppio
+    image: "ghcr.io/pascalhonegger/cc-doppio"
     build:
       context: ./frontend
+    networks:
+      - speedwagon_net
 
   speedwagon:
-    extends:
-      file: docker-compose.yml
-      service: speedwagon
+    image: "ghcr.io/pascalhonegger/cc-speedwagon"
     build:
       context: ./proxy
+    volumes:
+      - ./certs:/etc/envoy/certs:ro
     ports:
+      - 80:80
+      - 443:443
       - 9901:9901
+    networks:
+      - speedwagon_net
 
   joestar:
-    extends:
-      file: docker-compose.yml
-      service: joestar
+    image: "ghcr.io/pascalhonegger/cc-joestar"
     build:
       context: ./backend
       dockerfile: Dockerfile.joestar
     environment:
+      ROHAN_SERVER: rohan
       JWT_SECRET: kiMu3ODiG8NdA41/6bj5BcsKDUplTh32bmocO3EKbgbOdHGBfST1/dtfuh+hMOTqEGurJgMPI0XCUewlBWEdrw==
+    networks:
+      - speedwagon_net
+      - rohan_net
 
   rohan:
-    extends:
-      file: docker-compose.yml
-      service: rohan
+    image: "ghcr.io/pascalhonegger/cc-rohan"
     build:
       context: ./backend
       dockerfile: Dockerfile.rohan
+    networks:
+      - rohan_net
 
 networks:
   speedwagon_net:
