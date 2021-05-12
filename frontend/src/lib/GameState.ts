@@ -85,9 +85,10 @@ function disabledCell(cell: Cell): Cell {
     }
 }
 
-function clearedCell(cell: Cell): Cell {
+function clearedCell(): Cell {
     return {
-        ...cell,
+        disabled: false,
+        scored: false,
         piece: null
     }
 }
@@ -130,7 +131,7 @@ function disabledColumn(column: Column): Column {
 
 function clearedColumn(column: Column): Column {
     return {
-        ...column,
+        queue: [],
         cells: column.cells.map(clearedCell)
     }
 }
@@ -191,22 +192,24 @@ function newGameState(gameState: ApiGameState): GameState {
 }
 
 function handleColumnChanged(gameState: GameState, columnChanged: ColumnChanged): GameState {
-    const position = columnChanged.getPosition();
-    const { numberOfRows, columns } = gameState;
+    const positions = columnChanged.getPositionsList();
+    const {numberOfRows, columns} = gameState;
     let newColumns: Column[];
     switch (columnChanged.getAction()) {
         case ColumnAction.ADD:
+            newColumns = [...columns];
+            for (const position of positions) {
+                newColumns.splice(position, 0, newColumn(numberOfRows));
+            }
             return {
                 ...gameState,
-                columns: [
-                    ...columns.slice(0, position),
-                    newColumn(numberOfRows),
-                    ...columns.slice(position)
-                ]
+                columns: newColumns
             }
         case ColumnAction.DISABLE:
             newColumns = [...columns];
-            newColumns[position] = disabledColumn(newColumns[position]);
+            for (const position of positions) {
+                newColumns[position] = disabledColumn(newColumns[position]);
+            }
             return {
                 ...gameState,
                 columns: newColumns
@@ -214,11 +217,13 @@ function handleColumnChanged(gameState: GameState, columnChanged: ColumnChanged)
         case ColumnAction.DELETE:
             return {
                 ...gameState,
-                columns: columns.filter((_, index) => index !== position)
+                columns: columns.filter((_, index) => !positions.includes(index))
             }
         case ColumnAction.CLEAR:
             newColumns = [...columns];
-            newColumns[position] = clearedColumn(newColumns[position]);
+            for (const position of positions) {
+                newColumns[position] = clearedColumn(newColumns[position]);
+            }
             return {
                 ...gameState,
                 columns: newColumns
