@@ -15,11 +15,11 @@
     "validate": "svelte-check"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^18.0.0",
-    "@rollup/plugin-node-resolve": "^11.0.0",
+    "@rollup/plugin-commonjs": "^19.0.0",
+    "@rollup/plugin-node-resolve": "^13.0.0",
     "@rollup/plugin-typescript": "^8.0.0",
     "@tsconfig/svelte": "^1.0.0",
-    "@types/twemoji": "^12.1.1",
+    "@types/twemoji": "^12.0.0",
     "google-protobuf": "^3.0.0",
     "grpc-web": "^1.0.0",
     "jwt-decode": "^3.0.0",
@@ -32,7 +32,7 @@
     "svelte-check": "^1.0.0",
     "svelte-preprocess": "^4.0.0",
     "tslib": "^2.0.0",
-    "twemoji": "^13.0.2",
+    "twemoji": "^13.0.0",
     "typescript": "^4.0.0"
   },
   "dependencies": {
