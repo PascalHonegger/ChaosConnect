@@ -4,7 +4,9 @@ interface ScheduledGameService {
 
     suspend fun processQueueTick()
 
-    suspend fun cleanupTick()
+    suspend fun cleanupUsersTick()
+
+    suspend fun clearColumnsTick()
 
     suspend fun resizeFieldTick()
 }

@@ -15,6 +15,7 @@ fun <T> calculateCollectionResizingSuggestions(
     keep: (T) -> Boolean
 ): Pair<Int, Int> {
     val size = collection.size
+    if (targetSize == size) return Pair(0, 0)
     return when (val firstElementToKeepIndex = collection.indexOfFirst(keep)) {
         -1 ->
             //  Only deletable elements:
@@ -49,18 +50,16 @@ fun <T> calculateCollectionResizingSuggestions(
                 lastElementToKeepIndex + 1 - size + tailPadding
             )
         }
-    }
-        .apply {
-            val (headSuggestion, tailSuggestion) = this
-            assert(size + headSuggestion + tailSuggestion >= targetSize) {
-                "Suggestions go below target size (size: $size; target size: $targetSize; head suggestion: $headSuggestion; tail suggestion: $tailSuggestion)"
-            }
-            if (targetSize >= size) {
-                assert(size + headSuggestion + tailSuggestion == targetSize) {
-                    "Suggestions go beyond target size (size: $size; target size: $targetSize; head suggestion: $headSuggestion; tail suggestion: $tailSuggestion)"
-                }
+    }.also { (headSuggestion, tailSuggestion) ->
+        assert(size + headSuggestion + tailSuggestion >= targetSize) {
+            "Suggestions go below target size (size: $size; target size: $targetSize; head suggestion: $headSuggestion; tail suggestion: $tailSuggestion)"
+        }
+        if (targetSize >= size) {
+            assert(size + headSuggestion + tailSuggestion == targetSize) {
+                "Suggestions go beyond target size (size: $size; target size: $targetSize; head suggestion: $headSuggestion; tail suggestion: $tailSuggestion)"
             }
         }
+    }
 }
 
 private fun halve(full: Int): Pair<Int, Int> {

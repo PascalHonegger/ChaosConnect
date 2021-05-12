@@ -16,8 +16,13 @@ class GameServiceJobs(private val scheduledGameService: ScheduledGameService) {
     }
 
     @Scheduled(fixedDelay = "1m")
-    fun cleanupTick() = runBlocking {
-        scheduledGameService.cleanupTick()
+    fun cleanupUsersTick() = runBlocking {
+        scheduledGameService.cleanupUsersTick()
+    }
+
+    @Scheduled(fixedDelay = "10s")
+    fun clearColumnsTick() = runBlocking {
+        scheduledGameService.clearColumnsTick()
     }
 
     @Scheduled(fixedDelay = "30s")
