@@ -2,7 +2,12 @@
   <configuration default="false" name="Speedwagon Dev" type="docker-deploy" factoryName="docker-compose.yml" server-name="Docker">
     <deployment type="docker-compose.yml">
       <settings>
+        <option name="envFilePath" value="" />
+        <option name="commandLineOptions" value="--build" />
         <option name="sourceFilePath" value="docker-compose.proxy.yml" />
+        <option name="upDetach" value="false" />
+        <option name="upExitCodeFromService" value="" />
+        <option name="upTimeout" value="" />
       </settings>
     </deployment>
     <method v="2" />
