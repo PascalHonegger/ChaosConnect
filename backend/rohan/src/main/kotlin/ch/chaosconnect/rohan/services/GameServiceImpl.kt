@@ -9,16 +9,20 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
-import java.util.*
 import javax.inject.Singleton
 import kotlin.math.max
-import kotlin.math.sign
 
 const val initialWidth = 7
 const val initialHeight = 6
 const val inactiveTimeoutMinutes = 30
+const val disabledUntilClearedTimeoutSeconds = 30
+
+private val logger: Logger =
+    LoggerFactory.getLogger(GameServiceImpl::class.java)
 
 private data class ActivePlayerState(
     val lastActive: LocalDateTime,
@@ -41,8 +45,7 @@ class GameServiceImpl(private val storageService: StorageService) :
     private val mutex = Mutex()
     private val updates = MutableSharedFlow<Pair<GameUpdateEvent, GameState>>(1)
     private val activePlayers = mutableMapOf<String, ActivePlayerState>()
-    private val columns = mutableListOf<GameColumn>()
-    private val queues = mutableListOf<GameColumnQueue>()
+    private val columns = mutableListOf<CompleteColumn>()
     private val numberOfRows = initialHeight
     private val numberOfColumns get() = columns.size
 
@@ -83,17 +86,21 @@ class GameServiceImpl(private val storageService: StorageService) :
             user?.copy(lastActive = LocalDateTime.now())
         } ?: error("User $currentUser not actively playing")
 
-        check(queues.none { it.any { queue -> queue.owner == currentUser } }) {
+        check(columns.none { it.queue.any { queue -> queue.owner == currentUser } }) {
             "User already has piece enqueued"
         }
 
-        check(columns[columnIndex].size < numberOfRows) {
+        check(columns[columnIndex].numRows < numberOfRows) {
             "Column is already full"
+        }
+
+        check(columns[columnIndex].isEnabled) {
+            "Column is disabled"
         }
 
         val state = QueueCell(owner = currentUser, faction = user.faction)
 
-        queues[columnIndex].add(state)
+        columns[columnIndex].enqueue(state)
 
         emitCurrentState {
             queueChanged = QueueChanged
@@ -105,24 +112,27 @@ class GameServiceImpl(private val storageService: StorageService) :
 
     override suspend fun processQueueTick() =
         mutex.withLock {
-            val (columnIndex, queueToProcess) =
-                queues.withIndex()
-                    .filter { it.value.isNotEmpty() }
+            val (columnIndex, column) =
+                columns.withIndex()
+                    .filter { it.value.hasQueue() }
                     .randomOrNull()
-                    ?: return@withLock
+                    ?: return
 
-            val enqueueTask = queueToProcess.poll()
-            val column = columns[columnIndex]
-            val state = GameCell(
-                owner = enqueueTask.owner,
-                faction = enqueueTask.faction,
-                scored = false
-            )
-            column.add(state)
-            val rowIndex = column.size - 1
+            val state = column.dequeue().run {
+                GameCell(
+                    owner = owner,
+                    faction = faction,
+                    scored = false
+                )
+            }
+            column.place(state)
+            val rowIndex = column.rows.size - 1
 
-            if (column.size == numberOfRows - 1) {
-                queueToProcess.clear()
+            val columnIndicesToDisable = mutableSetOf<Int>()
+
+            if (column.rows.size == numberOfRows - 1) {
+                column.queue.clear()
+                columnIndicesToDisable += columnIndex
             }
 
             emitCurrentState {
@@ -139,7 +149,7 @@ class GameServiceImpl(private val storageService: StorageService) :
             }
 
             val winningPieces = getWinningPieces(
-                gameBoard = columns,
+                gameBoard = columns.onlyRows(),
                 placedColumn = columnIndex,
                 placedRow = rowIndex
             )
@@ -152,11 +162,12 @@ class GameServiceImpl(private val storageService: StorageService) :
 
                 // Additionally give one piece to each owner of every piece
                 for ((piece, pieceColumn, pieceRow) in winningPieces) {
-                    columns.getPieceOrNull(column = pieceColumn, row = pieceRow)
-                    columns[pieceColumn][pieceRow] = piece.copy(scored = true)
+                    columns[pieceColumn].rows[pieceRow] =
+                        piece.copy(scored = true)
                     addedScores.compute(piece.owner) { _, score ->
                         (score ?: 0) + 1
                     }
+                    columnIndicesToDisable += pieceColumn
                 }
 
                 // Emit piece changes as they're now marked as scored
@@ -195,9 +206,22 @@ class GameServiceImpl(private val storageService: StorageService) :
                 }
             }
 
+            if (columnIndicesToDisable.isNotEmpty()) {
+                val disabledAt = LocalDateTime.now()
+                for (colToDisable in columnIndicesToDisable) {
+                    columns[colToDisable].disabledAt = disabledAt
+                }
+                emitCurrentState {
+                    columnChanged = ColumnChanged
+                        .newBuilder()
+                        .setAction(ColumnAction.DISABLE)
+                        .addAllPositions(columnIndicesToDisable)
+                        .build()
+                }
+            }
         }
 
-    override suspend fun cleanupTick() =
+    override suspend fun cleanupUsersTick() =
         mutex.withLock {
             val inactivePlayers = activePlayers.filterValues { player ->
                 player.lastActive.until(
@@ -216,28 +240,35 @@ class GameServiceImpl(private val storageService: StorageService) :
             }
         }
 
+    override suspend fun clearColumnsTick() =
+        mutex.withLock {
+            val columnsToClear = columns.withIndex().filter { column ->
+                column.value.disabledAt != null &&
+                        (column.value.disabledAt!!.until(
+                            LocalDateTime.now(),
+                            ChronoUnit.SECONDS
+                        ) > disabledUntilClearedTimeoutSeconds)
+            }
+            if (columnsToClear.isNotEmpty()) {
+                for ((_, column) in columnsToClear) {
+                    column.reset()
+                }
+                emitCurrentState {
+                    columnChanged = ColumnChanged.newBuilder()
+                        .setAction(ColumnAction.CLEAR)
+                        .addAllPositions(columnsToClear.map { it.index })
+                        .build()
+                }
+            }
+        }
+
     override suspend fun resizeFieldTick() =
         mutex.withLock {
             val targetColumnCount = max(activePlayers.size, 2) * 3 + 1
-            assert(columns.size == queues.size) {
-                "Column count (${columns.size}) is not queue count (${queues.size})"
-            }
-            val (columnsHeadSuggestion, columnsTailSuggestion) = calculateCollectionResizingSuggestions(
+            val (headSuggestion, tailSuggestion) = calculateCollectionResizingSuggestions(
                 columns,
                 targetColumnCount
-            ) {
-                it.isNotEmpty()
-            }
-            val (queuesHeadSuggestion, queuesTailSuggestion) = calculateCollectionResizingSuggestions(
-                queues,
-                targetColumnCount
-            ) {
-                it.isNotEmpty()
-            }
-            val headSuggestion =
-                max(columnsHeadSuggestion, queuesHeadSuggestion)
-            val tailSuggestion =
-                max(columnsTailSuggestion, queuesTailSuggestion)
+            ) { it.isEnabled && (it.hasRows() || it.hasQueue()) }
 
             // Add new columns
             val addedIndices = mutableListOf<Int>()
@@ -254,6 +285,7 @@ class GameServiceImpl(private val storageService: StorageService) :
                 }
             }
             if (addedIndices.isNotEmpty()) {
+                logger.info("Expanded playing field with new columns: $addedIndices")
                 emitCurrentState {
                     columnChanged = ColumnChanged
                         .newBuilder()
@@ -278,6 +310,7 @@ class GameServiceImpl(private val storageService: StorageService) :
                 }
             }
             if (deletedIndices.isNotEmpty()) {
+                logger.info("Reduced playing field with deleted columns: $deletedIndices")
                 emitCurrentState {
                     columnChanged = ColumnChanged
                         .newBuilder()
@@ -296,11 +329,11 @@ class GameServiceImpl(private val storageService: StorageService) :
             GameState
                 .newBuilder()
                 .addAllColumns(
-                    (0 until numberOfColumns).map { index ->
+                    columns.map { column ->
                         GameStateColumn
                             .newBuilder()
                             .addAllPieces(
-                                columns[index].map {
+                                column.rows.map {
                                     Piece
                                         .newBuilder()
                                         .setOwner(it.owner)
@@ -309,7 +342,7 @@ class GameServiceImpl(private val storageService: StorageService) :
                                         .build()
                                 })
                             .addAllQueue(
-                                queues[index].map {
+                                column.queue.map {
                                     Piece
                                         .newBuilder()
                                         .setOwner(it.owner)
@@ -317,7 +350,7 @@ class GameServiceImpl(private val storageService: StorageService) :
                                         .setScored(false)
                                         .build()
                                 })
-                            .setDisabled(index % 3 == 0) // TODO
+                            .setDisabled(column.isDisabled)
                             .build()
                     }
                 )
@@ -330,12 +363,12 @@ class GameServiceImpl(private val storageService: StorageService) :
         } else {
             eventBuilder.gameState = state
         }
+        logger.info("Emit current event with latest action: ${eventBuilder.actionCase}")
         updates.emit(eventBuilder.build() to state)
     }
 
     init {
-        repeat(initialWidth) { columns.add(mutableListOf()) }
-        repeat(initialWidth) { queues.add(LinkedList()) }
+        repeat(initialWidth) { columns += CompleteColumn() }
         runBlocking { emitCurrentState() }
     }
 }
