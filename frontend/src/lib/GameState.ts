@@ -58,29 +58,20 @@ function newPiece(piece: ApiPiece | PieceState | QueueState): Piece {
 }
 
 export interface Cell {
-    disabled: boolean;
     scored: boolean;
     piece: Piece | null;
 }
 
 function newCell(piece?: ApiPiece | PieceState): Cell {
     return {
-        disabled: false,
         scored: piece?.getScored() ?? false,
         piece: piece != null ? newPiece(piece) : null
     };
 }
 
-function disabledCell(cell: Cell): Cell {
-    return {
-        ...cell,
-        disabled: true
-    }
-}
 
 function clearedCell(): Cell {
     return {
-        disabled: false,
         scored: false,
         piece: null
     }
@@ -103,6 +94,7 @@ function pieceScoredCell(cell: Cell): Cell {
 export interface Column {
     queue: Piece[];
     cells: Cell[];
+    disabled: boolean;
 }
 
 function newColumn(numberOfRows: number, column?: GameStateColumn): Column {
@@ -111,19 +103,23 @@ function newColumn(numberOfRows: number, column?: GameStateColumn): Column {
         cells.push(newCell());
     }
     const queue = column?.getQueueList().map(piece => newPiece(piece)) ?? [];
-    const computedColumn: Column = {cells, queue};
-    return column?.getDisabled() ? disabledColumn(computedColumn) : computedColumn;
+    return {
+        cells,
+        queue,
+        disabled: column?.getDisabled() ?? false
+    };
 }
 
 function disabledColumn(column: Column): Column {
     return {
         ...column,
-        cells: column.cells.map(disabledCell),
+        disabled: true,
     };
 }
 
 function clearedColumn(column: Column): Column {
     return {
+        disabled: false,
         queue: [],
         cells: column.cells.map(clearedCell)
     }
@@ -134,6 +130,7 @@ function piecePlacedColumn(column: Column, piece: PieceState): Column {
     const index = cells.findIndex(c => c.piece == null);
     cells[index] = piecePlacedCell(cells[index], piece);
     return {
+        ...column,
         cells: cells,
         queue: column.queue.slice(1)
     };
@@ -143,6 +140,7 @@ function pieceScoredColumn(column: Column, row: number): Column {
     const cells = [...column.cells];
     cells[row] = pieceScoredCell(cells[row]);
     return {
+        ...column,
         cells: cells,
         queue: column.queue
     };

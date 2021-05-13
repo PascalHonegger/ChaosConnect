@@ -34,6 +34,7 @@
         {#each $columns as column, index}
             <div
                 class="column"
+                class:disabled={column.disabled}
                 on:mouseenter={() => (previewColumn = column)}
                 on:mouseleave={() => (previewColumn = null)}
                 on:click={() => placePiece(index, $authMetadata)}
@@ -47,6 +48,10 @@
 </div>
 
 <style>
+    :root {
+        --column-size: calc(var(--piece-size) + 2px);
+    }
+
     .grid {
         display: flex;
         flex-direction: column;
@@ -59,14 +64,18 @@
     }
 
     .preview {
-        height: var(--piece-size);
-        width: var(--piece-size);
+        height: var(--column-size);
+        width: var(--column-size);
     }
 
     .queue,
     .column {
-        width: var(--piece-size);
+        width: var(--size);
         display: flex;
         flex-direction: column-reverse;
+    }
+
+    .disabled {
+        background: gray;
     }
 </style>
