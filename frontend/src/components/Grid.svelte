@@ -13,7 +13,7 @@
     <div>
         {#each $columns as column}
             <div class="preview">
-                {#if previewColumn === column && $player != null}
+                {#if previewColumn === column && !column.disabled && $player != null}
                     <Piece faction={$player.faction} />
                 {/if}
             </div>
@@ -35,9 +35,9 @@
             <div
                 class="column"
                 class:disabled={column.disabled}
-                on:mouseenter={() => (previewColumn = column)}
-                on:mouseleave={() => (previewColumn = null)}
-                on:click={() => placePiece(index, $authMetadata)}
+                on:mouseenter={() => previewColumn = column}
+                on:mouseleave={() => previewColumn = null}
+                on:click={column.disabled ? undefined : () => placePiece(index, $authMetadata)}
             >
                 {#each column.cells as cell}
                     <Cell {cell} />
