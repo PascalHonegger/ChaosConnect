@@ -50,17 +50,10 @@ export interface Piece {
     owner: string;
 }
 
-function newPiece(piece: ApiPiece | PieceState): Piece {
+function newPiece(piece: ApiPiece | PieceState | QueueState): Piece {
     return {
         owner: piece.getOwner(),
         faction: piece.getFaction()
-    };
-}
-
-function newQueuePiece(queueState: QueueState): Piece {
-    return {
-        owner: queueState.getOwner(),
-        faction: queueState.getFaction()
     };
 }
 
@@ -158,7 +151,7 @@ function pieceScoredColumn(column: Column, row: number): Column {
 function pieceEnqueuedColumn(column: Column, piece: QueueState): Column {
     return {
         ...column,
-        queue: [...column.queue, newQueuePiece(piece)]
+        queue: [...column.queue, newPiece(piece)]
     };
 }
 
