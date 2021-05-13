@@ -5,7 +5,7 @@
     export let cell: Cell;
 </script>
 
-<div class="cell" class:disabled={cell.disabled} class:scored={cell.scored}>
+<div class="cell" class:scored={cell.scored}>
     {#if cell.piece}
         <Piece piece={cell.piece}/>
     {/if}
@@ -18,8 +18,12 @@
         height: var(--piece-size);
     }
 
-    .disabled {
-        background: gray;
+    .cell:first-child {
+        border-bottom: 2px solid black;
+    }
+
+    .cell:last-child {
+        border-top: 2px solid black;
     }
 
     .scored {
