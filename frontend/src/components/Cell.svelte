@@ -13,17 +13,19 @@
 
 <style>
     .cell {
-        border: 1px solid black;
+        border-color: black;
+        border-width: 1px 0;
+        border-style: solid;
         width: var(--piece-size);
         height: var(--piece-size);
     }
 
     .cell:first-child {
-        border-bottom: 2px solid black;
+        border-bottom-width: 2px;
     }
 
     .cell:last-child {
-        border-top: 2px solid black;
+        border-top-width: 2px;
     }
 
     .scored {
