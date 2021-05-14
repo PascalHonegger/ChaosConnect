@@ -49,7 +49,8 @@
 
 <style>
     :root {
-        --column-size: calc(var(--piece-size) + 2px);
+        --column-width: calc(var(--piece-size) + 2px);
+        --edge-column-width: calc(var(--column-width) + 1px);
     }
 
     .grid {
@@ -63,16 +64,36 @@
         flex-direction: row;
     }
 
+    .queue, .preview {
+        width: var(--column-width);
+    }
+
     .preview {
-        height: var(--column-size);
-        width: var(--column-size);
+        height: var(--column-width);
+    }
+
+    .preview:first-child, .queue:first-child {
+        width: var(--edge-column-width);
     }
 
     .queue,
     .column {
-        width: var(--size);
         display: flex;
         flex-direction: column-reverse;
+    }
+
+    .column {
+        border-style: solid;
+        border-color: black;
+        border-width: 0 1px;
+    }
+
+    .column:first-child {
+        border-left-width: 2px;
+    }
+
+    .column:last-child {
+        border-right-width: 2px;
     }
 
     .disabled {
