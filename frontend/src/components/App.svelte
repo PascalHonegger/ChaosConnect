@@ -1,8 +1,6 @@
 <script lang="ts">
     import twemoji from "../lib/Twemoji";
     import TokenRefresher from "./TokenRefresher.svelte";
-    import chaosConnectClient from "../lib/ChaosConnectClient";
-    import webLoginClient from "../lib/WebLoginClient";
     import LoginRegister from "./LoginRegister.svelte";
     import { isLoggedIn, token } from "../stores/Auth";
     import Game from "./Game.svelte";
@@ -12,10 +10,10 @@
     <h1 use:twemoji>⚔️ ChaosConnect ⚔️</h1>
     {#if $isLoggedIn}
         <button on:click={() => token.unset()}>Logout</button>
-        <TokenRefresher client={webLoginClient} />
-        <Game client={chaosConnectClient} />
+        <TokenRefresher />
+        <Game />
     {:else}
-        <LoginRegister client={webLoginClient} />
+        <LoginRegister />
     {/if}
 </main>
 <footer>

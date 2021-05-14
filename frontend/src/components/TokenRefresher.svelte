@@ -1,12 +1,9 @@
 <script lang="ts">
-    import type { WebLoginServiceClient } from "../gen/JoestarServiceClientPb";
     import type { Error } from "grpc-web";
     import { StatusCode } from "grpc-web";
     import { authMetadata, token } from "../stores/Auth";
     import { onMount } from "svelte";
-    import { newEmpty } from "../lib/CommonClient";
-
-    export let client: WebLoginServiceClient;
+    import { renewToken } from "../lib/WebLoginClient";
 
     const retryTimeout = 5000;
 
@@ -16,10 +13,7 @@
 
     async function tryRenewToken() {
         try {
-            const tokenResponse = await client.renewToken(
-                newEmpty(),
-                $authMetadata
-            );
+            const tokenResponse = await renewToken($authMetadata);
             token.set(tokenResponse.getJwtToken());
         } catch (error) {
             if ((<Error>error).code === StatusCode.UNAUTHENTICATED) {

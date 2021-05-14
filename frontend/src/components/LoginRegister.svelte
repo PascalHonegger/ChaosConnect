@@ -1,16 +1,13 @@
 <script lang="ts">
     import twemoji from "../lib/Twemoji";
     import type { TokenResponse } from "../gen/authentication_pb";
-    import type { WebLoginServiceClient } from "../gen/JoestarServiceClientPb";
     import Spinner from "./Spinner.svelte";
-    import { token } from "../stores/Auth";
+    import { authMetadata, token } from "../stores/Auth";
     import {
-        newLoginRequest,
-        newPlayRequest,
-        newRegisterRequest,
+        login,
+        playWithoutAccount,
+        register,
     } from "../lib/WebLoginClient";
-
-    export let client: WebLoginServiceClient;
 
     let request: Promise<boolean> | null = null;
     let isLoading = false;
@@ -55,20 +52,17 @@
         switch (mode) {
             case "play":
                 request = handleResponse(
-                    client.playWithoutAccount(newPlayRequest(displayName), null)
+                    playWithoutAccount(displayName, $authMetadata)
                 );
                 break;
             case "login":
                 request = handleResponse(
-                    client.login(newLoginRequest(username, password), null)
+                    login(username, password, $authMetadata)
                 );
                 break;
             case "register":
                 request = handleResponse(
-                    client.register(
-                        newRegisterRequest(username, password, displayName),
-                        null
-                    )
+                    register(username, password, displayName, $authMetadata)
                 );
                 break;
         }

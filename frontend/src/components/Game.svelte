@@ -1,16 +1,13 @@
 <script lang="ts">
     import type { ClientReadableStream } from "grpc-web";
-    import { newEmpty } from "../lib/CommonClient";
     import { gameState, player } from "../stores/GameState";
     import type { GameUpdateEvent } from "../gen/game_pb";
-    import type { ChaosConnectServiceClient } from "../gen/JoestarServiceClientPb";
     import { authMetadata } from "../stores/Auth";
     import { onDestroy, onMount } from "svelte";
     import Grid from "./Grid.svelte";
     import PlayerList from "./PlayerList.svelte";
     import FactionSelect from "./FactionSelect.svelte";
-
-    export let client: ChaosConnectServiceClient;
+    import { getGameUpdates } from "../lib/ChaosConnectClient";
 
     function applyGameUpdate(gameUpdateEvent: GameUpdateEvent) {
         gameState.apply(gameUpdateEvent);
@@ -19,10 +16,7 @@
     let updateStream: ClientReadableStream<GameUpdateEvent>;
     onMount(() => {
         gameState.reset();
-        updateStream = client.getGameUpdates(
-            newEmpty(),
-            $authMetadata
-        ) as ClientReadableStream<GameUpdateEvent>;
+        updateStream = getGameUpdates($authMetadata);
         updateStream.on('data', applyGameUpdate);
     });
     onDestroy(() => {
