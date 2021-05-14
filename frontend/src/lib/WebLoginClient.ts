@@ -1,25 +1,31 @@
-import { LoginRequest, PlayWithoutAccountRequest, RegisterRequest } from "../gen/authentication_pb";
+import type { Metadata } from "grpc-web";
+import { LoginRequest, PlayWithoutAccountRequest, RegisterRequest, TokenResponse } from "../gen/authentication_pb";
+import { Empty } from "../gen/common_pb";
 import { WebLoginServiceClient } from "../gen/JoestarServiceClientPb";
 
-export default new WebLoginServiceClient("/api");
+const client = new WebLoginServiceClient('/api');
 
-export function newPlayRequest(displayName: string): PlayWithoutAccountRequest {
-    const loginRequest = new PlayWithoutAccountRequest();
-    loginRequest.setDisplayName(displayName);
-    return loginRequest;
+export async function playWithoutAccount(displayName: string, metadata: Metadata): Promise<TokenResponse> {
+    const request = new PlayWithoutAccountRequest();
+    request.setDisplayName(displayName);
+    return client.playWithoutAccount(request, metadata);
 }
 
-export function newLoginRequest(username: string, password: string): LoginRequest {
-    const loginRequest = new LoginRequest();
-    loginRequest.setUsername(username);
-    loginRequest.setPassword(password);
-    return loginRequest;
+export async function login(username: string, password: string, metadata: Metadata): Promise<TokenResponse> {
+    const request = new LoginRequest();
+    request.setUsername(username);
+    request.setPassword(password);
+    return client.login(request, metadata);
 }
 
-export function newRegisterRequest(username: string, password: string, displayName: string): RegisterRequest {
-    const registerRequest = new RegisterRequest();
-    registerRequest.setUsername(username);
-    registerRequest.setPassword(password);
-    registerRequest.setDisplayName(displayName);
-    return registerRequest;
+export async function register(username: string, password: string, displayName: string, metadata: Metadata): Promise<TokenResponse> {
+    const request = new RegisterRequest();
+    request.setUsername(username);
+    request.setPassword(password);
+    request.setDisplayName(displayName);
+    return client.register(request, metadata);
+}
+
+export async function renewToken(metadata: Metadata): Promise<TokenResponse> {
+    return client.renewToken(new Empty(), metadata);
 }

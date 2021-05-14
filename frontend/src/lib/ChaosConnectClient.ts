@@ -1,19 +1,22 @@
 
-import type { Metadata } from 'grpc-web';
-import { Faction, PlacePieceRequest, StartPlayingRequest } from '../gen/game_pb';
+import type { ClientReadableStream, Metadata } from 'grpc-web';
+import { Empty } from '../gen/common_pb';
+import { Faction, GameUpdateEvent, PlacePieceRequest, StartPlayingRequest } from '../gen/game_pb';
 import { ChaosConnectServiceClient } from '../gen/JoestarServiceClientPb';
 
 const client = new ChaosConnectServiceClient('/api');
 
-export default client;
+export function getGameUpdates(metadata: Metadata): ClientReadableStream<GameUpdateEvent> {
+    return client.getGameUpdates(new Empty(), metadata) as ClientReadableStream<GameUpdateEvent>;
+}
 
-export async function startPlaying(faction: Faction, metadata: Metadata) {
+export async function startPlaying(faction: Faction, metadata: Metadata): Promise<Empty> {
     const request = new StartPlayingRequest();
     request.setFaction(faction);
     return client.startPlaying(request, metadata);
 }
 
-export async function placePiece(column: number, metadata: Metadata) {
+export async function placePiece(column: number, metadata: Metadata): Promise<Empty> {
     const request = new PlacePieceRequest();
     request.setColumn(column);
     return client.placePiece(request, metadata);
