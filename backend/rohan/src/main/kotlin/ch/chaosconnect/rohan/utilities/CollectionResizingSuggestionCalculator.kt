@@ -17,8 +17,28 @@ fun <T> calculateCollectionResizingSuggestions(
     val size = collection.size
     return when (val firstElementToKeepIndex = collection.indexOfFirst(keep)) {
         -1 ->
+            //  Only deletable elements:
+            //      Example for targetSize < size:
+            //          |<======================= size =======================>|
+            //          |{................ deletable elements ................}|
+            //          |- headSuggestion -|<= targetSize =>|- tailSuggestion -|
+            //      Example for targetSize > size:
+            //          |<================= targetSize =================>|
+            //          |{............. deletable elements .............}|
+            //          |+ headSuggestion +|<= size =>|+ tailSuggestion +|
             halve(max(0, targetSize) - size)
         else -> {
+            //  Some deletable elements:
+            //      Example for targetSize < size:
+            //          |<============================================ size ============================================>|
+            //          |{....... deletable elements .......}|{. elements to keep .}|{....... deletable elements .......}|
+            //                             |<= headPadding =>|<=== minimalSize ====>|<= tailPadding =>|
+            //          |- headSuggestion -|<====================== targetSize ======================>|- tailSuggestion -|
+            //      Example for targetSize > size:
+            //          |<========================================= targetSize =========================================>|
+            //          |{....... deletable elements .......}|{. elements to keep .}|{....... deletable elements .......}|
+            //                             |<= headPadding =>|<=== minimalSize ====>|<= tailPadding =>|
+            //          |+ headSuggestion +|<========================= size =========================>|+ tailSuggestion +|
             val lastElementToKeepIndex = collection.indexOfLast(keep)
             val minimalSize =
                 lastElementToKeepIndex - firstElementToKeepIndex + 1
