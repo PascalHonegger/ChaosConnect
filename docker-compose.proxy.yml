@@ -1,7 +1,9 @@
-version: '3.3'
+version: '3'
 services:
   speedwagon:
-    image: envoyproxy/envoy-alpine:v1.17-latest
+    image: "ghcr.io/pascalhonegger/cc-speedwagon"
+    build:
+      context: ./proxy
     volumes:
       - ./proxy/envoy-dev.yaml:/etc/envoy/envoy.yaml:ro
     ports:

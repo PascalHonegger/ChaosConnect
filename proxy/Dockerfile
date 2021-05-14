@@ -1,4 +1,4 @@
-FROM envoyproxy/envoy-alpine:v1.17-latest
+FROM envoyproxy/envoy-alpine:v1.18-latest
 
 EXPOSE 80
 EXPOSE 443
