@@ -14,54 +14,36 @@ fun <T> calculateCollectionResizingSuggestions(
     targetSize: Int,
     keep: (T) -> Boolean
 ): Pair<Int, Int> {
-
     val size = collection.size
-
-    var headSuggestion: Int
-    var tailSuggestion: Int
-
-    when (val indexOfFirstElementToKeep = collection.indexOfFirst(keep)) {
-        -1 -> {
-            val totalSuggestion: Int = max(0, targetSize) - size
-            headSuggestion = totalSuggestion / 2
-            tailSuggestion = totalSuggestion - headSuggestion
-        }
+    return when (val firstElementToKeepIndex = collection.indexOfFirst(keep)) {
+        -1 ->
+            halve(max(0, targetSize) - size)
         else -> {
-            val indexOfLastElementToKeep = collection.indexOfLast(keep)
-
+            val lastElementToKeepIndex = collection.indexOfLast(keep)
             val minimalSize =
-                indexOfLastElementToKeep - indexOfFirstElementToKeep + 1
-
-            val fixedTargetSize = max(minimalSize, targetSize)
-
-            val totalPadding = fixedTargetSize - minimalSize
-            assert(totalPadding >= 0) {
-                "Negative total padding: $totalPadding"
-            }
-
-            val headPadding = totalPadding / 2
-            assert(headPadding >= 0) {
-                "Negative head padding: $headPadding"
-            }
-
-            val tailPadding = totalPadding - headPadding
-            assert(tailPadding >= 0) {
-                "Negative tail padding: $tailPadding"
-            }
-
-            headSuggestion =
-                headPadding - indexOfFirstElementToKeep
-            tailSuggestion =
-                indexOfLastElementToKeep + 1 - size + tailPadding
+                lastElementToKeepIndex - firstElementToKeepIndex + 1
+            val totalPadding = max(0, targetSize - minimalSize)
+            val (headPadding, tailPadding) = halve(totalPadding)
+            Pair(
+                headPadding - firstElementToKeepIndex,
+                lastElementToKeepIndex + 1 - size + tailPadding
+            )
         }
     }
-    assert(size + headSuggestion + tailSuggestion >= targetSize) {
-        "Suggestions go below target size (size: $size; target size: $targetSize; head suggestion: $headSuggestion; tail suggestion: $tailSuggestion)"
-    }
-    if (targetSize >= size) {
-        assert(size + headSuggestion + tailSuggestion == targetSize) {
-            "Suggestions go beyond target size (size: $size; target size: $targetSize; head suggestion: $headSuggestion; tail suggestion: $tailSuggestion)"
+        .apply {
+            val (headSuggestion, tailSuggestion) = this
+            assert(size + headSuggestion + tailSuggestion >= targetSize) {
+                "Suggestions go below target size (size: $size; target size: $targetSize; head suggestion: $headSuggestion; tail suggestion: $tailSuggestion)"
+            }
+            if (targetSize >= size) {
+                assert(size + headSuggestion + tailSuggestion == targetSize) {
+                    "Suggestions go beyond target size (size: $size; target size: $targetSize; head suggestion: $headSuggestion; tail suggestion: $tailSuggestion)"
+                }
+            }
         }
-    }
-    return headSuggestion to tailSuggestion
+}
+
+private fun halve(full: Int): Pair<Int, Int> {
+    val half = full / 2
+    return half to full - half
 }
