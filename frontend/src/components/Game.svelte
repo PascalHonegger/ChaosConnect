@@ -9,20 +9,38 @@
     import FactionSelect from "./FactionSelect.svelte";
     import { getGameUpdates } from "../lib/ChaosConnectClient";
 
+    const TIMEOUT = 500;
+
     function applyGameUpdate(gameUpdateEvent: GameUpdateEvent) {
         gameState.apply(gameUpdateEvent);
     }
 
-    let updateStream: ClientReadableStream<GameUpdateEvent>;
-    onMount(() => {
+    let updateStream: ClientReadableStream<GameUpdateEvent>|null = null;
+
+    function delayedRetry() {
+        stopGameUpdates();
+        setTimeout(startGameUpdates, TIMEOUT);
+    }
+
+    function startGameUpdates() {
         gameState.reset();
         updateStream = getGameUpdates($authMetadata);
         updateStream.on('data', applyGameUpdate);
-    });
-    onDestroy(() => {
-        updateStream.cancel();
-        updateStream.removeListener('data', applyGameUpdate);
-    });
+        updateStream.on('error', delayedRetry);
+        updateStream.on('end', delayedRetry);
+    }
+
+    function stopGameUpdates() {
+        if (updateStream != null) {
+            updateStream.cancel();
+            updateStream.removeListener('data', applyGameUpdate);
+            updateStream.removeListener('error', delayedRetry);
+            updateStream.removeListener('end', delayedRetry);
+        }
+    }
+
+    onMount(startGameUpdates);
+    onDestroy(stopGameUpdates);
 </script>
 
 {#if $player}
