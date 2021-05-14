@@ -72,14 +72,16 @@
         height: var(--column-width);
     }
 
-    .preview:first-child, .queue:first-child {
+    .preview:first-child, .queue:first-child, .preview:last-child, .queue:last-child {
         width: var(--edge-column-width);
     }
 
     .queue,
-    .column {
+    .column,
+    .preview {
         display: flex;
         flex-direction: column-reverse;
+        align-items: center;
     }
 
     .column {
