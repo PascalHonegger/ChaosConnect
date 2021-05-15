@@ -19,6 +19,63 @@ The modern, distributed and scalable implementation of a game inspired by Connec
 - You can exchange your points for perks and skins
 - To ensure fairness, some bots might be added to balance the teams
 
+# Architecture
+
+## Big Picture
+![Architecture Overview](https://www.plantuml.com/plantuml/png/jPTFRvim5C3l_XHUrMlI0ELFfIegtKuxT5FNsxQ31oxnOcngJDgkwdUVyy2a9K6g5FCEMFRxy-Cz7WPVrPeetPGSVM8YuqrEyIMNXQpFSfcjgPfNHhVSK_wjfHXHhQNcR4nPoLeNYjOFVCIWtb2kwOnbVNnKLuffYa-fsCZdIicdP_pJM_XFGN3cHR_n2rgCYvya2qSoZeaJa6anII_-P1ZV8YAuJeE9EqROPnMvnzX4l7UPUKunbXBlP-SU4nxCyDmnve3LEO0SOw9ufC7TOBma0anug4AX6mp4YG439NAFiUraCMs91fKxTu81IZj2qBrj9d25iUFXP-vFW05vp_6EnwGN43wrc8Flq94OFqqj9assepS59jrAs67IAJ5z40ym_ZIOPD02IJG9vcA_aRsfCNO_60OE4gUODBAVbo7Q4GQU2NIR_RoOqRwObd8inkvYlcqy8x5TjvFZ6tgtYq6yBeN0LCkMy3XCQ3ZHOXSwR5E03umLpyKFLBfBA8A4ukv1xQhb0jFkQcQyC14JArrwWSj_wDIAOGv_CzrXBAXzqA4FWtiC14yN4mfwHKWppIc-ezbAI2wBP_njGzM6qKU4wZKJ5L6anAKKCbifMLAiLKFVQ79wJngkx-YJJZahH4c5nfcvK8LGHR8rAIW-kJnjZvRB4_o2C5OqqqGK73HlZd_BN-ABh2ecJp2fyRsI9ep8ZSD3GnimtXq8ZUsFYjByaHHIW3qi6-EU-bNIxL4Nb7L6E1F5jT6Pa70NW_je3x4cRESs-zSebgt0MyYSUXzmCJLXTU_XVy23Iv5BqRi4nkKLZJdToXK1MwYm8XpIWGhTizPsUqfVWad-nomBgStoDSlPDYAJWd2SoR9i1Cl8TexrIiccME7YzljdyBlnJ5lOskFPigihNCrqK4a4fS6NCwCPt1IKO5GJ7DIycmBTf85kF3nlvhk6QEU3Eu5LDHz6l3ANfkJ_0G00)
+
+## Separation of Concerns
+The service names are all a reference to the popular anime `JoJo's Bizarre Adventure`.
+
+| Name       | Role            | Description                                                                   |
+| ---------- | --------------- | ----------------------------------------------------------------------------- |
+| Doppio     | Frontend        | Svelte-based web client                                                       |
+| Speedwagon | Load balancer   | Envoy-based load balancing reverse proxy                                      |
+| Joestar    | Scaling backend | Micronaut server for user authentication and caching                          |
+| Rohan      | Central backend | Micronaut server for central storage and processing of the game and its users |
+
+### Frontend
+The frontend is written in [Svelte](https://svelte.dev/).
+As it's main purpose is to display the current state of the board, we decided that frameworks such as Angular are overkill.
+
+### Load balancing
+We use [Envoy](https://www.envoyproxy.io/) as a reverse proxy to handle load balancing.
+We had to use Envoy as it's the only reverse proxy which currently supports grpc-web.
+
+### Backend
+The backend is split into two parts:
+* Scaling: Communicates directly with our Frontend, issues and validates JWT, caches game state and sends game updates to all clients
+* Central: Manages the actual game state, synchronizes requests and handles game logic, stores persistent information, such as user credentials and scores, in a json document
+
+Both backends use [Micronaut](https://micronaut.io/) with [Kotlin](https://kotlinlang.org/).
+
+### Storage
+We decided not to use a database but instead store the (very minimalistic) data in a JSON document.
+
+## Communication
+Bidirectional communication is enabled through [gRPC](https://grpc.io/).
+For example, this allows `Rohan` to send a game update event to all `Joestar` instances, which then forward them realtime to all `Doppio` clients.
+TODO:
+- gRPC:
+  - Authentication: Not used because of lack of support by Svelte ecosystem (overlap with [Symmetric JWT](#symmetric-jwt)?)?
+  - Bidirectional streaming and control flow: Updates only? How bidirectional is it?
+  - Blocking or non-blocking bindings: Relevant for programming (`suspend fun`s, `Promise`s + `async` + `await`)?
+  - Cancellation and timeouts: Relevant for programming (cancellation and timeout exceptions)?
+  - More?
+- JWT termination on Joestar servers
+- More?
+
+## Configuration
+TODO:
+- Locality
+- Processing
+- More?
+
+## Maintainability
+TODO:
+- Testing: 200+ unit tests
+- More?
+
 # Infrastructure
 
 ## Docker setup
@@ -139,60 +196,3 @@ docker-compose -f docker-compose.gen.yml up gen_self_signed_cert
 # Run services hosted under http://localhost:5001, built locally, run 2 joestar instances
 docker-compose -f docker-compose.dev.yml up --build --scale joestar=2
 ```
-
-# Architecture
-
-## Big Picture
-![Architecture Overview](https://www.plantuml.com/plantuml/png/jPTFRvim5C3l_XHUrMlI0ELFfIegtKuxT5FNsxQ31oxnOcngJDgkwdUVyy2a9K6g5FCEMFRxy-Cz7WPVrPeetPGSVM8YuqrEyIMNXQpFSfcjgPfNHhVSK_wjfHXHhQNcR4nPoLeNYjOFVCIWtb2kwOnbVNnKLuffYa-fsCZdIicdP_pJM_XFGN3cHR_n2rgCYvya2qSoZeaJa6anII_-P1ZV8YAuJeE9EqROPnMvnzX4l7UPUKunbXBlP-SU4nxCyDmnve3LEO0SOw9ufC7TOBma0anug4AX6mp4YG439NAFiUraCMs91fKxTu81IZj2qBrj9d25iUFXP-vFW05vp_6EnwGN43wrc8Flq94OFqqj9assepS59jrAs67IAJ5z40ym_ZIOPD02IJG9vcA_aRsfCNO_60OE4gUODBAVbo7Q4GQU2NIR_RoOqRwObd8inkvYlcqy8x5TjvFZ6tgtYq6yBeN0LCkMy3XCQ3ZHOXSwR5E03umLpyKFLBfBA8A4ukv1xQhb0jFkQcQyC14JArrwWSj_wDIAOGv_CzrXBAXzqA4FWtiC14yN4mfwHKWppIc-ezbAI2wBP_njGzM6qKU4wZKJ5L6anAKKCbifMLAiLKFVQ79wJngkx-YJJZahH4c5nfcvK8LGHR8rAIW-kJnjZvRB4_o2C5OqqqGK73HlZd_BN-ABh2ecJp2fyRsI9ep8ZSD3GnimtXq8ZUsFYjByaHHIW3qi6-EU-bNIxL4Nb7L6E1F5jT6Pa70NW_je3x4cRESs-zSebgt0MyYSUXzmCJLXTU_XVy23Iv5BqRi4nkKLZJdToXK1MwYm8XpIWGhTizPsUqfVWad-nomBgStoDSlPDYAJWd2SoR9i1Cl8TexrIiccME7YzljdyBlnJ5lOskFPigihNCrqK4a4fS6NCwCPt1IKO5GJ7DIycmBTf85kF3nlvhk6QEU3Eu5LDHz6l3ANfkJ_0G00)
-
-## Separation of Concerns
-The service names are all a reference to the popular anime `JoJo's Bizarre Adventure`.
-
-| Name       | Role            | Description                                                                   |
-| ---------- | --------------- | ----------------------------------------------------------------------------- |
-| Doppio     | Frontend        | Svelte-based web client                                                       |
-| Speedwagon | Load balancer   | Envoy-based load balancing reverse proxy                                      |
-| Joestar    | Scaling backend | Micronaut server for user authentication and caching                          |
-| Rohan      | Central backend | Micronaut server for central storage and processing of the game and its users |
-
-### Frontend
-The frontend is written in [Svelte](https://svelte.dev/).
-As it's main purpose is to display the current state of the board, we decided that frameworks such as Angular are overkill.
-
-### Load balancing
-We use [Envoy](https://www.envoyproxy.io/) as a reverse proxy to handle load balancing.
-We had to use Envoy as it's the only reverse proxy which currently supports grpc-web.
-
-### Backend
-The backend is split into two parts:
-* Scaling: Communicates directly with our Frontend, issues and validates JWT, caches game state and sends game updates to all clients
-* Central: Manages the actual game state, synchronizes requests and handles game logic, stores persistent information, such as user credentials and scores, in a json document
-
-Both backends use [Micronaut](https://micronaut.io/) with [Kotlin](https://kotlinlang.org/).
-
-### Storage
-We decided not to use a database but instead store the (very minimalistic) data in a JSON document.
-
-## Communication
-Bidirectional communication is enabled through [gRPC](https://grpc.io/).
-For example, this allows `Rohan` to send a game update event to all `Joestar` instances, which then forward them realtime to all `Doppio` clients.
-TODO:
-- gRPC:
-  - Authentication: Not used because of lack of support by Svelte ecosystem (overlap with [Symmetric JWT](#symmetric-jwt)?)?
-  - Bidirectional streaming and control flow: Updates only? How bidirectional is it?
-  - Blocking or non-blocking bindings: Relevant for programming (`suspend fun`s, `Promise`s + `async` + `await`)?
-  - Cancellation and timeouts: Relevant for programming (cancellation and timeout exceptions)?
-  - More?
-- JWT termination on Joestar servers
-- More?
-
-## Configuration
-TODO:
-- Locality
-- Processing
-- More?
-
-## Maintainability
-TODO:
-- Testing: 200+ unit tests
-- More?
