@@ -159,8 +159,9 @@ The service names are all a reference to the popular anime `JoJo's Bizarre Adven
 The frontend is written in [Svelte](https://svelte.dev/).
 As it's main purpose is to display the current state of the board, we decided that frameworks such as Angular are overkill.
 
-## Reverse Proxy
-We use [Envoy](https://www.envoyproxy.io/) as a reverse proxy to handle load balancing. We had to use Envoy as it's the only reverse proxy which currently supports grpc-web.
+### Load balancing
+We use [Envoy](https://www.envoyproxy.io/) as a reverse proxy to handle load balancing.
+We had to use Envoy as it's the only reverse proxy which currently supports grpc-web.
 
 ## Backend
 The backend is split into two parts:
