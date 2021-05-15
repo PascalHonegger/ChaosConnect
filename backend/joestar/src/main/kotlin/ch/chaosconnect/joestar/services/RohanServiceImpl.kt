@@ -38,6 +38,10 @@ class RohanServiceImpl(
         )
     }
 
+    override suspend fun stopPlaying() {
+        gameService.stopPlaying(Empty.getDefaultInstance())
+    }
+
     override suspend fun login(username: String, password: String) =
         userService.getUser(
             GetUserRequest.newBuilder()

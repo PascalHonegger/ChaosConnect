@@ -19,6 +19,11 @@ class GameEndpoint(private val service: GameService) :
         return Empty.getDefaultInstance()
     }
 
+    override suspend fun stopPlaying(request: Empty): Empty {
+        service.stopPlaying()
+        return Empty.getDefaultInstance()
+    }
+
     override suspend fun placePiece(request: PlacePieceRequest): Empty {
         service.placePiece(columnIndex = request.column)
         return Empty.getDefaultInstance()

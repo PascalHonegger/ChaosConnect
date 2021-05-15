@@ -9,6 +9,7 @@ interface RohanService {
     fun getGameUpdates(): Flow<GameUpdateResponse>
     suspend fun placePiece(column: Int)
     suspend fun startPlaying(faction: Faction)
+    suspend fun stopPlaying()
     suspend fun login(username: String, password: String): UserAuthResponse
     suspend fun register(
         displayName: String,

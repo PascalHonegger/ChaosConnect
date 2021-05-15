@@ -114,6 +114,7 @@ class RohanServiceMock : RohanService {
     override suspend fun placePiece(column: Int) = Unit
 
     override suspend fun startPlaying(faction: Faction) = Unit
+    override suspend fun stopPlaying() = Unit
 
     override suspend fun login(
         username: String,

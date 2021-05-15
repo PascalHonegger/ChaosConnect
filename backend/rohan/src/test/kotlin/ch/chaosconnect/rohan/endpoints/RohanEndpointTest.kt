@@ -155,6 +155,13 @@ internal class RohanEndpointTest {
         }
     }
 
+    @Test
+    fun `stopPlaying stops session`(): Unit =
+        runBlocking {
+            coJustRun { gameService.stopPlaying() }
+            gameServiceStub.stopPlaying(Empty.getDefaultInstance())
+            coVerify { gameService.stopPlaying() }
+        }
 }
 
 @Factory

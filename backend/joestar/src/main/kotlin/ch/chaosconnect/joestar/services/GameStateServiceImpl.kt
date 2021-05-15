@@ -60,6 +60,10 @@ class GameStateServiceImpl(
     override suspend fun startPlaying(faction: Faction) =
         rohanService.startPlaying(faction = faction)
 
+    override suspend fun stopPlaying() {
+        rohanService.stopPlaying()
+    }
+
     override fun isConnected() = isConnected.get()
 
     /**
