@@ -11,6 +11,7 @@ option java_multiple_files = true;
 
 service ChaosConnectService {
   rpc StartPlaying(api.game.StartPlayingRequest) returns (api.common.Empty);
+  rpc StopPlaying(api.common.Empty) returns (api.common.Empty);
   rpc PlacePiece(api.game.PlacePieceRequest) returns (api.common.Empty);
 
   rpc GetGameUpdates(api.common.Empty)
