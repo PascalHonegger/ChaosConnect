@@ -16,6 +16,10 @@ export async function startPlaying(faction: Faction, metadata: Metadata): Promis
     return client.startPlaying(request, metadata);
 }
 
+export async function stopPlaying(metadata: Metadata): Promise<Empty> {
+    return client.stopPlaying(new Empty(), metadata);
+}
+
 export async function placePiece(column: number, metadata: Metadata): Promise<Empty> {
     const request = new PlacePieceRequest();
     request.setColumn(column);

@@ -7,7 +7,7 @@
     import Grid from "./Grid.svelte";
     import PlayerList from "./PlayerList.svelte";
     import FactionSelect from "./FactionSelect.svelte";
-    import { getGameUpdates } from "../lib/ChaosConnectClient";
+    import { getGameUpdates, stopPlaying } from "../lib/ChaosConnectClient";
 
     const TIMEOUT = 500;
 
@@ -39,8 +39,18 @@
         }
     }
 
-    onMount(startGameUpdates);
-    onDestroy(stopGameUpdates);
+    function unloadListener() {
+        stopPlaying($authMetadata);
+    }
+
+    onMount(() => {
+        startGameUpdates();
+        window.addEventListener('beforeunload', unloadListener)
+    });
+    onDestroy(() => {
+        stopGameUpdates();
+        window.removeEventListener('beforeunload', unloadListener);
+    });
 </script>
 
 {#if $player}

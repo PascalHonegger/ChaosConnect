@@ -2,14 +2,24 @@
     import twemoji from "../lib/Twemoji";
     import TokenRefresher from "./TokenRefresher.svelte";
     import LoginRegister from "./LoginRegister.svelte";
-    import { isLoggedIn, token } from "../stores/Auth";
+    import { authMetadata, isLoggedIn, token } from "../stores/Auth";
     import Game from "./Game.svelte";
+    import { stopPlaying } from "../lib/ChaosConnectClient";
+    import { player } from "../stores/GameState";
+    import { onMount } from "svelte";   
+
+    function logout(): void {
+        if ($player) {
+            stopPlaying($authMetadata);
+        }
+        token.unset();
+    }
 </script>
 
 <main>
     <h1 use:twemoji>⚔️ ChaosConnect ⚔️</h1>
     {#if $isLoggedIn}
-        <button on:click={() => token.unset()}>Logout</button>
+        <button on:click={logout}>Logout</button>
         <TokenRefresher />
         <Game />
     {:else}
