@@ -20,6 +20,7 @@ const val initialWidth = 7
 const val initialHeight = 6
 const val inactiveTimeoutMinutes = 30
 const val disabledUntilClearedTimeoutSeconds = 30
+const val maxAllowedTeamDifference = 2
 
 private val logger: Logger =
     LoggerFactory.getLogger(GameServiceImpl::class.java)
@@ -52,6 +53,9 @@ class GameServiceImpl(private val storageService: StorageService) :
     override suspend fun startPlaying(faction: Faction): Unit = mutex.withLock {
         val currentUser = userIdentifierContextKey.get()
             ?: error("Cannot start playing without a user")
+
+        check(playerCanJoin(faction)) { "User can not join unbalanced faction" }
+
         val playerState = activePlayers.compute(currentUser) { _, user ->
             when (user) {
                 null -> ActivePlayerState(
@@ -74,6 +78,12 @@ class GameServiceImpl(private val storageService: StorageService) :
                 .setState(playerState.toPlayerState())
                 .build()
         }
+    }
+
+    private fun playerCanJoin(faction: Faction): Boolean {
+        val teamSize = activePlayers.values.count { it.faction == faction }
+        val otherTeamSize = activePlayers.size - teamSize
+        return teamSize - otherTeamSize < maxAllowedTeamDifference
     }
 
     override suspend fun placePiece(columnIndex: Int): Unit = mutex.withLock {

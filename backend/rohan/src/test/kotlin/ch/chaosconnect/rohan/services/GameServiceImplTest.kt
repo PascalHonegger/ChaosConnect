@@ -2,6 +2,7 @@ package ch.chaosconnect.rohan.services
 
 import app.cash.turbine.test
 import ch.chaosconnect.api.game.*
+import ch.chaosconnect.rohan.assertThrowsWithMessage
 import ch.chaosconnect.rohan.model.TemporaryUser
 import ch.chaosconnect.rohan.model.UserScore
 import ch.chaosconnect.rohan.runSignedIn
@@ -11,6 +12,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import kotlin.IllegalStateException
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
@@ -95,6 +97,24 @@ internal class GameServiceImplTest {
                 cancel()
             }
         }
+
+    @Test
+    fun `startPlaying fails on unbalanced team`() {
+        repeat(maxAllowedTeamDifference) {
+            val identifier = "user-$it"
+            val dummyScore = dummyScore(identifier)
+            every { storage.getUser(identifier) } returns dummyScore
+            runSignedIn("user-$it") {
+                service.startPlaying(Faction.RED)
+            }
+        }
+        every { storage.getUser("my-user") } returns dummyScore("my-user")
+        runSignedIn("my-user") {
+            assertThrowsWithMessage<IllegalStateException>("User can not join unbalanced faction") {
+                service.startPlaying(Faction.RED)
+            }
+        }
+    }
 
     @Test
     fun `processQueueTick TODO`() {
