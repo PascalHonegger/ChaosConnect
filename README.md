@@ -174,4 +174,14 @@ Both backends use [Micronaut](https://micronaut.io/) with [Kotlin](https://kotli
 We decided not to use a database but instead store the (very minimalistic) data in a JSON document.
 
 ## Communication
-Bidirectional communication is enabled through [gRPC](https://grpc.io/). For example, this allows `Rohan` to send a game update event to all `Joestar` instances, which then forward them realtime to all `Doppio` clients.
+Bidirectional communication is enabled through [gRPC](https://grpc.io/).
+For example, this allows `Rohan` to send a game update event to all `Joestar` instances, which then forward them realtime to all `Doppio` clients.
+TODO:
+- gRPC:
+  - Authentication: Not used because of lack of support by Svelte ecosystem (overlap with [Symmetric JWT](#symmetric-jwt)?)?
+  - Bidirectional streaming and control flow: Updates only? How bidirectional is it?
+  - Blocking or non-blocking bindings: Relevant for programming (`suspend fun`s, `Promise`s + `async` + `await`)?
+  - Cancellation and timeouts: Relevant for programming (cancellation and timeout exceptions)?
+  - More?
+- JWT termination on Joestar servers
+- More?
