@@ -170,8 +170,8 @@ The backend is split into two parts:
 
 Both backends use [Micronaut](https://micronaut.io/) with [Kotlin](https://kotlinlang.org/).
 
-## Database
-We decided not to use any database but instead store the (very minimalistic) data in a json document.
+### Storage
+We decided not to use a database but instead store the (very minimalistic) data in a JSON document.
 
 ## Communication
 Bidirectional communication is enabled through [gRPC](https://grpc.io/). For example, this allows `Rohan` to send a game update event to all `Joestar` instances, which then forward them realtime to all `Doppio` clients.
