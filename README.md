@@ -163,7 +163,7 @@ As it's main purpose is to display the current state of the board, we decided th
 We use [Envoy](https://www.envoyproxy.io/) as a reverse proxy to handle load balancing.
 We had to use Envoy as it's the only reverse proxy which currently supports grpc-web.
 
-## Backend
+### Backend
 The backend is split into two parts:
 * Scaling: Communicates directly with our Frontend, issues and validates JWT, caches game state and sends game updates to all clients
 * Central: Manages the actual game state, synchronizes requests and handles game logic, stores persistent information, such as user credentials and scores, in a json document
