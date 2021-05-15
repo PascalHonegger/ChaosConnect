@@ -185,3 +185,9 @@ TODO:
   - More?
 - JWT termination on Joestar servers
 - More?
+
+## Configuration
+TODO:
+- Locality
+- Processing
+- More?
