@@ -45,6 +45,45 @@ TODO:
 - Linode
 - More?
 
+# Design Decisions
+
+## gRPC
+TODO: Rationale
+- Fundamental requirement as part of the assignment
+- More?
+
+## Micronaut
+TODO: Rationale
+- Dependency injection
+- More?
+
+## Kotlin
+TODO: Rationale
+- Conciseness
+- `null` safety
+- More?
+
+## Svelte
+TODO: Rationale
+- Light-weight framework (suitable for small projects)
+- More?
+
+## Envoy
+TODO: Rationale
+- Compatibility (gRPC, JWT)?
+- More?
+
+## Symmetric JWT
+TODO: Rationale
+- Compatibility (gRPC)?
+- Library support (Svelte ecosystem)?
+- More?
+
+## Notifications
+TODO: Rationale
+- Why real time updates with change events instead of whole state?
+- More?
+
 # Operation
 The easiest way to get ChaosConnect running is using docker-compose. We do not provider support for running the software components otherwise.
 
