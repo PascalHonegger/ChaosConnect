@@ -19,6 +19,32 @@ The modern, distributed and scalable implementation of a game inspired by Connec
 - You can exchange your points for perks and skins
 - To ensure fairness, some bots might be added to balance the teams
 
+# Infrastructure
+
+## Docker setup
+TODO: Docker for everything
+
+## Reverse Proxy
+TODO:
+- Responsibilities (overlap with [Separation of concerns](#separation-of-concerns)?)
+- Load Balancing strategy
+- More?
+
+## CI/CD
+TODO:
+- GitHub actions
+- More?
+
+## PKI
+TODO:
+- Certbot
+- More?
+
+## Hosting
+TODO:
+- Linode
+- More?
+
 # Operation
 The easiest way to get ChaosConnect running is using docker-compose. We do not provider support for running the software components otherwise.
 
