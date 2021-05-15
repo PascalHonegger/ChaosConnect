@@ -152,7 +152,7 @@ class GameServiceImpl(private val storageService: StorageService) :
 
             val columnIndicesToDisable = mutableSetOf<Int>()
 
-            if (column.rows.size == numberOfRows - 1) {
+            if (column.rows.size == numberOfRows) {
                 column.queue.clear()
                 columnIndicesToDisable += columnIndex
             }
