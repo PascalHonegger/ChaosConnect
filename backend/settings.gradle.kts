@@ -24,15 +24,15 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
             version("kotlin", "1.5.0")
-            version("kotlinx", "1.5.0-RC")
-            version("serialization-json", "1.2.0")
-            version("micronaut", "2.5.1")
+            version("kotlinx", "1.5.0")
+            version("serialization-json", "1.2.1")
+            version("micronaut", "2.5.3")
             version("protoc", "3.16.0")
-            version("gen-grpc-java", "1.37.0")
+            version("gen-grpc-java", "1.37.1")
             version("gen-grpc-kotlin", "1.1.0")
             version("jjwt", "0.11.2")
             version("mockk", "1.11.0")
-            version("turbine", "0.5.0-rc1")
+            version("turbine", "0.5.0")
             version("argon2-jvm", "2.10.1")
 
             alias("kotlin-stdlib").to(
