@@ -86,6 +86,18 @@ class GameServiceImpl(private val storageService: StorageService) :
         return teamSize - otherTeamSize < maxAllowedTeamDifference
     }
 
+    override suspend fun stopPlaying (): Unit = mutex.withLock {
+        val currentUser = userIdentifierContextKey.get()
+        val playerState = activePlayers.remove(currentUser) ?: return
+        emitCurrentState {
+            playerChanged = PlayerChanged.newBuilder().apply {
+                action = PlayerAction.DISCONNECT
+                player = currentUser
+                state = playerState.toPlayerState()
+            }.build()
+        }
+    }
+
     override suspend fun placePiece(columnIndex: Int): Unit = mutex.withLock {
         val currentUser = userIdentifierContextKey.get()
             ?: error("Cannot place piece without a user")

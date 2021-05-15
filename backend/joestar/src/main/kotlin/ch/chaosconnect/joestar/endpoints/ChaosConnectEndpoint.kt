@@ -22,4 +22,8 @@ class ChaosConnectEndpoint(private val gameStateService: GameStateService) :
     override suspend fun startPlaying(request: StartPlayingRequest): Empty =
         gameStateService.startPlaying(request.faction)
             .let { Empty.getDefaultInstance() }
+
+    override suspend fun stopPlaying(request: Empty): Empty =
+        gameStateService.stopPlaying()
+            .let { Empty.getDefaultInstance() }
 }

@@ -10,6 +10,7 @@ import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.IllegalStateException
@@ -115,6 +116,36 @@ internal class GameServiceImplTest {
             }
         }
     }
+
+    @Test
+    fun `stopPlaying emits DISCONNECT event`() =
+        runSignedIn("my-user") {
+            every { storage.getUser("my-user") } returns dummyScore("my-user")
+            service.getGameUpdates().test {
+                expectItem()
+                service.startPlaying(Faction.RED)
+                expectItem()
+                service.stopPlaying()
+                val gameUpdateEvent = expectItem().first
+                assertEquals(GameUpdateEvent.ActionCase.PLAYER_CHANGED, gameUpdateEvent.actionCase)
+                val playerChanged = gameUpdateEvent.playerChanged
+                assertEquals(PlayerAction.DISCONNECT, playerChanged.action)
+                assertEquals("my-user", playerChanged.player)
+                expectNoEvents()
+                cancel()
+            }
+        }
+
+    @Test
+    fun `stopPlaying ignores non-playing user`() =
+        runSignedIn("my-user") {
+            service.getGameUpdates().test {
+                expectItem()
+                service.stopPlaying()
+                expectNoEvents()
+                cancel()
+            }
+        }
 
     @Test
     fun `processQueueTick TODO`() {

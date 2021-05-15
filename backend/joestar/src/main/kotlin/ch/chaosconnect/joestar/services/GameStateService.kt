@@ -21,6 +21,11 @@ interface GameStateService {
     suspend fun startPlaying(faction: Faction)
 
     /**
+     * Stops the game session
+     */
+    suspend fun stopPlaying()
+
+    /**
      * Indicate whether a healthy connection to the Rohan exists.
      */
     fun isConnected(): Boolean

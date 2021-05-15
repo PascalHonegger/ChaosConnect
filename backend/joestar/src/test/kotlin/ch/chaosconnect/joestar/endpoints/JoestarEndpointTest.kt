@@ -1,6 +1,7 @@
 package ch.chaosconnect.joestar.endpoints
 
 import ch.chaosconnect.api.authentication.LoginRequest
+import ch.chaosconnect.api.common.Empty
 import ch.chaosconnect.api.game.PlacePieceRequest
 import ch.chaosconnect.api.game.StartPlayingRequest
 import ch.chaosconnect.api.joestar.ChaosConnectServiceGrpcKt
@@ -93,6 +94,13 @@ class JoestarEndpointTest {
             )
         }
     }
+
+     @Test
+     fun `stopPlaying throws unauthenticated exception`(): Unit = runBlocking {
+         assertThrows<StatusException> {
+             chaosConnectServiceStub.stopPlaying(Empty.getDefaultInstance())
+         }
+     }
 }
 
 @Factory

@@ -119,4 +119,12 @@ class GameStateServiceTest {
             service.startPlaying(Faction.YELLOW)
             coVerify { rohanService.startPlaying(faction = Faction.YELLOW) }
         }
+
+    @Test
+    fun `stopPlaying is forwarded to Rohan`() =
+        runBlocking {
+            coJustRun { rohanService.stopPlaying() }
+            service.stopPlaying()
+            coVerify { rohanService.stopPlaying() }
+        }
 }
