@@ -148,12 +148,12 @@ docker-compose -f docker-compose.dev.yml up --build --scale joestar=2
 ## Separation of Concerns
 The service names are all a reference to the popular anime `JoJo's Bizarre Adventure`.
 
-| Service | Name |
-| ------- | ---- |
-| Frontend | Doppio |
-| Loadbalancer | Speedwagon |
-| Scaling Backend | Joestar |
-| Central Backend | Rohan |
+| Name       | Role            | Description                                                                   |
+| ---------- | --------------- | ----------------------------------------------------------------------------- |
+| Doppio     | Frontend        | Svelte-based web client                                                       |
+| Speedwagon | Load balancer   | Envoy-based load balancing reverse proxy                                      |
+| Joestar    | Scaling backend | Micronaut server for user authentication and caching                          |
+| Rohan      | Central backend | Micronaut server for central storage and processing of the game and its users |
 
 ## Frontend
 The frontend is written in [Svelte](https://svelte.dev/). As it's main purpose is to display the current state of the board, we decided that frameworks such as Angular are overkill.
