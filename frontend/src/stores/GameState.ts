@@ -23,12 +23,17 @@ export const columns = derived(gameState, $gameState => $gameState.columns);
 
 export const playerMap = derived(gameState, $gameState => $gameState.playerMap);
 
+function comparePlayers(p1: Player, p2: Player): number {
+    if (p1.disconnected === p2.disconnected) {
+        return p2.score - p1.score;
+    }
+    return p1.disconnected ? 1 : -1;
+}
+
 export const playersByFaction = derived(playerMap, $playerMap => {
     const result: Map<Faction, Player[]> = new Map(factions.map(f => [f, []]));
     $playerMap.forEach(player => result.get(player.faction)!.push(player));
-    result.forEach(
-        players => players.sort((p1, p2) => Number(p2.disconnected) - Number(p1.disconnected))
-    );
+    result.forEach(players => players.sort(comparePlayers));
     return result;
 });
 
