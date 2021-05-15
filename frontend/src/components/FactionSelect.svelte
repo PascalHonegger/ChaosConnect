@@ -1,10 +1,12 @@
 <script lang="ts">
     import type { Faction } from "../gen/game_pb";
     import { startPlaying } from "../lib/ChaosConnectClient";
-    import { factions } from "../lib/GameState";
     import { authMetadata } from "../stores/Auth";
+    import { playerMap, playersByFaction } from "../stores/GameState";
     import Piece from "./Piece.svelte";
     import Spinner from "./Spinner.svelte";
+
+    const MAX_TEAM_DIFFERENCE = 2;
 
     let waiting = false;
     let errorOccured = false;
@@ -22,6 +24,12 @@
             console.error(e);
         }
     }
+
+    function isUnbalanced(faction: Faction): boolean {
+        const teamSize = $playersByFaction.get(faction)?.length ?? 0;
+        const otherTeamSize = $playerMap.size - teamSize;
+        return teamSize - otherTeamSize >= MAX_TEAM_DIFFERENCE;
+    }
 </script>
 
 <div class="card">
@@ -32,9 +40,10 @@
         <Spinner />
     {:else}
         <h2>Choose faction:</h2>
-        {#each factions as faction}
-            <button on:click={() => chooseFaction(faction)}>
+        {#each [...$playersByFaction] as [faction, players]}
+            <button disabled={isUnbalanced(faction)} on:click={() => chooseFaction(faction)}>
                 <Piece {faction} />
+                {players.length} Player{#if players.length !== 1}s{/if}
             </button>
         {/each}
     {/if}
