@@ -53,6 +53,9 @@ Both backends use [Micronaut](https://micronaut.io/) with [Kotlin](https://kotli
 We decided not to use a database but instead store the (very minimalistic) data in a JSON document.
 
 ## Communication
+
+### Bi-directionality
+
 Bidirectional communication is enabled through [gRPC](https://grpc.io/).
 For example, this allows `Rohan` to send a game update event to all `Joestar` instances, which then forward them realtime to all `Doppio` clients.
 TODO:
