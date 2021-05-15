@@ -58,9 +58,13 @@ We decided not to use a database but instead store the (very minimalistic) data 
 
 Bidirectional communication is enabled through [gRPC](https://grpc.io/).
 For example, this allows `Rohan` to send a game update event to all `Joestar` instances, which then forward them realtime to all `Doppio` clients.
+
+### Authentication
+
+We use a custom solution based on symmetric JWT for authentication, as we did not want to commit to the standard solution provided by the Micronaut framework (see [Symmetric JWT](#symmetric-jwt)).
+
 TODO:
 - gRPC:
-  - Authentication: Not used because of lack of support by Svelte ecosystem (overlap with [Symmetric JWT](#symmetric-jwt)?)?
   - Bidirectional streaming and control flow: Updates only? How bidirectional is it?
   - Blocking or non-blocking bindings: Relevant for programming (`suspend fun`s, `Promise`s + `async` + `await`)?
   - Cancellation and timeouts: Relevant for programming (cancellation and timeout exceptions)?
@@ -134,10 +138,10 @@ TODO: Rationale
 - More?
 
 ## Symmetric JWT
-TODO: Rationale
-- Compatibility (gRPC)?
-- Library support (Svelte ecosystem)?
-- More?
+We couldn't easily use the `micronaut-security` package because the feature is still WIP for gRPC (see [`micronaut-grpc` issue #164](https://github.com/micronaut-projects/micronaut-grpc/issues/164)).
+The official token-based authentication works by using Google as a token provider, but we didn't want to have a vendor lock-in.
+In the end, we decided to use simple symmetric tokens because of the project scope.
+The client does use the metadata to send the token [which was recommended back in 2018 by the grpc-web team](https://github.com/grpc/grpc-web/issues/207#issuecomment-406134504).
 
 ## Notifications
 TODO: Rationale
