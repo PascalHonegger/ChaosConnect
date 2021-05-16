@@ -180,7 +180,9 @@ The client does use the metadata to send the token [which was recommended back i
 In order to preserve network bandwidth, which can be pricey depending on the hosting provider, we use real-time updates with light-weight change events instead of complete states.
 
 # Operation
-The easiest way to get ChaosConnect running is using docker-compose. We do not provider support for running the software components otherwise.
+
+The easiest way to get ChaosConnect running is using docker-compose.
+We do not provide support for running the software components otherwise.
 
 ## Prerequisites
 The `docker-compose.yml` file contains a placeholder for the JWT signing key.
