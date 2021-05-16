@@ -9,7 +9,7 @@
     const MAX_TEAM_DIFFERENCE = 2;
 
     let waiting = false;
-    let errorOccured = false;
+    let errorOccurred = false;
 
     async function chooseFaction(faction: Faction) {
         if (waiting) {
@@ -19,7 +19,7 @@
         try {
             await startPlaying(faction, $authMetadata);
         } catch (e) {
-            errorOccured = true;
+            errorOccurred = true;
             waiting = false;
             console.error(e);
         }
@@ -32,8 +32,8 @@
     }
 </script>
 
-<div class="card">
-    {#if errorOccured}
+<div class="faction-select">
+    {#if errorOccurred}
         <p>An error occurred</p>
     {/if}
     {#if waiting}
@@ -50,8 +50,7 @@
 </div>
 
 <style>
-    .card {
-        padding: 1rem;
+    .faction-select {
         text-align: center;
         align-self: center;
     }

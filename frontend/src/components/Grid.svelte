@@ -57,6 +57,7 @@
         display: flex;
         flex-direction: column;
         justify-self: center;
+        align-self: end;
     }
 
     .grid > div {

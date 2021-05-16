@@ -87,6 +87,7 @@ button:focus {
     background: white;
     border-radius: 2px;
     box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+    padding: 1rem;
 }
 
 .card-overlay {
@@ -96,7 +97,6 @@ button:focus {
     top: 0;
     left: 0;
     z-index: 10;
-    background-color: transparent;
     display: grid;
     align-items: center;
     justify-items: center;
