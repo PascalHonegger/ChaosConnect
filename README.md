@@ -99,7 +99,8 @@ The following configurations are probably the most interesting ones to configure
 
 ## Maintainability
 
-We use state-of-the-art technology and are using the latest (!) version of everything (e. g. Kotlin version released a week ago, targeting JDK 16).
+We use state-of-the-art technology and are using the latest version to take advantage of the latest language and framework features.
+For example, many Kotlin coroutine features we rely upon to easily implement real time updates were released as stable May 14th, just in time for the v1 release.
 
 We try to avoid unnecessary code cohesion and favor testability instead.
 Currently, we have more than 200 unit tests.
