@@ -10,7 +10,6 @@ The modern, distributed and scalable implementation of a game inspired by Connec
 - Other players cannot place a chip close to another chip for a certain timeout
 - If more people join, the timeouts are altered, and the playing field scales automatically
   - More people => make playing field wider
-  - More people => make playing field slightly higher
   - Fewer people => Mark (now superfluous) rows and columns as soon to be deleted, delete after a certain time passed
 - If a disk you placed is part of a 4 disk long line you get points, and the associated columns are cleared
 
