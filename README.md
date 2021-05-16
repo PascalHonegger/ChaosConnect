@@ -104,7 +104,14 @@ TODO:
 # Infrastructure
 
 ## Docker setup
-TODO: Docker for everything
+
+In order to enable easy deployment every service is dockerized.
+We do not use docker containers for developing, but you can easily build the containers locally to test their cross-container communication.
+We also use docker to run gRPC code generation for `grpc-web` to ensure the code gets generated with the same compiler version on every device.
+
+The docker images are generally optimized for file size and try to use the smallest available base image.
+
+Our images also implement [Docker Healthchecks](https://docs.docker.com/engine/reference/builder/#healthcheck) which can be used to determine if a server is irrecoverably broken.
 
 ## Reverse Proxy
 TODO:
