@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { ClientReadableStream } from "grpc-web";
-    import { gameState, player } from "../stores/GameState";
+    import { gameState, playerConnected } from "../stores/GameState";
     import type { GameUpdateEvent } from "../gen/game_pb";
     import { authMetadata } from "../stores/Auth";
     import { onDestroy, onMount } from "svelte";
@@ -53,7 +53,7 @@
     });
 </script>
 
-{#if $player}
+{#if $playerConnected}
     <div class="game">
         <div class="card">
             <PlayerList/>

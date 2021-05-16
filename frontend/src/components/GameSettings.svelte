@@ -197,9 +197,6 @@
         grid-column: 3 / 4;
         margin: 0;
     }
-    h2 {
-        margin-top: 0;
-    }
     input {
         grid-column: 2 / 4;
     }
