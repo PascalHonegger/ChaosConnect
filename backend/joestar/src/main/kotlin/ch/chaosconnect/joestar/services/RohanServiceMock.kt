@@ -2,7 +2,9 @@ package ch.chaosconnect.joestar.services
 
 import ch.chaosconnect.api.game.*
 import ch.chaosconnect.api.rohan.GameUpdateResponse
+import ch.chaosconnect.api.user.PlayerType
 import ch.chaosconnect.api.user.UserAuthResponse
+import ch.chaosconnect.api.user.UserTokenContent
 import ch.chaosconnect.joestar.auth.currentUserIdentifier
 import io.micronaut.context.annotation.Requires
 import kotlinx.coroutines.delay
@@ -37,7 +39,11 @@ class RohanServiceMock : RohanService {
         }.build()
 
     private fun mockAuthResponse(userIdentifier: String): UserAuthResponse =
-        UserAuthResponse.newBuilder().setIdentifier(userIdentifier).build()
+        UserAuthResponse.newBuilder().setToken(
+            UserTokenContent.newBuilder()
+                .setIdentifier(userIdentifier)
+                .setPlayerType(PlayerType.REGULAR)
+        ).build()
 
     override fun getGameUpdates(): Flow<GameUpdateResponse> = flow {
         while (true) {
@@ -134,6 +140,10 @@ class RohanServiceMock : RohanService {
         mockAuthResponse(currentUserIdentifier.get())
 
     override suspend fun setPassword(newPassword: String) = mockAuthResponse(
+        currentUserIdentifier.get()
+    )
+
+    override suspend fun renewToken(): UserAuthResponse = mockAuthResponse(
         currentUserIdentifier.get()
     )
 

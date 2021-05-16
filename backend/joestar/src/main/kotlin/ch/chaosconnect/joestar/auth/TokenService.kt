@@ -1,5 +1,6 @@
 package ch.chaosconnect.joestar.auth
 
+import ch.chaosconnect.api.user.PlayerType
 import io.jsonwebtoken.*
 import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
@@ -13,12 +14,14 @@ import javax.inject.Singleton
 private val logger =
     LoggerFactory.getLogger(TokenServiceImpl::class.java)
 
+private const val PlayerTypeKey = "player_type"
+
 interface TokenService {
     /**
      * Encodes the given user identity into a signed json web token
      * @return the signed json web token
      */
-    fun createSignedToken(identifier: String): String
+    fun createSignedToken(identifier: String, playerType: PlayerType): String
 
     /**
      * @param jwtToken signed json web token to verify and parse
@@ -37,7 +40,7 @@ class TokenServiceImpl(private val jwtConfig: JwtConfig) : TokenService {
      * Encodes the given user identity into a signed json web token
      * @return the signed json web token
      */
-    override fun createSignedToken(identifier: String): String {
+    override fun createSignedToken(identifier: String, playerType: PlayerType): String {
         val now = Instant.now()
         return Jwts.builder()
             .signWith(key)
@@ -46,6 +49,7 @@ class TokenServiceImpl(private val jwtConfig: JwtConfig) : TokenService {
             .setAudience(jwtConfig.audience)
             .setIssuedAt(Date.from(now))
             .setExpiration(Date.from(now.plus(jwtConfig.validFor)))
+            .claim(PlayerTypeKey, playerType.name)
             .compact()
     }
 

@@ -1,5 +1,6 @@
 package ch.chaosconnect.joestar.auth
 
+import ch.chaosconnect.api.user.PlayerType
 import io.jsonwebtoken.io.DecodingException
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -20,7 +21,7 @@ class TokenServiceTest {
                 audience = "You"
                 validFor = Duration.ofDays(1)
             })
-        val token = service.createSignedToken("SomeUsername")
+        val token = service.createSignedToken("SomeUsername", PlayerType.REGULAR)
         val decoded = service.parseToken(token)
         assertEquals("SomeUsername", decoded)
     }

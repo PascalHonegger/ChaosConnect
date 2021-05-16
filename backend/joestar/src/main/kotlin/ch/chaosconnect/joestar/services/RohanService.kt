@@ -24,4 +24,6 @@ interface RohanService {
     suspend fun setDisplayName(newDisplayName: String): UserAuthResponse
 
     suspend fun setPassword(newPassword: String): UserAuthResponse
+
+    suspend fun renewToken(): UserAuthResponse
 }
