@@ -119,7 +119,7 @@ Our images also implement [Docker Healthchecks](https://docs.docker.com/engine/r
 
 ## Reverse Proxy
 
-We use a dockerized Envoy reverse proxy server as a load balancer.
+We use a dockerized Envoy reverse proxy server as a load balancer (see [Envoy](#envoy) for details).
 
 ## CI/CD
 We use [GitHub Actions](https://github.com/features/actions) to test and build ChaosConnect automatically.
