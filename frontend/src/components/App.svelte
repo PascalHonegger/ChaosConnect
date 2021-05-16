@@ -6,7 +6,7 @@
     import { authMetadata, isLoggedIn, token } from "../stores/Auth";
     import Game from "./Game.svelte";
     import { stopPlaying } from "../lib/ChaosConnectClient";
-    import { player } from "../stores/GameState";
+    import { player, playerConnected } from "../stores/GameState";
 
     let mode: "game" | "settings" = "game";
 
@@ -22,11 +22,12 @@
     <h1 use:twemoji>⚔️ ChaosConnect ⚔️</h1>
     {#if $isLoggedIn}
         <TokenRefresher />
-        {#if $player}
+        {#if $playerConnected}
             <div>
                 Hey <span class="player-name">{$player?.displayName}</span>!
                 {#if mode === "game"}
                     <button on:click={logout}>Logout</button>
+                    <button on:click={() => stopPlaying($authMetadata)}>Switch Faction</button>
                     <button on:click={() => (mode = "settings")} use:twemoji
                         >⚙</button
                     >

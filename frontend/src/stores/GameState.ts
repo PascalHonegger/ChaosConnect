@@ -43,3 +43,7 @@ export const player: Readable<Player|null> = derived([playerMap, userIdentifier]
     }
     return $playerMap.get($userIdentifier) ?? null;
 });
+
+export const playerConnected: Readable<boolean> = derived(player, ($player) =>
+    $player != null && !$player.disconnected
+);

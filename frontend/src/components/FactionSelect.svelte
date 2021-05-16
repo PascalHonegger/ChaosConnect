@@ -39,7 +39,7 @@
     {#if waiting}
         <Spinner />
     {:else}
-        <h2>Choose faction:</h2>
+        <h2>Choose Your Faction</h2>
         {#each [...$playersByFaction] as [faction, players]}
             <button disabled={isUnbalanced(faction)} on:click={() => chooseFaction(faction)}>
                 <Piece {faction} />
