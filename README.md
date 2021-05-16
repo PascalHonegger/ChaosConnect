@@ -61,7 +61,8 @@ For example, this allows `Rohan` to send a game update event to all `Joestar` in
 
 ### Authentication
 
-We use a custom solution based on symmetric JWT for authentication, as we did not want to commit to the standard solution provided by the Micronaut framework (see [Symmetric JWT](#symmetric-jwt)).
+Because we use gRPC for communication, which is based on HTTP, we send the authentication token in the [Authorization Header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization).
+We use a custom solution based on symmetric JWT for authentication, as we did not want to commit to a vendor-specific or work-in-progress solution (see [Symmetric JWT](#symmetric-jwt)).
 
 ### Control flow
 
