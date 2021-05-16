@@ -78,9 +78,9 @@ The request-based API is asynchronous by nature as well, but allows for convenie
 | Streams                | `kotlinx.coroutines.flow.Flow` + callback methods           | `ClientReadableStream` + callback methods |
 | 'Synchronous' Requests | `suspend fun` + `kotlinx.coroutines.BuildersKt.runBlocking` | `Promise` + `async` + `await`             |
 
-TODO:
-- JWT termination on Joestar servers
-- More?
+### JWT
+
+JWTs are issued and terminated by Joestar servers.
 
 ## Configuration
 TODO:
@@ -148,10 +148,13 @@ TODO: Rationale
 - More?
 
 ## Symmetric JWT
+
 We couldn't easily use the `micronaut-security` package because the feature is still WIP for gRPC (see [`micronaut-grpc` issue #164](https://github.com/micronaut-projects/micronaut-grpc/issues/164)).
 The official token-based authentication works by using Google as a token provider, but we didn't want to have a vendor lock-in.
+
 In the end, we decided to use simple symmetric tokens because of the project scope.
-The client does use the metadata to send the token [which was recommended back in 2018 by the grpc-web team](https://github.com/grpc/grpc-web/issues/207#issuecomment-406134504).
+
+The client does use the metadata to send the token [which was recommended back in 2018 by the `grpc-web` team](https://github.com/grpc/grpc-web/issues/207#issuecomment-406134504).
 
 ## Notifications
 TODO: Rationale
