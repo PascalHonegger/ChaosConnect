@@ -1,5 +1,5 @@
 import type { Metadata } from "grpc-web";
-import { LoginRequest, PlayWithoutAccountRequest, RegisterRequest, TokenResponse } from "../gen/authentication_pb";
+import { LoginRequest, PlayWithoutAccountRequest, RegisterRequest, TokenResponse, UpdateMetaStateRequest } from "../gen/authentication_pb";
 import { Empty } from "../gen/common_pb";
 import { WebLoginServiceClient } from "../gen/JoestarServiceClientPb";
 
@@ -28,4 +28,16 @@ export async function register(username: string, password: string, displayName: 
 
 export async function renewToken(metadata: Metadata): Promise<TokenResponse> {
     return client.renewToken(new Empty(), metadata);
+}
+
+export async function setDisplayName(newDisplayName: string, metadata: Metadata): Promise<TokenResponse> {
+    const request = new UpdateMetaStateRequest();
+    request.setDisplayName(newDisplayName);
+    return client.updateMetaState(request, metadata);
+}
+
+export async function setPassword(newPassword: string, metadata: Metadata): Promise<TokenResponse> {
+    const request = new UpdateMetaStateRequest();
+    request.setPassword(newPassword);
+    return client.updateMetaState(request, metadata);
 }

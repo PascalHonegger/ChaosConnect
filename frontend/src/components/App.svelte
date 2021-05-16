@@ -2,11 +2,13 @@
     import twemoji from "../lib/Twemoji";
     import TokenRefresher from "./TokenRefresher.svelte";
     import LoginRegister from "./LoginRegister.svelte";
+    import GameSettings from "./GameSettings.svelte";
     import { authMetadata, isLoggedIn, token } from "../stores/Auth";
     import Game from "./Game.svelte";
     import { stopPlaying } from "../lib/ChaosConnectClient";
     import { player } from "../stores/GameState";
-    import { onMount } from "svelte";   
+
+    let mode: "game" | "settings" = "game";
 
     function logout(): void {
         if ($player) {
@@ -19,9 +21,29 @@
 <main>
     <h1 use:twemoji>⚔️ ChaosConnect ⚔️</h1>
     {#if $isLoggedIn}
-        <button on:click={logout}>Logout</button>
         <TokenRefresher />
-        <Game />
+        {#if $player}
+            <div>
+                Hey <span class="player-name">{$player?.displayName}</span>!
+                {#if mode === "game"}
+                    <button on:click={logout}>Logout</button>
+                    <button on:click={() => (mode = "settings")} use:twemoji
+                        >⚙</button
+                    >
+                {:else if mode === "settings"}
+                    <button on:click={() => (mode = "game")} use:twemoji>
+                        Go back
+                    </button>
+                {/if}
+            </div>
+        {/if}
+        <!-- Only hide game to prevent unsubscribe and resubscribe to events -->
+        <div class:hidden={mode !== "game"}>
+            <Game />
+        </div>
+        {#if mode === "settings"}
+            <GameSettings />
+        {/if}
     {:else}
         <LoginRegister />
     {/if}
@@ -33,6 +55,10 @@
 </footer>
 
 <style>
+    .player-name {
+        font-weight: bold;
+    }
+
     main {
         padding: 1em;
         margin: 0 auto;
@@ -71,5 +97,4 @@
             font-size: 5em;
         }
     }
-
 </style>
