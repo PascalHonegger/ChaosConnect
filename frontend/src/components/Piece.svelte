@@ -15,7 +15,7 @@
     class:yellow={faction === Faction.YELLOW}
     class:red={faction === Faction.RED}
     title={playerName != null ? `Placed by ${playerName}` : undefined}
-/>
+><slot /></div>
 
 <style>
     .piece {

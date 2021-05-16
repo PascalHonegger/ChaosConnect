@@ -1,7 +1,8 @@
 <script lang="ts">
+    import twemoji from "../lib/Twemoji";
     import type { Faction } from "../gen/game_pb";
     import { startPlaying } from "../lib/ChaosConnectClient";
-import type { Player } from "../lib/GameState";
+    import type { Player } from "../lib/GameState";
     import { authMetadata } from "../stores/Auth";
     import { playersByFaction } from "../stores/GameState";
     import Piece from "./Piece.svelte";
@@ -59,18 +60,55 @@ import type { Player } from "../lib/GameState";
         <Spinner />
     {:else}
         <h2>Choose Your Faction</h2>
-        {#each [...$playersByFaction] as [faction, players]}
-            <button disabled={isUnbalanced(faction)} on:click={() => chooseFaction(faction)}>
-                <Piece {faction} />
-                {countConnected(players)} Player{#if countConnected(players) !== 1}s{/if}
-            </button>
-        {/each}
+        <div class="wrapper">
+            {#each [...$playersByFaction] as [faction, players], i}
+                {#if i !== 0}
+                    <span use:twemoji class="vs-button">🆚</span>
+                {/if}
+                <button
+                    disabled={isUnbalanced(faction)}
+                    on:click={() => chooseFaction(faction)}
+                >
+                    <span class="piece-wrapper">
+                        <Piece {faction} />
+                    </span>
+                    <span>
+                        {countConnected(players)} Player{#if countConnected(players) !== 1}s{/if}
+                    </span>
+                </button>
+            {/each}
+        </div>
     {/if}
 </div>
 
 <style>
     .faction-select {
         text-align: center;
-        align-self: center;
+    }
+
+    .wrapper {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .vs-button {
+        font-size: 2em;
+        display: flex;
+        margin: 0 var(--spacing);
+    }
+
+    .piece-wrapper {
+        position: relative;
+        display: block;
+        width: var(--piece-size);
+        height: var(--piece-size);
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    button {
+        margin: 0;
     }
 </style>

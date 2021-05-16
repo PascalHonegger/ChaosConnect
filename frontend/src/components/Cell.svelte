@@ -1,13 +1,18 @@
 <script lang="ts">
-    import type {Cell} from "../lib/GameState";
+    import twemoji from "../lib/Twemoji";
+    import type { Cell } from "../lib/GameState";
     import Piece from "./Piece.svelte";
 
     export let cell: Cell;
 </script>
 
-<div class="cell" class:scored={cell.scored}>
+<div class="cell">
     {#if cell.piece}
-        <Piece piece={cell.piece}/>
+        <Piece piece={cell.piece}>
+            {#if cell.scored}
+                <div class="score-indicator" use:twemoji>⭐</div>
+            {/if}
+        </Piece>
     {/if}
 </div>
 
@@ -28,7 +33,12 @@
         border-top-width: 2px;
     }
 
-    .scored {
-        background: gold;
+    .score-indicator {
+        position: absolute;
+        display: flex;
+        place-content: center;
+        place-items: center;
+        width: var(--piece-size);
+        height: var(--piece-size);
     }
 </style>
