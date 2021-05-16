@@ -3,12 +3,13 @@
     import TokenRefresher from "./TokenRefresher.svelte";
     import LoginRegister from "./LoginRegister.svelte";
     import GameSettings from "./GameSettings.svelte";
+    import GameHelp from "./GameHelp.svelte";
     import { authMetadata, isLoggedIn, token } from "../stores/Auth";
     import Game from "./Game.svelte";
     import { stopPlaying } from "../lib/ChaosConnectClient";
     import { player, playerConnected } from "../stores/GameState";
 
-    let mode: "game" | "settings" = "game";
+    let mode: "game" | "settings" | "help" = "game";
 
     function logout(): void {
         if ($player) {
@@ -31,7 +32,14 @@
                     <button on:click={() => (mode = "settings")} use:twemoji
                         >⚙</button
                     >
+                    <button on:click={() => (mode = "help")} use:twemoji
+                        >❓</button
+                    >
                 {:else if mode === "settings"}
+                    <button on:click={() => (mode = "game")} use:twemoji>
+                        Go back
+                    </button>
+                {:else if mode === "help"}
                     <button on:click={() => (mode = "game")} use:twemoji>
                         Go back
                     </button>
@@ -44,6 +52,9 @@
         </div>
         {#if mode === "settings"}
             <GameSettings />
+        {/if}
+        {#if mode === "help"}
+            <GameHelp />
         {/if}
     {:else}
         <LoginRegister />
