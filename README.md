@@ -137,9 +137,8 @@ If you don't already have a valid certificate around, you can easily generate on
 # Design Decisions
 
 ## gRPC
-TODO: Rationale
-- Fundamental requirement as part of the assignment
-- More?
+We wanted real time updates and gRPC provides a way to stream real time updates.
+Implementing real time update from server-to-server and server-to-browser is no easy task and implementing a type safe variant through websockets would have taken a lot longer than just using a gRPC library.
 
 ## Micronaut
 TODO: Rationale
