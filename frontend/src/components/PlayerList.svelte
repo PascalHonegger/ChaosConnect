@@ -17,7 +17,7 @@
                     {/each}
                 </ul>
             {:else}
-                <div class="no-players-message">No Players yet</div>
+                <div class="no-players-message">No players</div>
             {/if}
         </li>
     {/each}
@@ -26,6 +26,8 @@
 <style>
     ul {
         list-style: none;
+        margin: 0;
+        padding: 0;
     }
 
     .factions > li {

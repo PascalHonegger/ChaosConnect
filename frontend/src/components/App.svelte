@@ -49,8 +49,27 @@
 
     h1 {
         color: var(--primary-color);
-        font-size: 4em;
+        font-size: 2em;
         font-weight: 100;
         text-align: center;
     }
+
+    @media only screen and (min-width: 768px) {
+        h1 {
+            font-size: 3em;
+        }
+    }
+
+    @media only screen and (min-width: 992px) {
+        h1 {
+            font-size: 4em;
+        }
+    }
+
+    @media only screen and (min-width: 1920px) {
+        h1 {
+            font-size: 5em;
+        }
+    }
+
 </style>

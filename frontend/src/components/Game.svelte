@@ -55,17 +55,48 @@
 
 {#if $player}
     <div class="game">
-        <PlayerList />
+        <div class="card">
+            <PlayerList/>
+        </div>
 
-        <Grid />
+        <div class="card">
+            <Grid/>
+        </div>
     </div>
 {:else}
-    <FactionSelect />
+    <div class="card faction-select">
+        <FactionSelect/>
+    </div>
 {/if}
 
 <style>
+    .faction-select {
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 50vw;
+        min-width: 250px;
+    }
+
     .game {
         display: grid;
-        grid-template-columns: 1fr 6fr;
+        min-height: 250px;
+        column-gap: 2rem;
+        row-gap: 2rem;
+    }
+
+    .game > .card {
+        display: grid;
+    }
+
+    @media only screen and (min-width: 992px) {
+        .game {
+            grid-template-columns: 2fr 6fr;
+        }
+    }
+
+    @media only screen and (min-width: 1920px) {
+        .game {
+            grid-template-columns: 1fr 6fr;
+        }
     }
 </style>

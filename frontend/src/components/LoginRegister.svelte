@@ -1,13 +1,9 @@
 <script lang="ts">
     import twemoji from "../lib/Twemoji";
-    import type { TokenResponse } from "../gen/authentication_pb";
+    import type {TokenResponse} from "../gen/authentication_pb";
     import Spinner from "./Spinner.svelte";
-    import { authMetadata, token } from "../stores/Auth";
-    import {
-        login,
-        playWithoutAccount,
-        register,
-    } from "../lib/WebLoginClient";
+    import {authMetadata, token} from "../stores/Auth";
+    import {login, playWithoutAccount, register,} from "../lib/WebLoginClient";
 
     let request: Promise<boolean> | null = null;
     let isLoading = false;
@@ -147,7 +143,6 @@
         max-width: 600px;
         margin-left: auto;
         margin-right: auto;
-        padding: 10px;
     }
     .content {
         display: grid;
