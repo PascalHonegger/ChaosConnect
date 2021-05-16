@@ -173,9 +173,8 @@ In the end, we decided to use simple symmetric tokens because of the project sco
 The client does use the metadata to send the token [which was recommended back in 2018 by the `grpc-web` team](https://github.com/grpc/grpc-web/issues/207#issuecomment-406134504).
 
 ## Notifications
-TODO: Rationale
-- Why real time updates with change events instead of whole state?
-- More?
+
+In order to preserve network bandwidth, which can be pricey depending on the hosting provider, we use real-time updates with light-weight change events instead of complete states.
 
 # Operation
 The easiest way to get ChaosConnect running is using docker-compose. We do not provider support for running the software components otherwise.
