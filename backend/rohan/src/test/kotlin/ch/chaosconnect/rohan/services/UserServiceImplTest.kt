@@ -2,10 +2,12 @@ package ch.chaosconnect.rohan.services
 
 import ch.chaosconnect.rohan.assertThrowsWithMessage
 import ch.chaosconnect.rohan.meta.StorageConfig
+import ch.chaosconnect.rohan.model.RegularUser
 import ch.chaosconnect.rohan.runSignedIn
 import ch.chaosconnect.rohan.runSignedOut
 import kotlinx.coroutines.CoroutineScope
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtensionContext
@@ -87,7 +89,7 @@ internal class UserServiceImplTest {
     @Test
     fun `signUpAsRegularUser accepts duplicate display names among regular and temporary users`() {
         runSignedOut {
-            service.signInAsTemporaryUser("Eve89")
+            service.signUpAsTemporaryUser("Eve89")
             service.signUpAsRegularUser("eve2", "pw", "Eve89")
         }
     }
@@ -97,22 +99,22 @@ internal class UserServiceImplTest {
     fun `signInAsTemporaryUser does not accept blank display name`(displayName: String) =
         runSignedOut {
             assertThrowsWithMessage<IllegalArgumentException>("Display name may not be blank") {
-                service.signInAsTemporaryUser(displayName)
+                service.signUpAsTemporaryUser(displayName)
             }
         }
 
     @Test
     fun `signInAsTemporaryUser accepts duplicate display names among temporary users`() =
         runSignedOut {
-            service.signInAsTemporaryUser("Eve89")
-            service.signInAsTemporaryUser("Eve89")
+            service.signUpAsTemporaryUser("Eve89")
+            service.signUpAsTemporaryUser("Eve89")
         }
 
     @Test
     fun `signInAsTemporaryUser accepts duplicate display names among temporary and regular user`() =
         runSignedOut {
             service.signUpAsRegularUser("eve", "pw", "Eve89")
-            service.signInAsTemporaryUser("Eve89")
+            service.signUpAsTemporaryUser("Eve89")
         }
 
     @Test
@@ -182,13 +184,34 @@ internal class UserServiceImplTest {
         }
     }
 
+    @Test
+    fun `getCurrentUser throws for signed out users`() = runSignedOut {
+        assertThrowsWithMessage<IllegalStateException>("No active user") {
+            service.getCurrentUser()
+        }
+    }
+
+    @Test
+    fun `getCurrentUser throws for user ID with no matching storage entry`() = runSignedIn("loeli") {
+        assertThrowsWithMessage<AccountException>("Provided user ID no longer exists") {
+            service.getCurrentUser()
+        }
+    }
+
+    @Test
+    fun `getCurrentUser returns current user if signed in`() = runSignedInAsRegularUser("loeli", "123", "Löli") {
+        val currentUser = service.getCurrentUser()
+        assertTrue(currentUser is RegularUser)
+        assertEquals("loeli", (currentUser as RegularUser).credentials.name)
+    }
+
     private fun <T> runSignedInAsTemporaryUser(
         displayName: String,
         block: suspend CoroutineScope.() -> T
     ) =
         runSignedOut {
             runSignedIn(
-                service.signInAsTemporaryUser(displayName),
+                service.signUpAsTemporaryUser(displayName).identifier,
                 block
             )
         }
@@ -211,9 +234,9 @@ internal class UserServiceImplTest {
         displayName: String
     ): String {
         val identifier1 =
-            service.signUpAsRegularUser(name, password, displayName)
+            service.signUpAsRegularUser(name, password, displayName).identifier
         val identifier2 =
-            service.signInAsRegularUser(name, password)
+            service.signInAsRegularUser(name, password).identifier
         assertEquals(identifier1, identifier2)
         return identifier2
     }

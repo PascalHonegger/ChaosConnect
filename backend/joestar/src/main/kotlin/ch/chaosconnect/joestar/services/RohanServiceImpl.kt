@@ -85,4 +85,7 @@ class RohanServiceImpl(
                 .setPassword(newPassword)
                 .build()
         )
+
+    override suspend fun renewToken() =
+        userService.renewToken(Empty.getDefaultInstance())
 }

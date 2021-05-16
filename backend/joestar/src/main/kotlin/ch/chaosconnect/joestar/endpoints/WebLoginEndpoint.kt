@@ -17,9 +17,9 @@ class WebLoginEndpoint(
 ) : WebLoginServiceGrpcKt.WebLoginServiceCoroutineImplBase() {
 
     private fun UserAuthResponse?.asTokenResponseOrError(): TokenResponse =
-        if (this != null && this.hasIdentifier()) {
+        if (this != null && hasToken()) {
             TokenResponse.newBuilder()
-                .setJwtToken(tokenService.createSignedToken(this.identifier))
+                .setJwtToken(tokenService.createSignedToken(token.identifier, token.playerType))
                 .build()
         } else {
             throw Status.UNAUTHENTICATED.withDescription("Authentication with backend failed")
@@ -42,14 +42,7 @@ class WebLoginEndpoint(
         ).asTokenResponseOrError()
 
     override suspend fun renewToken(request: Empty) =
-        when (val existingToken = currentUserIdentifier.get()) {
-            null -> null
-            // We assume that the user still exists in the backend
-            // If not, game service calls made with an invalid user will fail
-            else -> UserAuthResponse.newBuilder().setIdentifier(existingToken)
-                .build()
-        }.asTokenResponseOrError()
-
+        rohanService.renewToken().asTokenResponseOrError()
 
     override suspend fun updateMetaState(request: UpdateMetaStateRequest) =
         when {

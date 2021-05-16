@@ -6,7 +6,12 @@ import ch.chaosconnect.api.game.*
 import ch.chaosconnect.api.rohan.GameServiceGrpcKt
 import ch.chaosconnect.api.rohan.UserServiceGrpcKt
 import ch.chaosconnect.api.user.GetUserRequest
+import ch.chaosconnect.api.user.PlayerType
 import ch.chaosconnect.api.user.UpdateUserRequest
+import ch.chaosconnect.api.user.UserTokenContent
+import ch.chaosconnect.rohan.model.RegularUser
+import ch.chaosconnect.rohan.model.TemporaryUser
+import ch.chaosconnect.rohan.model.UserCredentials
 import ch.chaosconnect.rohan.services.GameService
 import ch.chaosconnect.rohan.services.UserService
 import io.grpc.ManagedChannel
@@ -51,21 +56,25 @@ internal class RohanEndpointTest {
     }
 
     @Test
-    fun `successful login returns identifier`(): Unit =
+    fun `successful login returns token content`(): Unit =
         runBlocking {
             coEvery {
                 userService.signInAsRegularUser(
                     "john",
                     "123"
                 )
-            } returns "token"
+            } returns TemporaryUser("identifier", "some name")
             val response = userServiceStub.getUser(
                 GetUserRequest.newBuilder()
                     .setUsername("john")
                     .setPassword("123").build()
             )
 
-            assertEquals("token", response.identifier)
+            val expectedResponse = UserTokenContent.newBuilder()
+                .setIdentifier("identifier")
+                .setPlayerType(PlayerType.TEMPORARY)
+                .build()
+            assertEquals(expectedResponse, response.token)
         }
 
     @Test
@@ -91,7 +100,7 @@ internal class RohanEndpointTest {
         runBlocking {
             coEvery {
                 userService.setPassword("newPw")
-            } returns "token"
+            } returns RegularUser("identifier", "some name", UserCredentials("username", "password-hash"))
             val response = userServiceStub.updateUser(
                 UpdateUserRequest.newBuilder()
                     .setPassword("newPw").build()
@@ -99,7 +108,11 @@ internal class RohanEndpointTest {
 
             coVerify { userService.setPassword("newPw") }
 
-            assertEquals("token", response.identifier)
+            val expectedResponse = UserTokenContent.newBuilder()
+                .setIdentifier("identifier")
+                .setPlayerType(PlayerType.REGULAR)
+                .build()
+            assertEquals(expectedResponse, response.token)
         }
 
     @Test
@@ -107,7 +120,7 @@ internal class RohanEndpointTest {
         runBlocking {
             coEvery {
                 userService.setDisplayName("newName")
-            } returns "token"
+            } returns TemporaryUser("identifier", "some name")
             val response = userServiceStub.updateUser(
                 UpdateUserRequest.newBuilder()
                     .setDisplayName("newName").build()
@@ -115,7 +128,36 @@ internal class RohanEndpointTest {
 
             coVerify { userService.setDisplayName("newName") }
 
-            assertEquals("token", response.identifier)
+            val expectedResponse = UserTokenContent.newBuilder()
+                .setIdentifier("identifier")
+                .setPlayerType(PlayerType.TEMPORARY)
+                .build()
+            assertEquals(expectedResponse, response.token)
+        }
+
+    @Test
+    fun `renew token works for existing user`(): Unit =
+        runBlocking {
+            coEvery {
+                userService.getCurrentUser()
+            } returns TemporaryUser("identifier", "some name")
+            val response = userServiceStub.renewToken(Empty.getDefaultInstance())
+
+            val expectedResponse = UserTokenContent.newBuilder()
+                .setIdentifier("identifier")
+                .setPlayerType(PlayerType.TEMPORARY)
+                .build()
+            assertEquals(expectedResponse, response.token)
+        }
+
+    @Test
+    fun `renew token fails for inexistent user`(): Unit =
+        runBlocking {
+            coEvery {
+                userService.getCurrentUser()
+            } throws IllegalStateException("Some Error")
+            val response = userServiceStub.renewToken(Empty.getDefaultInstance())
+            assertEquals("Some Error", response.failureReason)
         }
 
     @Test

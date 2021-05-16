@@ -7,6 +7,7 @@ import ch.chaosconnect.api.game.StartPlayingRequest
 import ch.chaosconnect.api.joestar.ChaosConnectServiceGrpcKt
 import ch.chaosconnect.api.joestar.WebLoginServiceGrpcKt
 import ch.chaosconnect.api.user.UserAuthResponse
+import ch.chaosconnect.api.user.UserTokenContent
 import ch.chaosconnect.joestar.services.GameStateService
 import ch.chaosconnect.joestar.services.RohanService
 import io.grpc.ManagedChannel
@@ -76,7 +77,9 @@ class JoestarEndpointTest {
                 "User",
                 "Password"
             )
-        } returns UserAuthResponse.newBuilder().setIdentifier("123456").build()
+        } returns UserAuthResponse.newBuilder()
+            .setToken(UserTokenContent.newBuilder().setIdentifier("123456"))
+            .build()
 
         val request = LoginRequest.newBuilder()
             .setUsername("User")
@@ -95,12 +98,12 @@ class JoestarEndpointTest {
         }
     }
 
-     @Test
-     fun `stopPlaying throws unauthenticated exception`(): Unit = runBlocking {
-         assertThrows<StatusException> {
-             chaosConnectServiceStub.stopPlaying(Empty.getDefaultInstance())
-         }
-     }
+    @Test
+    fun `stopPlaying throws unauthenticated exception`(): Unit = runBlocking {
+        assertThrows<StatusException> {
+            chaosConnectServiceStub.stopPlaying(Empty.getDefaultInstance())
+        }
+    }
 }
 
 @Factory

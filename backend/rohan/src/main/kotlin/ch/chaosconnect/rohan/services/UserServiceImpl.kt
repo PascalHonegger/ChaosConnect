@@ -26,7 +26,7 @@ class UserServiceImpl(private val storageService: StorageService) :
         name: String,
         password: String,
         displayName: String
-    ): String = signUp {
+    ): User {
         requireNotBlank(name, "User name")
         requireNotBlank(password, "Password")
         requireNotBlank(displayName, "Display name")
@@ -34,7 +34,7 @@ class UserServiceImpl(private val storageService: StorageService) :
         val credentials =
             UserCredentials(name = name, passwordHash = hashPassword(password))
 
-        when (val currentIdentifier = getCurrentIdentifier()) {
+        return when (val currentIdentifier = getCurrentIdentifier()) {
             null -> storageService.addUser {
                 RegularUser(
                     identifier = it,
@@ -55,29 +55,29 @@ class UserServiceImpl(private val storageService: StorageService) :
         }
     }
 
-    override suspend fun signInAsTemporaryUser(displayName: String): String =
-        signIn {
-            requireNotBlank(displayName, "Display name")
-            storageService.addUser { TemporaryUser(it, displayName) }
-        }
+    override suspend fun signUpAsTemporaryUser(displayName: String): User {
+        require(getCurrentIdentifier() == null) { "Already signed in" }
+        requireNotBlank(displayName, "Display name")
+        return storageService.addUser { TemporaryUser(it, displayName) }
+    }
 
     override suspend fun signInAsRegularUser(
         name: String,
         password: String
-    ): String = signIn {
-        storageService.findUser(name) {
+    ): User {
+        require(getCurrentIdentifier() == null) { "Already signed in" }
+        return storageService.findUser(name) {
             verifyPassword(
                 hash = it.credentials.passwordHash,
                 password = password
             )
-        }
-            ?: throw FailedLoginException("Sign-in failed")
+        } ?: throw FailedLoginException("Sign-in failed")
     }
 
-    override suspend fun setPassword(password: String): String = update {
+    override suspend fun setPassword(password: String): User {
         val currentIdentifier = getCurrentIdentifier()
         checkNotNull(currentIdentifier) { "No active user" }
-        storageService.updateUser(currentIdentifier) {
+        return storageService.updateUser(currentIdentifier) {
             when (it) {
                 is RegularUser -> it.copy(
                     credentials = it.credentials.copy(
@@ -89,10 +89,10 @@ class UserServiceImpl(private val storageService: StorageService) :
         }
     }
 
-    override suspend fun setDisplayName(displayName: String): String = update {
+    override suspend fun setDisplayName(displayName: String): User {
         val currentIdentifier = getCurrentIdentifier()
         checkNotNull(currentIdentifier) { "No active user" }
-        storageService.updateUser(currentIdentifier) {
+        return storageService.updateUser(currentIdentifier) {
             when (it) {
                 is RegularUser -> it.copy(displayName = displayName)
                 is TemporaryUser -> it.copy(displayName = displayName)
@@ -100,17 +100,12 @@ class UserServiceImpl(private val storageService: StorageService) :
         }
     }
 
-    private fun signIn(userProvider: () -> User): String =
-        when (getCurrentIdentifier()) {
-            null -> userProvider().identifier
-            else -> error("Already signed in")
-        }
-
-    private fun signUp(userProvider: () -> User): String =
-        userProvider().identifier
-
-    private fun update(userProvider: () -> User): String =
-        userProvider().identifier
+    override suspend fun getCurrentUser(): User {
+        val currentIdentifier = getCurrentIdentifier()
+        checkNotNull(currentIdentifier) { "No active user" }
+        return storageService.getUser(currentIdentifier)?.user
+            ?: throw AccountException("Provided user ID no longer exists")
+    }
 
     private fun hashPassword(password: String): String =
         argon2.hash(10, 65536, 1, password.toCharArray())

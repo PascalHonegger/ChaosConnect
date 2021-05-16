@@ -28,4 +28,5 @@ service UserService {
   rpc AddUser(api.user.AddUserRequest) returns (api.user.UserAuthResponse);
   rpc AddTemporaryUser(api.user.AddTemporaryUserRequest) returns (api.user.UserAuthResponse);
   rpc UpdateUser(api.user.UpdateUserRequest) returns (api.user.UserAuthResponse);
+  rpc RenewToken(api.common.Empty) returns (api.user.UserAuthResponse);
 }

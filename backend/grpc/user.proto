@@ -5,6 +5,11 @@ package api.user;
 option java_package = "ch.chaosconnect.api.user";
 option java_multiple_files = true;
 
+enum PlayerType {
+  TEMPORARY = 0;
+  REGULAR = 1;
+}
+
 message GetUserRequest {
   string username = 1;
   string password = 2;
@@ -27,9 +32,14 @@ message UpdateUserRequest {
   }
 }
 
+message UserTokenContent {
+  string identifier = 1;
+  PlayerType player_type = 2;
+}
+
 message UserAuthResponse {
   oneof response {
-    string identifier = 1;
+    UserTokenContent token = 1;
     string failure_reason = 2;
   }
 }
