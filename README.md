@@ -155,9 +155,8 @@ Kotlin is a modern, concise, and `null` safe programming language, which offer g
 For example, implementing parallel code using Kotlin coroutines is vastly easier than using plain old java.
 
 ## Svelte
-TODO: Rationale
-- Light-weight framework (suitable for small projects)
-- More?
+
+Svelte is a modern, light-weight SPA framework that meets the needs of small projects like ours.
 
 ## Envoy
 
