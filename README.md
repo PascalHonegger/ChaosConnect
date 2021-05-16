@@ -68,11 +68,17 @@ We use a custom solution based on symmetric JWT for authentication, as we did no
 We use streaming to propagate game state updates from Rohan to Joestar servers and from Joestar servers to Doppio clients.
 All other communication is request-based.
 
+### Asynchronicity
+
+The streaming API offers hooks for various events.
+The request-based API is asynchronous by nature as well, but allows for convenient programming styles that are similar to those common in synchronous contexts.
+
+| Control Flow           | Kotlin                                                      | TypeScript                                |
+| ---------------------- | ----------------------------------------------------------- | ----------------------------------------- |
+| Streams                | `kotlinx.coroutines.flow.Flow` + callback methods           | `ClientReadableStream` + callback methods |
+| 'Synchronous' Requests | `suspend fun` + `kotlinx.coroutines.BuildersKt.runBlocking` | `Promise` + `async` + `await`             |
+
 TODO:
-- gRPC:
-  - Blocking or non-blocking bindings: Relevant for programming (`suspend fun`s, `Promise`s + `async` + `await`)?
-  - Cancellation and timeouts: Relevant for programming (cancellation and timeout exceptions)?
-  - More?
 - JWT termination on Joestar servers
 - More?
 
