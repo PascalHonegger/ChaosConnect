@@ -120,9 +120,9 @@ TODO:
 - More?
 
 ## CI/CD
-TODO:
-- GitHub actions
-- More?
+We use [GitHub Actions](https://github.com/features/actions) to test and build ChaosConnect automatically.
+Every push is tested and built and Pull Requests can only be merged if all tests succeed.
+Creating a new [Release](https://github.com/PascalHonegger/ChaosConnect/releases) automatically builds and publishes all required [Packages](https://github.com/PascalHonegger?tab=packages&repo_name=ChaosConnect) such that users can run ChaosConnect with a specific version without needing to build the images themselves.
 
 ## PKI
 TODO:
