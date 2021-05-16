@@ -83,10 +83,18 @@ The request-based API is asynchronous by nature as well, but allows for convenie
 JWTs are issued and terminated by Joestar servers.
 
 ## Configuration
-TODO:
-- Locality
-- Processing
-- More?
+
+We use [Micronaut Application Configuration](https://docs.micronaut.io/latest/guide/index.html#config) to make some parts of the application configurable.
+These configurations can be set through the `application.yml` file at compile time or through an environment variable at runtime.
+The following configurations are probably the most interesting ones to configure, for a full list see the source code:
+
+- Joestar
+  - `JOESTAR_PORT`: The port at which Rohan is listening
+  - `ROHAN_SERVER`: The hostname or ip of the Rohan server
+  - `ROHAN_PORT`: The port at which Rohan is listening
+  - `JWT_SECRET`: The base-64 encoded 512-bit private key used for signing the JWT
+- Rohan
+  - `ROHAN_PORT`: The port at which Rohan is listening
 
 ## Maintainability
 TODO:
