@@ -59,7 +59,7 @@
             <PlayerList/>
         </div>
 
-        <div class="card">
+        <div class="card grid">
             <Grid/>
         </div>
     </div>
@@ -79,13 +79,16 @@
 
     .game {
         display: grid;
-        min-height: 250px;
         column-gap: var(--spacing);
         row-gap: var(--spacing);
     }
 
     .game > .card {
         display: grid;
+    }
+
+    .grid {
+        min-height: calc(var(--column-width) * 6 + var(--piece-size) * 2 + var(--spacing));
     }
 
     @media only screen and (min-width: 992px) {
