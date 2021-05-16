@@ -107,7 +107,6 @@ button:focus {
     left: 0;
     z-index: 10;
     display: grid;
-    align-items: center;
-    justify-items: center;
+    place-items: center;
     background-color: #2022253d;
 }
