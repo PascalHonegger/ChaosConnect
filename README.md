@@ -160,9 +160,11 @@ TODO: Rationale
 - More?
 
 ## Envoy
-TODO: Rationale
-- Compatibility (gRPC, JWT)?
-- More?
+
+Envoy is the only reverse proxy with official and native `grpc-web` support known to us.
+
+Envoy uses round-robin for load balancing and only considers servers for load balancing which fulfill a readiness check.
+For example, a Joestar instance without a valid rohan connection is not considered ready and will not be load-balanced.
 
 ## Symmetric JWT
 
