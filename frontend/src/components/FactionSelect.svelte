@@ -1,8 +1,9 @@
 <script lang="ts">
     import type { Faction } from "../gen/game_pb";
     import { startPlaying } from "../lib/ChaosConnectClient";
+import type { Player } from "../lib/GameState";
     import { authMetadata } from "../stores/Auth";
-    import { playerMap, playersByFaction } from "../stores/GameState";
+    import { playersByFaction } from "../stores/GameState";
     import Piece from "./Piece.svelte";
     import Spinner from "./Spinner.svelte";
 
@@ -26,9 +27,27 @@
     }
 
     function isUnbalanced(faction: Faction): boolean {
-        const teamSize = $playersByFaction.get(faction)?.length ?? 0;
-        const otherTeamSize = $playerMap.size - teamSize;
+        let teamSize = 0;
+        let otherTeamSize = 0;
+        for (const [key, players] of $playersByFaction) {
+            const count = countConnected(players);
+            if (key === faction) {
+                teamSize = count;
+            } else {
+                otherTeamSize = count;
+            }
+        }
         return teamSize - otherTeamSize >= MAX_TEAM_DIFFERENCE;
+    }
+
+    function countConnected(players: Player[]) {
+        let count = 0;
+        for (const p of players) {
+            if (!p.disconnected) {
+                count++;
+            }
+        }
+        return count;
     }
 </script>
 
@@ -43,7 +62,7 @@
         {#each [...$playersByFaction] as [faction, players]}
             <button disabled={isUnbalanced(faction)} on:click={() => chooseFaction(faction)}>
                 <Piece {faction} />
-                {players.length} Player{#if players.length !== 1}s{/if}
+                {countConnected(players)} Player{#if countConnected(players) !== 1}s{/if}
             </button>
         {/each}
     {/if}
