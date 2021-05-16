@@ -4,7 +4,7 @@ The modern, distributed and scalable implementation of a game inspired by Connec
 # Gameplay
 
 ## Rules
-- There are two main fractions: Yellow vs Red
+- There are two main factions: Yellow vs Red
 - There's only one big playing field for all players
 - Each player can make a move after a certain timeout
 - Other players cannot place a chip close to another chip for a certain timeout
@@ -14,7 +14,7 @@ The modern, distributed and scalable implementation of a game inspired by Connec
 - If a disk you placed is part of a 4 disk long line you get points, and the associated columns are cleared
 
 ## Future Plans
-- You get more points if you're on the losing fraction for balance purposes
+- You get more points if you're on the losing faction for balance purposes
 - You can exchange your points for perks and skins
 - To ensure fairness, some bots might be added to balance the teams
 
