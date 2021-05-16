@@ -149,10 +149,9 @@ Micronaut offers a couple of benefits:
 - It provides fast startup and performance by using build-time dependency injection
 
 ## Kotlin
-TODO: Rationale
-- Conciseness
-- `null` safety
-- More?
+
+Kotlin is a modern, concise, and `null` safe programming language, which offer great language and ecosystem support for gRPC.
+For example, implementing parallel code using Kotlin coroutines is vastly easier than using plain old java.
 
 ## Svelte
 TODO: Rationale
