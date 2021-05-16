@@ -125,10 +125,14 @@ Every push is tested and built and Pull Requests can only be merged if all tests
 Creating a new [Release](https://github.com/PascalHonegger/ChaosConnect/releases) automatically builds and publishes all required [Packages](https://github.com/PascalHonegger?tab=packages&repo_name=ChaosConnect) such that users can run ChaosConnect with a specific version without needing to build the images themselves.
 
 ## Hosting
-TODO:
-- Linode
-- Certbot
-- More?
+
+At the time of writing this, the latest stable version of ChaosConnect is deployed at [chaos.honegger.dev](https://chaos.honegger.dev/).
+We decided to use the cloud provider [Linode](https://www.linode.com/) because they provide fair pricing and a good free initial credit.
+
+Setting up hosting was very easy, you just copy the docker-compose.yml file, replace the placeholder jwt-secret with a generated one and you're almost ready to start.
+If you don't already have a valid certificate around, you can easily generate one using [Certbot](https://certbot.eff.org/) using a command similar to the following and mounting them to their corresponding location within the Speedwagon container:
+
+`sudo docker run -it --rm --name certbot -v "/etc/letsencrypt:/etc/letsencrypt" -v "/var/lib/letsencrypt:/var/lib/letsencrypt" -p 80:80 certbot/certbot certonly --standalone`
 
 # Design Decisions
 
