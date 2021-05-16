@@ -63,9 +63,13 @@ For example, this allows `Rohan` to send a game update event to all `Joestar` in
 
 We use a custom solution based on symmetric JWT for authentication, as we did not want to commit to the standard solution provided by the Micronaut framework (see [Symmetric JWT](#symmetric-jwt)).
 
+### Control flow
+
+We use streaming to propagate game state updates from Rohan to Joestar servers and from Joestar servers to Doppio clients.
+All other communication is request-based.
+
 TODO:
 - gRPC:
-  - Bidirectional streaming and control flow: Updates only? How bidirectional is it?
   - Blocking or non-blocking bindings: Relevant for programming (`suspend fun`s, `Promise`s + `async` + `await`)?
   - Cancellation and timeouts: Relevant for programming (cancellation and timeout exceptions)?
   - More?
