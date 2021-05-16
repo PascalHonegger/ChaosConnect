@@ -151,6 +151,14 @@ internal class UserServiceImplTest {
             }
         }
 
+    @ParameterizedTest
+    @ArgumentsSource(BlankStringProvider::class)
+    fun `setPassword does not accept blank password`(newPassword: String) = runSignedIn("some-id") {
+        assertThrowsWithMessage<IllegalArgumentException>("Password may not be blank") {
+            service.setPassword(newPassword)
+        }
+    }
+
     @Test
     fun `setPassword invalidates old password for signed in regular users`() {
         val name = "bob"
@@ -174,6 +182,14 @@ internal class UserServiceImplTest {
         }
         runSignedOut {
             service.signInAsRegularUser(name, newPassword)
+        }
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(BlankStringProvider::class)
+    fun `setDisplayName does not accept blank display name`(newDisplayName: String) = runSignedIn("some-id") {
+        assertThrowsWithMessage<IllegalArgumentException>("Display name may not be blank") {
+            service.setDisplayName(newDisplayName)
         }
     }
 

@@ -77,6 +77,7 @@ class UserServiceImpl(private val storageService: StorageService) :
     override suspend fun setPassword(password: String): User {
         val currentIdentifier = getCurrentIdentifier()
         checkNotNull(currentIdentifier) { "No active user" }
+        requireNotBlank(password, "Password")
         return storageService.updateUser(currentIdentifier) {
             when (it) {
                 is RegularUser -> it.copy(
@@ -92,6 +93,7 @@ class UserServiceImpl(private val storageService: StorageService) :
     override suspend fun setDisplayName(displayName: String): User {
         val currentIdentifier = getCurrentIdentifier()
         checkNotNull(currentIdentifier) { "No active user" }
+        requireNotBlank(displayName, "Display name")
         return storageService.updateUser(currentIdentifier) {
             when (it) {
                 is RegularUser -> it.copy(displayName = displayName)
