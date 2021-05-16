@@ -62,7 +62,7 @@ For example, this allows `Rohan` to send a game update event to all `Joestar` in
 ### Authentication
 
 Because we use gRPC for communication, which is based on HTTP, we send the authentication token in the [Authorization Header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization).
-We use a custom solution based on symmetric JWT for authentication, as we did not want to commit to a vendor-specific or work-in-progress solution (see [Symmetric JWT](#symmetric-jwt)).
+We use a custom solution based on symmetric JWT for authentication, as we did not want to commit to a vendor-specific or work-in-progress solution (see [Symmetric JWT](#symmetric-jwt) for details).
 
 ### Control flow
 
@@ -168,7 +168,7 @@ For example, a Joestar instance without a valid rohan connection is not consider
 
 ## Symmetric JWT
 
-We couldn't easily use the `micronaut-security` package because the feature is still WIP for gRPC (see [`micronaut-grpc` issue #164](https://github.com/micronaut-projects/micronaut-grpc/issues/164)).
+We couldn't easily use the `micronaut-security` package because the feature is still WIP for gRPC (see [`micronaut-grpc` issue #164](https://github.com/micronaut-projects/micronaut-grpc/issues/164) for details).
 The official token-based authentication works by using Google as a token provider, but we didn't want to have a vendor lock-in.
 
 In the end, we decided to use simple symmetric tokens because of the project scope.
