@@ -98,9 +98,11 @@ The following configurations are probably the most interesting ones to configure
   - `ROHAN_PORT`: The port at which Rohan is listening
 
 ## Maintainability
-TODO:
-- Testing: 200+ unit tests
-- More?
+
+We use state-of-the-art technology and are using the latest (!) version of everything (e. g. Kotlin version released a week ago, targeting JDK 16).
+
+We try to avoid unnecessary code cohesion and favor testability instead.
+Currently, we have more than 200 unit tests.
 
 # Infrastructure
 
