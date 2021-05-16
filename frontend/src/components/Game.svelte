@@ -80,8 +80,8 @@
     .game {
         display: grid;
         min-height: 250px;
-        column-gap: 2rem;
-        row-gap: 2rem;
+        column-gap: var(--spacing);
+        row-gap: var(--spacing);
     }
 
     .game > .card {
