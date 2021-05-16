@@ -115,10 +115,8 @@ The docker images are generally optimized for file size and try to use the small
 Our images also implement [Docker Healthchecks](https://docs.docker.com/engine/reference/builder/#healthcheck) which can be used to determine if a server is irrecoverably broken.
 
 ## Reverse Proxy
-TODO:
-- Responsibilities (overlap with [Separation of concerns](#separation-of-concerns)?)
-- Load Balancing strategy
-- More?
+
+We use a dockerized Envoy reverse proxy server as a load balancer.
 
 ## CI/CD
 We use [GitHub Actions](https://github.com/features/actions) to test and build ChaosConnect automatically.
