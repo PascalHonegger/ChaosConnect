@@ -201,6 +201,12 @@ docker-compose up --scale joestar=5 -d
 ```
 
 # Development
+
+## Prerequisites
+
+For local development JDK 16, Node 16 and a modern version of docker need to be installed.
+Our project also contains run configurations for IntelliJ, which is our IDE of choice.
+
 In order to run components natively in development mode, the following commands are good to get started:
 
 ```sh
